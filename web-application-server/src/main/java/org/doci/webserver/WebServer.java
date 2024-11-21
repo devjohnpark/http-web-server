@@ -40,9 +40,13 @@ public class WebServer {
         return webService;
     }
 
-    public void start() throws IOException {
-        log.debug("Web Application Server started - Host: {}, Port: {}.", serverSocket.getInetAddress().getHostName(), serverSocket.getLocalPort());
+    public void start() {
+        log.debug("Web Server started - Host: {}, Port: {}.", serverSocket.getInetAddress().getHostName(), serverSocket.getLocalPort());
         Connector connector = new Connector(serverSocket, webService);
-        connector.connect();
+        try {
+            connector.connect();
+        } catch (IOException e) {
+            log.error("Socket accept error on the Web Server - Host: {}, Port: {}.", serverSocket.getInetAddress().getHostName(), serverSocket.getLocalPort());
+        }
     }
 }
