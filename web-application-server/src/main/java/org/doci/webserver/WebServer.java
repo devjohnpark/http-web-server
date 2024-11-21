@@ -17,23 +17,27 @@ import java.util.List;
 // 클라이언트 연결 대기용 소켓 닫기 (커널 영역에 할당된 I/O 자원을 해제)
 public class WebServer {
     private static final Logger log = LoggerFactory.getLogger(WebServer.class);
-    private final ServerSocket serverSocket = new ServerSocket();
+    private int port = 8080;
+    private String hostName = "localhost";
     private final WebService webService = new WebService();
 
-    public WebServer(int port) throws IOException {
-        serverSocket.bind(new InetSocketAddress("localhost", port));
+    public WebServer() {}
+
+    public WebServer(int port) {
+        this.port = port;
     }
 
-    public WebServer(int port, String hostName) throws IOException {
-        serverSocket.bind(new InetSocketAddress(hostName, port));
+    public WebServer(int port, String hostName) {
+        this.port = port;
+        this.hostName = hostName;
     }
 
     public String getWebServerName() {
-        return serverSocket.getInetAddress().getHostName();
+        return hostName;
     }
 
     public int getWebServerPort() {
-        return serverSocket.getLocalPort();
+        return port;
     }
 
     public WebService getWebService() {
@@ -41,12 +45,13 @@ public class WebServer {
     }
 
     public void start() {
-        log.debug("Web Server started - Host: {}, Port: {}.", serverSocket.getInetAddress().getHostName(), serverSocket.getLocalPort());
-        Connector connector = new Connector(serverSocket, webService);
-        try {
+        log.debug("Web Server started - Host: {}, Port: {}.", hostName, port);
+        try(ServerSocket serverSocket = new ServerSocket()) {
+            serverSocket.bind(new InetSocketAddress(hostName, port));
+            Connector connector = new Connector(serverSocket, webService);
             connector.connect();
         } catch (IOException e) {
-            log.error("Socket accept error on the Web Server - Host: {}, Port: {}.", serverSocket.getInetAddress().getHostName(), serverSocket.getLocalPort());
+            log.error("Socket accept error on the Web Server - Host: {}, Port: {}.", hostName, port);
         }
     }
 }
