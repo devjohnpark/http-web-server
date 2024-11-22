@@ -26,7 +26,6 @@ public class Executor {
             for (WebServer webServer: allWebServers) {
                 executor.submit(webServer::start);
             }
-            executor.shutdown();
         }
     }
 }
