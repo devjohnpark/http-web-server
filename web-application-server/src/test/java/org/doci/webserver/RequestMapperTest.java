@@ -1,7 +1,7 @@
 package org.doci.webserver;
 
-import org.doci.http.api.AbstractHttpApiHandler;
 import org.doci.http.api.DefaultHttpApiHandler;
+import org.doci.http.api.HttpApiHandler;
 import org.doci.http.api.LoginHttpApiHandler;
 import org.doci.webresource.WebResourceProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ class RequestMapperTest {
     @BeforeEach
     void setUp() {
 
-        Map<String, AbstractHttpApiHandler> requestMappings = Map.of(
+        Map<String, HttpApiHandler> requestMappings = Map.of(
                 "/", new DefaultHttpApiHandler(),
                 "/user/create", new LoginHttpApiHandler()
         );

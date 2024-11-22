@@ -1,43 +1,37 @@
 package org.doci.webserver;
 
-import org.doci.http.api.AbstractHttpApiHandler;
 import org.doci.http.api.DefaultHttpApiHandler;
+import org.doci.http.api.HttpApiHandler;
 import org.doci.webresource.WebResourceProvider;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class WebService {
-    private Map<String, AbstractHttpApiHandler> services = new HashMap<>();
+    private Map<String, HttpApiHandler> services = new HashMap<>();
     private String webResourceBase = "webapp";
 
-    public void addService(String path, AbstractHttpApiHandler service) {
-        services.put(path, service);
+    public WebService() {
+        services.put("/", new DefaultHttpApiHandler());
     }
 
-    public void setServices(Map<String, AbstractHttpApiHandler> services) {
-        this.services = new HashMap<>(services);
+    public WebService addService(String path, HttpApiHandler service) {
+        services.put(path, service);
+        return this;
     }
 
     public void setWebResourceBase(String webResourceBase) {
         this.webResourceBase = webResourceBase;
     }
 
-    public Map<String, AbstractHttpApiHandler> getServices() {
-        inputDefaultService(webResourceBase);
-        initServices(new WebResourceProvider(webResourceBase));
-        return services;
+    public Map<String, HttpApiHandler> getServices() {
+        return initServices(new WebResourceProvider(webResourceBase));
     }
 
-    private void initServices(WebResourceProvider webResourceProvider) {
-        for (AbstractHttpApiHandler service : services.values()) {
+    private Map<String, HttpApiHandler> initServices(WebResourceProvider webResourceProvider) {
+        for (HttpApiHandler service : services.values()) {
             service.init(webResourceProvider);
         }
-    }
-
-    private void inputDefaultService(String webBase) {
-        if (webResourceBase.equals("webapp")) {
-            services.put("/", new DefaultHttpApiHandler());
-        }
+        return services;
     }
 }

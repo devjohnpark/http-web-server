@@ -20,20 +20,13 @@ class WebServiceTest {
     }
 
     @Test
-    void addService() {
-        webService.addService("/user", new LoginHttpApiHandler());
-        assertEquals(LoginHttpApiHandler.class, webService.getServices().get("/user").getClass());
+    void getService_default() {
+        assertEquals(DefaultHttpApiHandler.class, webService.getServices().get("/").getClass());
     }
 
     @Test
-    void setServices() {
-        Map<String, AbstractHttpApiHandler> webServices = Map.of(
-                "/", new DefaultHttpApiHandler(),
-                "/user", new LoginHttpApiHandler()
-        );
-
-        webService.setServices(webServices);
-        assertEquals(DefaultHttpApiHandler.class, webService.getServices().get("/").getClass());
+    void addService() {
+        webService.addService("/user", new LoginHttpApiHandler());
         assertEquals(LoginHttpApiHandler.class, webService.getServices().get("/user").getClass());
     }
 }

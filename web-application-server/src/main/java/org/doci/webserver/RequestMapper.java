@@ -9,9 +9,9 @@ import java.util.Map;
 
 public class RequestMapper {
     private static final Logger log = LoggerFactory.getLogger(RequestMapper.class);
-    private final Map<String, AbstractHttpApiHandler> requestMappings; // new HashMap<String, HttpApiHandler>()
+    private final Map<String, HttpApiHandler> requestMappings; // new HashMap<String, HttpApiHandler>()
 
-    public RequestMapper(Map<String, AbstractHttpApiHandler> requestMappings) {
+    public RequestMapper(Map<String, HttpApiHandler> requestMappings) {
          this.requestMappings = requestMappings;
     }
 
