@@ -13,8 +13,8 @@ public class Connector {
     private final WebService webService;
 
 
-    public Connector(ServerSocket serverSocket, WebService webService) {
-        this.listenSocket = serverSocket;
+    public Connector(ServerSocket listenSocket, WebService webService) {
+        this.listenSocket = listenSocket;
         this.webService = webService;
     }
 

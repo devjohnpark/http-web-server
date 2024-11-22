@@ -1,15 +1,12 @@
 package org.doci.webserver;
 
-import org.doci.http.api.AbstractHttpApiHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.util.List;
 
-// WebServer
 // main 메서드 인자값으로 포트 번호를 받을 수 있도록 구현
 // HTTP는 TCP/IP 위에서 동작하기 때문에, 연결 요청 대기용 소켓을 생성하고 Port 번호와 IP를 바인딩한다. 그래야 어떤 디바이스와 프로세스로 패킷이 송수신 될지 결정된다.
 // 소켓을 listen 상태로 변경해서 클라이언트의 요청을 대기한다.
@@ -32,11 +29,11 @@ public class WebServer {
         this.hostName = hostName;
     }
 
-    public String getWebServerName() {
+    public String getHostName() {
         return hostName;
     }
 
-    public int getWebServerPort() {
+    public int getPort() {
         return port;
     }
 

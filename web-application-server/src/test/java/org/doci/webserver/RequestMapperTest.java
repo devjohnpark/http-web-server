@@ -22,8 +22,8 @@ class RequestMapperTest {
     void setUp() {
 
         Map<String, AbstractHttpApiHandler> requestMappings = Map.of(
-                "/", new DefaultHttpApiHandler(webResourceProvider),
-                "/user/create", new LoginHttpApiHandler(webResourceProvider)
+                "/", new DefaultHttpApiHandler(),
+                "/user/create", new LoginHttpApiHandler()
         );
         requestMapper = new RequestMapper(requestMappings);
     }

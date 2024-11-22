@@ -3,7 +3,6 @@ package org.doci.webserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +17,7 @@ public class Executor {
     private Executor() {}
 
     public static void addWebServer(WebServer webServer) {
-        webServers.put(webServer.getWebServerPort(), webServer);
+        webServers.put(webServer.getPort(), webServer);
     }
 
     public static void execute() {
