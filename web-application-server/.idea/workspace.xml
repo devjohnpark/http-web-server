@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6178ed4d-1cd8-4675-815e-e66435613216" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/.idea/uiDesigner.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/gradlew" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/gradlew.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/settings.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/api/AbstractHttpApiHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/api/AbstractHttpApiHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/api/DefaultHttpApiHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/api/DefaultHttpApiHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/api/HttpApiHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/api/HttpApiHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/api/LoginHttpApiHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/api/LoginHttpApiHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/request/HttpMethod.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/request/HttpMethod.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/request/HttpRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/request/HttpRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/request/HttpVersion.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/request/HttpVersion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/request/RequestHeaders.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/request/RequestHeaders.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/request/RequestLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/request/RequestLine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/request/RequestParameters.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/request/RequestParameters.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/response/HttpResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/response/HttpResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/response/HttpStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/response/HttpStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/response/ResponseHeaders.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/response/ResponseHeaders.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/response/StatusLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/response/StatusLine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/http/util/HttpParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/http/util/HttpParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/util/DateFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/util/DateFormatter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webresource/Resource.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webresource/Resource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webresource/ResourceProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webresource/ResourceProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webresource/ResourceType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webresource/ResourceType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webresource/WebResourceProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webresource/WebResourceProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webserver/Connector.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webserver/Connector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webserver/Executor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webserver/Executor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webserver/RequestHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webserver/RequestHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webserver/RequestMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webserver/RequestMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webserver/WebServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webserver/WebServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webserver/WebServerLauncher.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webserver/WebServerLauncher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/doci/webserver/WebService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/java/org/doci/webserver/WebService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/logback.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/main/resources/logback.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/request/HttpMethodTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/request/HttpMethodTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/request/HttpRequestTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/request/HttpRequestTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/request/HttpVersionTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/request/HttpVersionTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/request/RequestHeadersTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/request/RequestHeadersTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/request/RequestLineTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/request/RequestLineTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/request/RequestParametersTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/request/RequestParametersTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/response/HttpResponseTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/response/HttpResponseTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/response/ResponseHeadersTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/response/ResponseHeadersTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/response/StatusLineTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/response/StatusLineTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/util/HttpParserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/util/HttpParserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/http/util/SplitTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/http/util/SplitTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/webresource/ContentTypeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/webresource/ContentTypeTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/webresource/WebResourceProviderTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/webresource/WebResourceProviderTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/webserver/RequestMapperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/webserver/RequestMapperTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/org/doci/webserver/WebServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/java/org/doci/webserver/WebServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/http_req_get_only_path.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/resources/http_req_get_only_path.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/http_req_get_query-string.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/resources/http_req_get_query-string.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/http_req_post.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/resources/http_req_post.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/http_req_post_content-type_text.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/resources/http_req_post_content-type_text.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/http_req_post_negative_content-length.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/resources/http_req_post_negative_content-length.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/http_req_post_non_content-length.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/resources/http_req_post_non_content-length.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/http_req_post_non_content-type.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/resources/http_req_post_non_content-type.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/http_req_post_request-params_duplication.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/src/test/resources/http_req_post_request-params_duplication.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webapp/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/webapp/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webapp/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../http-web-server/webapp/index.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="2pBteM1JesxkFqnFn4bPBCHQh0K" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JUnit.org.doci in web-application-server.test.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="org.doci in web-application-server.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="web-application-server.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.doci.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.doci" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.org.doci in web-application-server.test" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9f38398b9061-18abd8497189-intellij.indexing.shared.core-IU-241.14494.240" />
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-IU-241.14494.240" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6178ed4d-1cd8-4675-815e-e66435613216" name="Changes" comment="" />
+      <created>1732251392066</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1732251392066</updated>
+      <workItem from="1732251393445" duration="1075000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
