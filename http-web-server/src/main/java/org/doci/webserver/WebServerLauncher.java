@@ -15,7 +15,5 @@ public class WebServerLauncher {
         Executor.addWebServer(server1);
         Executor.addWebServer(server2);
         Executor.execute();
-//        WebServer webServer = new WebServer();
-//        webServer.start();
     }
 }

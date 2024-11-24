@@ -21,7 +21,7 @@ public class RequestLine {
         HttpMethod method = HttpMethod.valueOf(tokens[0]);
         Uri uri = getUri(tokens[1]);
         HttpVersion version = HttpVersion.fromString(tokens[2]);
-        return new RequestLine(method, uri.path, uri.queryString, version);
+        return new RequestLine(method, uri.path(), uri.queryString(), version);
     }
 
     private static Uri getUri(String uri) {
