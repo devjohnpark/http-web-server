@@ -110,11 +110,11 @@ class HttpRequestTest {
     }
 
     @Test
-    void post_getAllBody() throws IOException {
+    void post_getAllBodyAsString() throws IOException {
         // given, when
         createHttpRequest("http_req_post_content-type_text.txt");
 
         // then
-        assertThat(httpRequest.getAllBody()).isEqualTo("hello world");
+        assertThat(httpRequest.getAllBodyAsString()).isEqualTo("hello world");
     }
 }

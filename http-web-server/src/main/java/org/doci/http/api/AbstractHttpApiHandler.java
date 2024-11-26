@@ -56,9 +56,9 @@ public abstract class AbstractHttpApiHandler implements HttpApiHandler {
     private void sendDefaultError(HttpRequest request, HttpResponse response) {
         HttpVersion protocol = request.getHttpVersion();
         if (protocol.equals(HttpVersion.HTTP_0_9) || protocol.equals(HttpVersion.HTTP_1_0)) {
-            response.sendError(HttpStatus.METHOD_NOT_ALLOWED);
-        } else {
             response.sendError(HttpStatus.BAD_REQUEST);
+        } else {
+            response.sendError(HttpStatus.METHOD_NOT_ALLOWED);
         }
     }
 }

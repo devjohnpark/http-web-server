@@ -29,6 +29,11 @@ public class HttpResponse {
         return this;
     }
 
+    public HttpResponse addConnection(boolean isKeepAlive) {
+        this.headers.addHeader(ResponseHeaders.CONNECTION, isKeepAlive ? "keep-alive" : "close");
+        return this;
+    }
+
     public void send(HttpStatus status) {
         send(status, null, null);
     }

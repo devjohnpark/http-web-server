@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WebService {
-    private Map<String, HttpApiHandler> services = new HashMap<>();
+    private final Map<String, HttpApiHandler> services = new HashMap<>();
     private String webResourceBase = "webapp";
 
     public WebService() {

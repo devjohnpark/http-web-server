@@ -47,15 +47,19 @@ public class HttpRequest {
     private void setParameters() throws IOException {
         parameters.addRequestParameters(requestLine.getQueryString());
         if (ResourceType.URL.getMimeType().equals(headers.getContentType())) {
-            parameters.addRequestParameters(getAllBody());
+            parameters.addRequestParameters(getAllBodyAsString());
         }
     }
 
-    public String getAllBody() throws IOException {
+    public String getAllBodyAsString() throws IOException {
         int contentLength = headers.getContentLength();
         char[] body = new char[contentLength];
         int actualLength = br.read(body, 0, contentLength);
         return String.copyValueOf(body, 0, actualLength);
+    }
+
+    public byte[] getBodyAsBytes() throws IOException {
+        return getAllBodyAsString().getBytes(StandardCharsets.UTF_8);
     }
 
     public BufferedReader getBufferedReader() { return br; }
