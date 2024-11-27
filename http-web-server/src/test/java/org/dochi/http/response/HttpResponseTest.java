@@ -1,5 +1,7 @@
 package org.dochi.http.response;
 
+import org.dochi.http.request.HttpVersion;
+import org.dochi.http.request.RequestHeaders;
 import org.dochi.webresource.ResourceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,5 +80,45 @@ class HttpResponseTest {
         String result = outputStream.toString();
         assertFalse(result.contains("Content-Type:"));
         assertFalse(result.contains("Content-Length:"));
+    }
+
+    @Test
+    void addHeader() {
+        response.addHeader("Last-Modified", "Sat, 07 Feb xxxx");
+
+        response.send(HttpStatus.OK);
+
+        String result = outputStream.toString();
+        assertTrue(result.contains("Last-Modified: " + "Sat, 07 Feb xxxx"));
+    }
+
+    @Test
+    void addVersion() {
+        response.addVersion(HttpVersion.HTTP_1_1);
+
+        response.send(HttpStatus.OK);
+
+        String result = outputStream.toString();
+        assertTrue(result.contains("HTTP/1.1"));
+    }
+
+    @Test
+    void addConnection() {
+        response.addConnection(true);
+
+        response.send(HttpStatus.OK);
+
+        String result = outputStream.toString();
+        assertTrue(result.contains("Connection: " + "keep-alive"));
+    }
+
+    @Test
+    void addCookie() {
+        response.addCookie("sessionId=abc123");
+
+        response.send(HttpStatus.OK);
+
+        String result = outputStream.toString();
+        assertTrue(result.contains("Cookie: " + "sessionId=abc123"));
     }
 }

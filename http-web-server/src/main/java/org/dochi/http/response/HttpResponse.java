@@ -19,6 +19,11 @@ public class HttpResponse {
         this.dos = new DataOutputStream(out);
     }
 
+    public HttpResponse addHeader(String key, String value) {
+        this.headers.addHeader(key, value);
+        return this;
+    }
+
     public HttpResponse addCookie(String cookie) {
         this.headers.addHeader(ResponseHeaders.SET_COOKIE, cookie);
         return this;
