@@ -1,6 +1,0 @@
-2024-11-23 00:04:50.806 [main] DEBUG org.dochi.webserver.WebServer - Web Server started - Host: localhost, Port: 8080.
-2024-11-23 00:05:08.764 [Thread-1] DEBUG org.dochi.webserver.RequestHandler - New client connected IP: /127.0.0.1, Port: 54028
-2024-11-23 00:05:08.763 [Thread-0] DEBUG org.dochi.webserver.RequestHandler - New client connected IP: /127.0.0.1, Port: 54027
-2024-11-23 00:05:26.616 [main] DEBUG org.dochi.webserver.WebServer - Web Server started - Host: localhost, Port: 8080.
-2024-11-23 00:05:30.790 [Thread-1] DEBUG org.dochi.webserver.RequestHandler - New client connected IP: /127.0.0.1, Port: 54039
-2024-11-23 00:05:30.789 [Thread-0] DEBUG org.dochi.webserver.RequestHandler - New client connected IP: /127.0.0.1, Port: 54038

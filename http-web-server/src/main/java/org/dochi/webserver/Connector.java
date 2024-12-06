@@ -21,7 +21,8 @@ public class Connector {
     public void connect() throws IOException {
         Socket establishedSocket;
         RequestMapper requestMapper = new RequestMapper(webService.getServices());
-        // accept(): 클라이언트와 연결 요청을 할때까지 block 되고 연결 요청 수락시 새로운 소켓을 생성, 따라서 acceptedSocket은 null 값이 될수 없음
+        // webService.getServices() 가져와서 init
+        // 스레드 모두 실행하고 나서 destroy
         while ((establishedSocket = listenSocket.accept()) != null) {
             RequestHandler requestHandler = new RequestHandler(establishedSocket, requestMapper); // RequestMapper 제공
             requestHandler.start();
