@@ -3,9 +3,9 @@
 ## VERSION
 
 - 0.0.0 
-	- HTTP request data processing
-	- HTTP response data processing
-	- HTTP API processing
+	- HTTP request data processing.
+	- HTTP response data processing.
+	- HTTP API processing.
 - 0.0.1
 	- Support virtual servers by port and domain by.
 
