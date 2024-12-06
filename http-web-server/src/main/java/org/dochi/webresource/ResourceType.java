@@ -7,6 +7,7 @@ public enum ResourceType {
     XML(".xml", "application/xml"),
     CSS(".css", "text/css"),
     PNG(".png", "image/png"),
+    ICO(".ico", "image/x-icon"),
     JPEG(".jpeg", "image/jpeg"),
     JSON(".json", "application/json"),
     URL(".url", "application/x-www-form-urlencoded");

@@ -17,6 +17,10 @@ public class Executor {
     private Executor() {}
 
     public static void addWebServer(WebServer webServer) {
+        if (webServers.containsKey(webServer.getPort())) {
+            log.error("Web server already exists: {}", webServer.getPort());
+            throw new IllegalArgumentException("Web server has already exists.");
+        }
         webServers.put(webServer.getPort(), webServer);
     }
 
