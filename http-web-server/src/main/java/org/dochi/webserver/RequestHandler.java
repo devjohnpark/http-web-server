@@ -2,6 +2,7 @@ package org.dochi.webserver;
 
 import org.dochi.http.api.HttpApiHandler;
 import org.dochi.http.request.HttpRequest;
+import org.dochi.http.request.HttpVersion;
 import org.dochi.http.response.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ public class RequestHandler extends Thread {
         ) {
             HttpRequest request = new HttpRequest(in);
             HttpResponse response = new HttpResponse(out);
+            response.addVersion(request.getHttpVersion());
             HttpApiHandler httpApiHandler = requestMapper.getHttpApiHandler(request.getPath());
             httpApiHandler.handleApi(request, response);
         } catch (IOException e) {
@@ -35,4 +37,3 @@ public class RequestHandler extends Thread {
         }
     }
 }
-

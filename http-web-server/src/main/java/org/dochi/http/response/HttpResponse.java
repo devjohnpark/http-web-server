@@ -43,6 +43,7 @@ public class HttpResponse {
         send(status, null, null);
     }
 
+    // writeHttpResMessage에서 클라이언트와 연결 끊기면 IOException의 하위 클래스인 SocketException 처리해야한다.
     public void send(HttpStatus status, byte[] body, String contentType) {
         addStatus(status);
         addHeaders(contentType, body != null ? body.length : null);
@@ -62,10 +63,11 @@ public class HttpResponse {
     }
 
     private void addHeaders(String contentType, Integer contentLength) {
-        this.headers.addHeader(ResponseHeaders.SERVER, "doci");
+        this.headers.addHeader(ResponseHeaders.SERVER, "dochi");
         this.headers.addHeader(ResponseHeaders.DATE, DateFormatter.getCurrentDate());
         this.headers.addHeader(ResponseHeaders.CONTENT_TYPE, contentType);
         this.headers.addHeader(ResponseHeaders.CONTENT_LENGTH, contentLength != null ? String.valueOf(contentLength) : null);
+        this.headers.addHeader(ResponseHeaders.CONNECTION, "keep-alive");
     }
 
     private void writeHttpResMessage(byte[] body) {
@@ -94,7 +96,9 @@ public class HttpResponse {
         if (body != null) {
             dos.write(body, 0, body.length);
         }
-        dos.writeBytes("\r\n");
+        // \r\n\r\n은 헤더와 본문을 구분하는 구분자이다. 이 구분자가 body 끝에 추가되면, 헤더만 응답한 경우가 된다. 이는 브라우저는 이를 "응답이 끝났고 새로운 요청을 시작할 수 있다"는 신호로 해석할 수 있다.
+        //  그래서 만약 응답 본문 끝에 \r\n\r\n이 추가되면, 브라우저는 Connection을 닫았다고 판단하고, 이후 요청에서 새로운 소켓 연결을 시도한다.
+//        dos.writeBytes("\r\n");
         dos.flush(); // 스트림 버퍼의 데이터를 OS의 네트워크 스택인 TCP(socket) 버퍼에 즉시 전달 보장 (DataOutputStream은 8바이트의 버퍼 하나 존재)
     }
 }

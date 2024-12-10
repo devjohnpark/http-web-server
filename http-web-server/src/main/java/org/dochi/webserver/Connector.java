@@ -21,11 +21,14 @@ public class Connector {
     public void connect() throws IOException {
         Socket establishedSocket;
         RequestMapper requestMapper = new RequestMapper(webService.getServices());
+        int threadCnt = 0;
         // webService.getServices() 가져와서 init
         // 스레드 모두 실행하고 나서 destroy
         while ((establishedSocket = listenSocket.accept()) != null) {
-            RequestHandler requestHandler = new RequestHandler(establishedSocket, requestMapper); // RequestMapper 제공
+            threadCnt++;
+            RequestHandlerTimeout2 requestHandler = new RequestHandlerTimeout2(establishedSocket, requestMapper); // RequestMapper 제공
             requestHandler.start();
+            log.debug("Thread Count: {}", threadCnt);
         }
     }
 }

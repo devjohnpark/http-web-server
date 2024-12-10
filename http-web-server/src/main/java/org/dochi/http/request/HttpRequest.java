@@ -1,6 +1,7 @@
 package org.dochi.http.request;
 
 import java.io.*;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
 import org.dochi.webresource.ResourceType;
@@ -14,22 +15,26 @@ public class HttpRequest {
     private final RequestHeaders headers = new RequestHeaders();
     private final RequestParameters parameters = new RequestParameters();
 
-    public HttpRequest(InputStream in) {
-        try {
-            this.br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            processHttpRequest();
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void processHttpRequest() throws IOException {
+    public HttpRequest(InputStream in) throws IOException, IllegalArgumentException {
+        this.br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
         requestLine = getRequestLine();
         setHeaders();
         setParameters();
+//        try {
+//            this.br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+//            processHttpRequest();
+//        } catch (IOException e) {
+//            log.error("HttpRequest " + e.getMessage());
+//        }
     }
 
-    private RequestLine getRequestLine() throws IOException {
+//    private void processHttpRequest() throws IOException, IllegalArgumentException {
+//        requestLine = getRequestLine();
+//        setHeaders();
+//        setParameters();
+//    }
+
+    private RequestLine getRequestLine() throws IOException, IllegalArgumentException {
         String line = br.readLine();
         if (line == null) {
             throw new IllegalStateException();
