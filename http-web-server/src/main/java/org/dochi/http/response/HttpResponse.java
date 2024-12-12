@@ -39,22 +39,21 @@ public class HttpResponse {
         return this;
     }
 
-    public void send(HttpStatus status) {
+    public void send(HttpStatus status) throws IOException {
         send(status, null, null);
     }
 
-    // writeHttpResMessage에서 클라이언트와 연결 끊기면 IOException의 하위 클래스인 SocketException 처리해야한다.
-    public void send(HttpStatus status, byte[] body, String contentType) {
+    public void send(HttpStatus status, byte[] body, String contentType) throws IOException {
         addStatus(status);
         addHeaders(contentType, body != null ? body.length : null);
         writeHttpResMessage(body);
     }
 
-    public void sendError(HttpStatus status) {
+    public void sendError(HttpStatus status) throws IOException {
         sendError(status, status.getDescription());
     }
 
-    public void sendError(HttpStatus status, String errorMessage) {
+    public void sendError(HttpStatus status, String errorMessage) throws IOException {
         send(status, errorMessage.getBytes(), ResourceType.TEXT.getMimeType());
     }
 
@@ -67,17 +66,12 @@ public class HttpResponse {
         this.headers.addHeader(ResponseHeaders.DATE, DateFormatter.getCurrentDate());
         this.headers.addHeader(ResponseHeaders.CONTENT_TYPE, contentType);
         this.headers.addHeader(ResponseHeaders.CONTENT_LENGTH, contentLength != null ? String.valueOf(contentLength) : null);
-        this.headers.addHeader(ResponseHeaders.CONNECTION, "keep-alive");
     }
 
-    private void writeHttpResMessage(byte[] body) {
-        try {
-            writeStatusLine();
-            writeHeaders();
-            writeBody(body);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
+    private void writeHttpResMessage(byte[] body) throws IOException {
+        writeStatusLine();
+        writeHeaders();
+        writeBody(body);
     }
 
     private void writeStatusLine() throws IOException {

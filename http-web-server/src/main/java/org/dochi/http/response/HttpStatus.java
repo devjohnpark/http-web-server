@@ -5,7 +5,9 @@ public enum HttpStatus {
     BAD_REQUEST(400, "Bad Request", "The server cannot or will not process the request."),
     NOT_FOUND(404, "Not Found", "The requested resource could not be found."),
     METHOD_NOT_ALLOWED(405, "Method Not Allowed", "The request method is known by the server but is not supported by the target resource."),
-    NOT_IMPLEMENTED(501, "Not Implemented", "The request method is not supported by the server and cannot be handled.");
+    NOT_IMPLEMENTED(501, "Not Implemented", "The request method is not supported by the server and cannot be handled."),
+    REQUEST_TIMEOUT(408, "Request Timeout", "Failed to process request in time. Please try again."),
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error", "The server was unable to complete your request. Please try again later.");
 
     private final int code;
     private final String codeMessage;

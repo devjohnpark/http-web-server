@@ -16,7 +16,7 @@ public class RequestLine {
         this.version = version;
     }
 
-    public static RequestLine createFromRequestLine(String requestLine) {
+    public static RequestLine createFromRequestLine(String requestLine) throws IllegalArgumentException {
         String[] tokens = HttpParser.parseRequestLine(requestLine);
         HttpMethod method = HttpMethod.valueOf(tokens[0]);
         Uri uri = getUri(tokens[1]);
