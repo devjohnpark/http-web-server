@@ -22,6 +22,11 @@ public abstract class AbstractHttpApiHandler implements HttpApiHandler {
     }
 
     @Override
+    public void destroy() {
+        // Noting by default
+    }
+
+    @Override
     public void handleApi(HttpRequest request, HttpResponse response) throws IOException {
         HttpMethod method = request.getMethod();
         if (HttpMethod.GET.equals(method)) {

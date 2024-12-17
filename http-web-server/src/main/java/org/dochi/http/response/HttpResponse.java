@@ -24,20 +24,20 @@ public class HttpResponse {
         return this;
     }
 
-    public HttpResponse addCookie(String cookie) {
-        this.headers.addHeader(ResponseHeaders.SET_COOKIE, cookie);
-        return this;
-    }
+//    public HttpResponse addCookie(String cookie) {
+//        this.headers.addHeader(ResponseHeaders.SET_COOKIE, cookie);
+//        return this;
+//    }
 
     public HttpResponse addVersion(HttpVersion version) {
         this.statusLine.setVersion(version);
         return this;
     }
 
-    public HttpResponse addConnection(boolean isKeepAlive) {
-        this.headers.addHeader(ResponseHeaders.CONNECTION, isKeepAlive ? "keep-alive" : "close");
-        return this;
-    }
+//    public HttpResponse addConnection(boolean isKeepAlive) {
+//        this.headers.addHeader(ResponseHeaders.CONNECTION, isKeepAlive ? "keep-alive" : "close");
+//        return this;
+//    }
 
     public void send(HttpStatus status) throws IOException {
         send(status, null, null);

@@ -1,4 +1,4 @@
-package org.dochi.webserver;
+package org.dochi.webserver.config;
 
 public class KeepAlive {
     private int keepAliveTimeout = 3000; // -1: unlimited

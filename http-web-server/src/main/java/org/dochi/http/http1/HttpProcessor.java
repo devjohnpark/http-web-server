@@ -70,8 +70,8 @@ public class HttpProcessor {
             return moreRequestsPossible;
         } catch (IOException e) {
             handleRequestException(e);
+            return false;
         }
-        return false;
     }
 
     private boolean shouldKeepAlive(SocketWrapper socketWrapper) {
@@ -117,7 +117,7 @@ public class HttpProcessor {
             log.error("Failed response internal server error: {}", e.getMessage());
         }
     }
-    
+
     private boolean isKeepAlive() {
         if (request.getHttpVersion().equals(HttpVersion.HTTP_1_1) && !request.getHeader(RequestHeaders.CONNECTION).equalsIgnoreCase("close")) {
             return true;

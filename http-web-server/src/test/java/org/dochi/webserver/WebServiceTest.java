@@ -2,6 +2,7 @@ package org.dochi.webserver;
 
 import org.dochi.http.api.DefaultHttpApiHandler;
 import org.dochi.http.api.LoginHttpApiHandler;
+import org.dochi.webserver.config.WebService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,5 +1,6 @@
 package org.dochi.webserver;
 
+import org.dochi.webserver.context.ServerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,24 +13,34 @@ import java.util.concurrent.Executors;
 
 public class Executor {
     private static final Logger log = LoggerFactory.getLogger(Executor.class);
-    private static final Map<Integer, WebServer> webServers = new HashMap<>();
+    private static final Map<Integer, ServerContext> servers = new HashMap<>();
 
     private Executor() {}
 
     public static void addWebServer(WebServer webServer) {
-        if (webServers.containsKey(webServer.getPort())) {
+        if (servers.containsKey(webServer.getPort())) {
             log.error("Web server already exists: {}", webServer.getPort());
             throw new IllegalArgumentException("Web server has already exists.");
         }
-        webServers.put(webServer.getPort(), webServer);
+        servers.put(webServer.getPort(), new ServerContext(webServer));
     }
 
     public static void execute() {
-        List<WebServer> allWebServers = new ArrayList<>(webServers.values());
+        List<ServerContext> allWebServers = new ArrayList<>(servers.values());
         try(ExecutorService executor = Executors.newFixedThreadPool(allWebServers.size())) {
-            for (WebServer webServer: allWebServers) {
-                executor.submit(webServer::start);
+            for (ServerContext serverContext: allWebServers) {
+                executor.submit(serverContext::start);
             }
+            registerShutdownHook(allWebServers);
         }
+    }
+
+    private static void registerShutdownHook(List<ServerContext> allWebServers) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("Execute hook just before JVM shutdown: 웹 서버 중지 시작");
+            for (ServerContext serverContext: allWebServers) {
+                serverContext.stop();
+            }
+        }));
     }
 }

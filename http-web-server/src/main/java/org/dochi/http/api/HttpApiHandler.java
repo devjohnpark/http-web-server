@@ -9,4 +9,5 @@ import java.io.IOException;
 public interface HttpApiHandler {
     void init(WebResourceProvider webResourceProvider);
     void handleApi(HttpRequest request, HttpResponse response) throws IOException;
+    void destroy();
 }
