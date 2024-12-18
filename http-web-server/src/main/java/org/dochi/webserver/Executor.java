@@ -37,7 +37,7 @@ public class Executor {
 
     private static void registerShutdownHook(List<ServerContext> allWebServers) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.info("Execute hook just before JVM shutdown: 웹 서버 중지 시작");
+            log.info("Execute hook just before jvm shutdown.");
             for (ServerContext serverContext: allWebServers) {
                 serverContext.stop();
             }

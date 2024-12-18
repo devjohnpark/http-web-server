@@ -18,37 +18,28 @@ public class HttpRequest {
         this.br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
     }
 
-    public boolean prepareHttpRequest() throws IOException {
-        try {
-            requestLine = setRequestLine();
-            headers = setHeaders();
-            parameters = setParameters();
-            return true;
-        } catch (IllegalStateException e) {
-            log.debug(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error(e.getMessage());
+    public boolean prepareHttpRequest() throws IOException, IllegalArgumentException {
+        if ((requestLine = setRequestLine()) == null) {
+            return false;
         }
-        return false;
+        headers = setHeaders();
+        parameters = setParameters();
+        return true;
     }
 
 
-    private RequestLine setRequestLine() throws IOException {
+    private RequestLine setRequestLine() throws IOException, IllegalArgumentException {
         String line = br.readLine();
         if (line == null) {
             // readLine(): null if the end of the stream has been reached without reading any character
-            // 클라이언트 종료 -> 소켓 닫힘 -> OS가 소켓과 연결된 파일 디스크립터에 EOF 상태 설정 -> java 애플리케이션이 스트림을 통해 EOF를 감지(네이티브 코드에 의해 처리됨) -> EOF에 도달하여 read() 메서드 -1 반환 -> readLine() null 반환
+            // 클라이언트 종료 요청(Fin) -> OS가 소켓을 닫기 위해 소켓과 연결된 파일 디스크립터에 EOF 상태 설정 -> java 애플리케이션이 스트림을 통해 EOF를 감지(네이티브 코드에 의해 처리됨) -> EOF에 도달하여 read() 메서드 -1 반환 -> readLine() null 반환
             // TCP/IP 통신에서 연결 종료는 4-way handshake를 통해 이루어진다.
             // 연결 종료 시 소켓 스트림에 파일의 끝인 EOF(End of File) 마커가 전달된다.
             // 네트워크 소켓의 경우, EOF는 클라이언트와의 연결이 완전히 종료되었음을 나타낸다.
             // 즉, 클라이언트가 데이터 전송을 완료하고 연결을 닫았다는 의미이다.
-            throw new IllegalStateException("Request line is null: client closed connection");
+            return null;
         }
-        try {
-            return RequestLine.createFromRequestLine(line);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid request line: " + line);
-        }
+        return RequestLine.createFromRequestLine(line);
     }
 
     private RequestHeaders setHeaders() throws IOException {

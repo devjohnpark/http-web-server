@@ -68,10 +68,10 @@ public class HttpProcessor {
             HttpApiHandler httpApiHandler = requestMapper.getHttpApiHandler(request.getPath());
             httpApiHandler.handleApi(request, response);
             return moreRequestsPossible;
-        } catch (IOException e) {
+        } catch (Exception e) {
             handleRequestException(e);
-            return false;
         }
+        return false;
     }
 
     private boolean shouldKeepAlive(SocketWrapper socketWrapper) {
@@ -84,7 +84,7 @@ public class HttpProcessor {
         return false;
     }
 
-    private void handleRequestException(IOException e) {
+    private void handleRequestException(Exception e) {
         if (e instanceof SocketTimeoutException) {
             // Socket의 soSetTimeout()으로 입력 시간 설정 이후, SocketInputStream 객체의 read() 메서드 의해 blocking 중인 상태에서 유효 시간이 만료되면 SocketTimeoutException 예외 던짐
             // 1. 서버가 요청을 처리하는 동안 타임아웃이 발생: 408 Request Timeout 응답 (write()는 setSoTimeout와 관련 없음)
@@ -96,6 +96,9 @@ public class HttpProcessor {
             // 클라이언트가 연결 끊었을 때, read() SocketException("Connection reset") 던짐 내부적으로 ConnectionReset 예외 발생
             // 클라이언트가 연결 끊었을 때, write() SocketException("Socket closed") 던짐
             log.warn("Socket was read or write after the client closed connection: {}", e.getMessage());
+        } else if (e instanceof IllegalArgumentException) {
+            log.warn("Request line has invalid argument: {}", e.getMessage());
+            handleInvalidRequestLine();
         } else {
             log.error("Unhandled I/O Exception: {}", e.getMessage());
             handleUnhandledException();
@@ -115,6 +118,14 @@ public class HttpProcessor {
             response.sendError(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IOException e) {
             log.error("Failed response internal server error: {}", e.getMessage());
+        }
+    }
+
+    private void handleInvalidRequestLine() {
+        try {
+            response.sendError(HttpStatus.BAD_REQUEST);
+        } catch (IOException e) {
+            log.error("Failed response invalid request line: {}", e.getMessage());
         }
     }
 
