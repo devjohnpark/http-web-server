@@ -1,5 +1,6 @@
 package org.dochi.http.response;
 
+import org.dochi.http.request.HttpRequest;
 import org.dochi.http.request.HttpVersion;
 import org.dochi.http.request.RequestHeaders;
 import org.dochi.webresource.ResourceType;
@@ -8,6 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,6 +21,7 @@ class HttpResponseTest {
     // OutputStream.toString(): ByteArrayOutputStream 클래스의 메서드로, 스트림에 쓰여진 바이트 데이터를 문자열로 변환하여 반환
     private ByteArrayOutputStream outputStream;
     private HttpResponse response;
+    private Path tempDir;
 
     @BeforeEach
     void setUp() {
@@ -31,7 +36,6 @@ class HttpResponseTest {
 
         String result = outputStream.toString();
         assertTrue(result.startsWith("HTTP/1.1 200 OK\r\n"));
-//        assertTrue(result.contains("Date: "));
         assertTrue(result.endsWith("\r\n\r\n"));
     }
 

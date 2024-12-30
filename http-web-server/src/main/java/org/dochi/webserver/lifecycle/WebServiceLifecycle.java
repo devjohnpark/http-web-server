@@ -1,19 +1,18 @@
-package org.dochi.webserver.context;
+package org.dochi.webserver.lifecycle;
 
 import org.dochi.http.api.HttpApiHandler;
 import org.dochi.webresource.WebResourceProvider;
-import org.dochi.webserver.lifecycle.Lifecycle;
 import org.dochi.webserver.config.WebService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class WebServiceContext implements Lifecycle {
-    private static final Logger log = LoggerFactory.getLogger(WebServiceContext.class);
+public class WebServiceLifecycle implements Lifecycle {
+    private static final Logger log = LoggerFactory.getLogger(WebServiceLifecycle.class);
     private final WebService webService;
 
-    public WebServiceContext(WebService webService) {
+    public WebServiceLifecycle(WebService webService) {
         this.webService = webService;
     }
 

@@ -25,8 +25,7 @@ public class HttpProcessor {
     }
 
     public void process(SocketWrapper socketWrapper, RequestMapper requestMapper) {
-        int requestCount = 0;
-        try  {
+        try {
             configureSocketTimeout(socketWrapper);
             processRequests(socketWrapper, requestMapper);
         } catch (SocketException e) {

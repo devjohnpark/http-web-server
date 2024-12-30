@@ -1,15 +1,14 @@
-package org.dochi.webserver;
+package org.dochi.webserver.config;
 
 import org.dochi.http.api.DefaultHttpApiHandler;
 import org.dochi.http.api.LoginHttpApiHandler;
-import org.dochi.webserver.config.WebService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class WebServiceTest {
+
     private WebService webService;
 
     @BeforeEach
@@ -18,13 +17,24 @@ class WebServiceTest {
     }
 
     @Test
-    void getService_default() {
-        assertEquals(DefaultHttpApiHandler.class, webService.getServices().get("/").getClass());
+    void setWebResourceBase() {
+        webService.setWebResourceBase("webapp2");
+        assertEquals("webapp2", webService.getWebResourceBase());
+    }
+
+    @Test
+    void getWebResourceBase() {
+        assertEquals("webapp", webService.getWebResourceBase());
     }
 
     @Test
     void addService() {
         webService.addService("/user", new LoginHttpApiHandler());
         assertEquals(LoginHttpApiHandler.class, webService.getServices().get("/user").getClass());
+    }
+
+    @Test
+    void getServices() {
+        assertEquals(DefaultHttpApiHandler.class, webService.getServices().get("/").getClass());
     }
 }

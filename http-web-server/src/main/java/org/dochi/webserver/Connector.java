@@ -19,10 +19,6 @@ public class Connector {
     public void connect(ServerConfig serverConfig) throws IOException {
         Socket establishedSocket;
         RequestMapper requestMapper = new RequestMapper(serverConfig.getWebService().getServices());
-        // WebServiceWrapper
-        // webService.getServices() 가져와서 init
-        // 스레드 모두 실행하고 나서 destroy
-        // 웹서버 종료되면 destroy 호출
         while ((establishedSocket = listenSocket.accept()) != null) {
             // 스레드 풀 생성시, RequestHandler, SocketWrapper 객체를 미리 생성해서 사용
             // 추후, 스레드 풀 적용해서 스레드 재활용시 소켓 연결 끊겼으면 Socket 객체 바꿔치기: socketWrapper.changeSocket(establishedSocket);
