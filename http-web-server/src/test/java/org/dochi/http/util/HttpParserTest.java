@@ -146,7 +146,7 @@ class HttpParserTest {
     void parseRequestLine_incorrect_input() {
         String requestLine = "GET / ";
 
-        assertThrows(IllegalStateException.class, () -> HttpParser.parseRequestLine(requestLine));
+        assertThrows(IllegalArgumentException.class, () -> HttpParser.parseRequestLine(requestLine));
     }
 
     @Test

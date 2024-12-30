@@ -54,10 +54,14 @@ public class RequestHeaders {
     public String getConnection() { return getHeader(CONNECTION); }
 
     private int parseContentLength(String contentLength) {
-        if (contentLength == null) {
+        if (contentLength == null || contentLength.isEmpty()) {
             return 0;
         }
         int length = Integer.parseInt(contentLength);
         return Math.max(length, 0);
+    }
+
+    public void clearHeaders() {
+        headers.clear();
     }
 }

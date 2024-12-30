@@ -42,7 +42,7 @@ public class RequestHandler implements Runnable {
             HttpProcessor httpProcessor = new HttpProcessor(new HttpRequest(in), new HttpResponse(out));
             httpProcessor.process(socketWrapper, requestMapper);
         }  catch (IOException e) {
-            log.error("Error get socket i/o stream: " + e.getMessage());
+            log.error("Error get socket i/o stream: {}", e.getMessage());
         }
     }
 }

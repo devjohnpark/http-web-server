@@ -24,4 +24,6 @@ public class RequestParameters {
     }
 
     public String getParameter(String key) { return parameters.get(key); }
+
+    public void clearParameters() { parameters.clear(); }
 }

@@ -19,7 +19,7 @@ Content-Encoding: gzip
 
 public class ResponseHeaders {
     private final Map<String, String> headers = new HashMap<>();
-
+    private boolean includeDateHeader = true;
     public static final String SERVER = "Server";
     public static final String DATE = "Date";
     public static final String CONTENT_TYPE = "Content-Type";
@@ -35,7 +35,40 @@ public class ResponseHeaders {
         headers.put(key, value);
     }
 
+    public void addContentLength(Integer contentLength) {
+        addHeader(CONTENT_LENGTH, contentLength != null ? String.valueOf(contentLength) : null);
+    }
+
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public void addConnection(boolean isKeepAlive) {
+        addHeader(CONNECTION, isKeepAlive ? "Keep-Alive" : "close");
+    }
+
+    public void addKeepAlive(int timeout, int maxRequests) {
+        if (timeout <= 0 && maxRequests <= 0) {
+            return;
+        }
+
+        StringBuilder keepAlive = new StringBuilder();
+
+        if (timeout > 0) {
+            keepAlive.append("timeout=").append(timeout / 1000);
+        }
+
+        if (maxRequests > 0) {
+            if (!keepAlive.isEmpty()) {
+                keepAlive.append(", ");
+            }
+            keepAlive.append("max=").append(maxRequests);
+        }
+
+        addHeader(KEEP_ALIVE, keepAlive.toString());
+    }
+
+    public void clearHeaders() {
+        headers.clear();
     }
 }

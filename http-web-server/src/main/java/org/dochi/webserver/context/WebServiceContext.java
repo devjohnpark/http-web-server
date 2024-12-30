@@ -19,6 +19,16 @@ public class WebServiceContext implements Lifecycle {
 
     @Override
     public void start() {
+        // Noting by default
+    }
+
+    @Override
+    public void stop() {
+        // Noting by default
+    }
+
+    @Override
+    public void init() {
         Map<String, HttpApiHandler> services = webService.getServices();
         WebResourceProvider webResourceProvider = new WebResourceProvider(webService.getWebResourceBase());
         for (HttpApiHandler service : services.values()) {
@@ -27,7 +37,7 @@ public class WebServiceContext implements Lifecycle {
     }
 
     @Override
-    public void stop() {
+    public void destroy() {
         Map<String, HttpApiHandler> services = webService.getServices();
         for (HttpApiHandler service : services.values()) {
             service.destroy();

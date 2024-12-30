@@ -1,7 +1,6 @@
 package org.dochi.webserver;
 
 import org.dochi.webserver.config.ServerConfig;
-import org.dochi.webserver.context.WebServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,5 +31,5 @@ public class WebServer {
         return port;
     }
 
-    public ServerConfig getServerConfig() { return serverConfig; }
+    public ServerConfig getConfig() { return serverConfig; }
 }

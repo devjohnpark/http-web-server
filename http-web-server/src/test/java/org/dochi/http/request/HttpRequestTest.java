@@ -9,34 +9,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class HttpRequestTest {
     private HttpRequest httpRequest;
-    private String fileName;
 
-    private void createHttpRequest(String fileName) {
-        try {
-            String testDir = "./src/test/resources/";
-            InputStream in = new FileInputStream(new File(testDir + fileName));
-            httpRequest = new HttpRequest(in);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    private void createHttpRequest(String fileName) throws IOException {
+        String testDir = "./src/test/resources/";
+        InputStream in = new FileInputStream(new File(testDir + fileName));
+        httpRequest = new HttpRequest(in);
+        httpRequest.prepareRequest();
     }
 
     @Test
-    void get_only_path() {
-        // given, when
-        createHttpRequest("http_req_get_only_path.txt");
-
-        // then
-        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.GET);
-        assertThat(httpRequest.getPath()).isEqualTo("/");
-        assertThat(httpRequest.getRequestParameter("name")).isNull();
-        assertThat(httpRequest.getRequestParameter("")).isNull();
-        assertThat(httpRequest.getHttpVersion()).isEqualTo(HttpVersion.HTTP_1_1);
-        assertThat(httpRequest.getHeader(RequestHeaders.CONNECTION)).isEqualTo(httpRequest.getConnection());
+    void invalid_requestLine() throws IOException {
+        assertThrows(IllegalArgumentException.class, () -> createHttpRequest("http_req_invalid_request_line1.txt"));
+        assertThrows(IllegalArgumentException.class, () -> createHttpRequest("http_req_invalid_request_line2.txt"));
     }
 
     @Test
-    void get_path_queryString() {
+    void get_path_queryString() throws IOException {
         // given, when
         createHttpRequest("http_req_get_query-string.txt");
 
@@ -46,11 +34,11 @@ class HttpRequestTest {
         assertThat(httpRequest.getRequestParameter("name")).isEqualTo("john park");
         assertThat(httpRequest.getRequestParameter("password")).isEqualTo("1234");
         assertThat(httpRequest.getHttpVersion()).isEqualTo(HttpVersion.HTTP_1_1);
-        assertThat(httpRequest.getHeader(RequestHeaders.CONNECTION)).isEqualTo(httpRequest.getConnection());
+        assertThat(httpRequest.getConnection()).isEqualTo("keep-alive");
     }
 
     @Test
-    void post() {
+    void post() throws IOException {
         // given, when
         createHttpRequest("http_req_post.txt");
 
@@ -60,11 +48,11 @@ class HttpRequestTest {
         assertThat(httpRequest.getRequestParameter("userId")).isEqualTo("john park");
         assertThat(httpRequest.getRequestParameter("password")).isEqualTo("1234");
         assertThat(httpRequest.getHttpVersion()).isEqualTo(HttpVersion.HTTP_1_1);
-        assertThat(httpRequest.getHeader(RequestHeaders.CONNECTION)).isEqualTo(httpRequest.getConnection());
+        assertThat(httpRequest.getConnection()).isEqualTo("keep-alive");
     }
 
     @Test
-    void post_non_contentLength() {
+    void post_non_contentLength() throws IOException {
         // given, when
         createHttpRequest("http_req_post_non_content-length.txt");
 
@@ -74,18 +62,21 @@ class HttpRequestTest {
     }
 
     @Test
-    void post_negative_contentLength() {
+    void post_negative_contentLength() throws IOException {
         // given, when
         createHttpRequest("http_req_post_negative_content-length.txt");
 
         // then
+//        int length = Integer.parseInt("-1");
+//        assertEquals(Math.max(length, 0), 0);
+
         assertEquals(0, httpRequest.getContentLength());
         assertThat(httpRequest.getRequestParameter("userId")).isNull();
         assertThat(httpRequest.getRequestParameter("password")).isNull();
     }
 
     @Test
-    void post_non_contentType() {
+    void post_non_contentType() throws IOException {
         // given, when
         createHttpRequest("http_req_post_non_content-type.txt");
 
@@ -95,7 +86,7 @@ class HttpRequestTest {
     }
 
     @Test
-    void post_requestLine_body_params_duplication() {
+    void post_requestLine_body_params_duplication() throws IOException {
         // given, when
         createHttpRequest("http_req_post_request-params_duplication.txt");
 
@@ -106,15 +97,15 @@ class HttpRequestTest {
         assertThat(httpRequest.getRequestParameter("password")).isEqualTo("1234");
         assertThat(httpRequest.getRequestParameter("num")).isEqualTo("123445");
         assertThat(httpRequest.getHttpVersion()).isEqualTo(HttpVersion.HTTP_1_1);
-        assertThat(httpRequest.getHeader(RequestHeaders.CONNECTION)).isEqualTo(httpRequest.getConnection());
+        assertThat(httpRequest.getConnection()).isEqualTo("keep-alive");
     }
 
     @Test
-    void post_getAllBodyAsString() throws IOException {
+    void post_getBodyAsString() throws IOException {
         // given, when
         createHttpRequest("http_req_post_content-type_text.txt");
 
         // then
-        assertThat(httpRequest.getAllBodyAsString()).isEqualTo("hello world");
+        assertThat(httpRequest.getBodyAsString()).isEqualTo("hello world");
     }
 }

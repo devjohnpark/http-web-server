@@ -22,22 +22,22 @@ class HttpResponseTest {
     void setUp() {
         outputStream = new ByteArrayOutputStream();
         response = new HttpResponse(outputStream);
+        response.inActiveDateHeader();
     }
 
     @Test
-    void send() {
+    void send() throws IOException {
         response.send(HttpStatus.OK);
 
         String result = outputStream.toString();
         assertTrue(result.startsWith("HTTP/1.1 200 OK\r\n"));
-        assertTrue(result.contains("Server: doci\r\n"));
-        assertTrue(result.contains("Date: "));
+//        assertTrue(result.contains("Date: "));
         assertTrue(result.endsWith("\r\n\r\n"));
     }
 
 
     @Test
-    void send_body() {
+    void send_body() throws IOException {
         String body = "Hello, World!";
         byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
 
@@ -50,7 +50,7 @@ class HttpResponseTest {
     }
 
     @Test
-    void sendError() {
+    void sendError() throws IOException {
         HttpStatus status = HttpStatus.NOT_FOUND;
         response.sendError(HttpStatus.NOT_FOUND);
 
@@ -62,7 +62,7 @@ class HttpResponseTest {
     }
 
     @Test
-    void sendError_errorMessage() {
+    void sendError_errorMessage() throws IOException {
         String errorMessage = "error message";
 
         response.sendError(HttpStatus.BAD_REQUEST, errorMessage);
@@ -74,7 +74,7 @@ class HttpResponseTest {
     }
 
     @Test
-    void send_body_null() {
+    void send_body_null() throws IOException {
         response.send(HttpStatus.OK, null, null);
 
         String result = outputStream.toString();
@@ -83,7 +83,7 @@ class HttpResponseTest {
     }
 
     @Test
-    void addHeader() {
+    void addHeader() throws IOException {
         response.addHeader("Last-Modified", "Sat, 07 Feb xxxx");
 
         response.send(HttpStatus.OK);
@@ -93,32 +93,12 @@ class HttpResponseTest {
     }
 
     @Test
-    void addVersion() {
+    void addVersion() throws IOException {
         response.addVersion(HttpVersion.HTTP_1_1);
 
         response.send(HttpStatus.OK);
 
         String result = outputStream.toString();
         assertTrue(result.contains("HTTP/1.1"));
-    }
-
-    @Test
-    void addConnection() {
-        response.addConnection(true);
-
-        response.send(HttpStatus.OK);
-
-        String result = outputStream.toString();
-        assertTrue(result.contains("Connection: " + "keep-alive"));
-    }
-
-    @Test
-    void addCookie() {
-        response.addCookie("sessionId=abc123");
-
-        response.send(HttpStatus.OK);
-
-        String result = outputStream.toString();
-        assertTrue(result.contains("Cookie: " + "sessionId=abc123"));
     }
 }

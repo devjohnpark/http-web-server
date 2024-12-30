@@ -17,6 +17,7 @@ public abstract class LifecycleBase implements Lifecycle {
     @Override
     public void start() {
         for (Lifecycle lifecycle : lifecycles) {
+            lifecycle.init();
             lifecycle.start(); // 하위 컴포넌트 시작
             log.debug("{} started.", lifecycle.getClass().getSimpleName());
         }
@@ -25,8 +26,19 @@ public abstract class LifecycleBase implements Lifecycle {
     @Override
     public void stop() {
         for (Lifecycle lifecycle : lifecycles) {
+            lifecycle.destroy();
             lifecycle.stop(); // 하위 컴포넌트 중지
             log.debug("{} stopped.", lifecycle.getClass().getSimpleName());
         }
+    }
+
+    @Override
+    public void init() {
+        // Noting by default
+    }
+
+    @Override
+    public void destroy() {
+        // Noting by default
     }
 }
