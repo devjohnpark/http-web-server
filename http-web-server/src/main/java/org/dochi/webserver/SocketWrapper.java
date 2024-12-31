@@ -3,7 +3,6 @@ package org.dochi.webserver;
 import org.dochi.webserver.config.KeepAlive;
 
 import java.net.Socket;
-import java.net.SocketException;
 
 public class SocketWrapper {
     private Socket socket = null;
@@ -17,7 +16,7 @@ public class SocketWrapper {
 
     public Socket getSocket() { return socket; }
 
-    public boolean isConnected() { return socket != null && socket.isConnected(); }
+    public boolean isReusable() { return !(socket != null && socket.isConnected()); }
 
     public KeepAlive getKeepAlive() { return keepAlive; }
 }
