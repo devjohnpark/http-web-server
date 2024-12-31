@@ -1,5 +1,6 @@
-package org.dochi.webserver;
+package org.dochi.webserver.executor;
 
+import org.dochi.webserver.WebServer;
 import org.dochi.webserver.lifecycle.ServerLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +12,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Executor {
-    private static final Logger log = LoggerFactory.getLogger(Executor.class);
+public class ServerExecutor {
+    private static final Logger log = LoggerFactory.getLogger(ServerExecutor.class);
     private static final Map<Integer, ServerLifecycle> servers = new HashMap<>();
 
-    private Executor() {}
+    private ServerExecutor() {}
 
     public static void addWebServer(WebServer webServer) {
         if (servers.containsKey(webServer.getPort())) {

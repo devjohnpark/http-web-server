@@ -38,9 +38,8 @@ public class HttpProcessor {
         socketWrapper.getSocket().setSoTimeout(keepAliveTimeout);
     }
 
-
     private void processRequests(SocketWrapper socketWrapper, RequestMapper requestMapper) {
-        int maxKeepAliveRequests = socketWrapper.getKeepAlive().getMaxKeepAliveRequests();
+        int maxKeepAliveRequests = getMaxKeepAliveRequests(socketWrapper);
         int requestCount = 0;
 
         while (requestCount < maxKeepAliveRequests) {
@@ -70,6 +69,38 @@ public class HttpProcessor {
         return false;
     }
 
+    private void handleRequestException(Exception e) {
+        if (e instanceof SocketTimeoutException) {
+            // Socket의 soSetTimeout()으로 입력 시간 설정 이후, SocketInputStream 객체의 read() 메서드 의해 blocking 중인 상태에서 유효 시간이 만료되면 SocketTimeoutException 예외 던짐
+            // 1. 서버가 요청을 처리하는 동안 타임아웃이 발생: 408 Request Timeout 응답 (write()는 setSoTimeout와 관련 없음)
+            // 2. 소켓 닫아서 클라이언트와의 연결은 4-way handshake를 통해 정상적으로 종료된다.
+            // 3. 클라이언트는 커넥션이 끊어지면, 요청을 반복해서 보내도 문제가 없는 경우에 요청을 다시 보낸다.
+            log.warn("Socket read timeout occurred: {}", e.getMessage());
+            sendError(response, HttpStatus.REQUEST_TIMEOUT);
+        } else if (e instanceof SocketException) {
+            // 클라이언트가 연결 끊은 이후 read() 호출시 SocketException("Connection reset") 던짐 내부적으로 ConnectionReset 예외 발생
+            // 클라이언트가 연결 끊은 이후, write() 호출시 SocketException("Socket closed") 던짐
+            log.warn("Socket was read or write after the client closed connection: {}", e.getMessage());
+        } else if (e instanceof IllegalArgumentException) {
+            log.warn("Request line has invalid argument: {}", e.getMessage());
+            sendError(response, HttpStatus.BAD_REQUEST);
+        } else {
+            log.error("Unhandled I/O Exception: {}", e.getMessage());
+            sendError(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void sendError(HttpResponse response, HttpStatus status) {
+        try {
+            response.sendError(status);
+        } catch (IOException e) {
+            log.error("Failed to send error response: {}", e.getMessage());
+        }
+    }
+    private int getMaxKeepAliveRequests(SocketWrapper socketWrapper) {
+        return socketWrapper.getKeepAlive().getMaxKeepAliveRequests();
+    }
+
     private boolean shouldKeepAlive(SocketWrapper socketWrapper) {
         boolean isKeepAlive = isKeepAlive();
         response.addConnection(isKeepAlive);
@@ -77,45 +108,6 @@ public class HttpProcessor {
             response.addKeepAlive(socketWrapper.getKeepAlive().getKeepAliveTimeout(), socketWrapper.getKeepAlive().getMaxKeepAliveRequests());
         }
         return isKeepAlive;
-    }
-
-    private void handleRequestException(Exception e) {
-        if (e instanceof SocketTimeoutException) {
-            log.warn("Socket read timeout occurred: {}", e.getMessage());
-            handleTimeoutException();
-        } else if (e instanceof SocketException) {
-            log.warn("Socket was read or write after the client closed connection: {}", e.getMessage());
-        } else if (e instanceof IllegalArgumentException) {
-            log.warn("Request line has invalid argument: {}", e.getMessage());
-            handleInvalidRequestLine();
-        } else {
-            log.error("Unhandled I/O Exception: {}", e.getMessage());
-            handleUnhandledException();
-        }
-    }
-
-    private void handleTimeoutException() {
-        try {
-            response.sendError(HttpStatus.REQUEST_TIMEOUT);
-        } catch (IOException e) {
-            log.error("Failed response keep-alive timeout: {}", e.getMessage());
-        }
-    }
-
-    private void handleUnhandledException() {
-        try {
-            response.sendError(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (IOException e) {
-            log.error("Failed response internal server error: {}", e.getMessage());
-        }
-    }
-
-    private void handleInvalidRequestLine() {
-        try {
-            response.sendError(HttpStatus.BAD_REQUEST);
-        } catch (IOException e) {
-            log.error("Failed response invalid request line: {}", e.getMessage());
-        }
     }
 
     private boolean isKeepAlive() {

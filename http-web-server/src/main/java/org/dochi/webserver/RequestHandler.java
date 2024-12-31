@@ -27,10 +27,6 @@ public class RequestHandler implements Runnable {
 
     // 1. 스레드에 유효 시간을 부여
     // 2. 클라이언트 연결 소켓에 setSoTimeout으로 읽기 시간 설정 -> 연결 소켓 모니터링 -> getSoTimeout 호출 0이면 제거
-    //  1) 스레드 풀에서 스레드 제거?
-    //  2) Socket 객체를 체크하는 객체를 주입해서, 스레드 풀에서 스레드를 가져와서 실행시키기전에, 스레드에 Socket 객체 바꿔치기?
-    //  3)
-    // 3. 직접 시간을 측정한다.
     @Override
     public void run() {
         log.debug("New client connected IP: {}, Port: {}", socketWrapper.getSocket().getInetAddress(), socketWrapper.getSocket().getPort());
@@ -44,5 +40,9 @@ public class RequestHandler implements Runnable {
         }  catch (IOException e) {
             log.error("Error get socket i/o stream: {}", e.getMessage());
         }
+    }
+
+    public SocketWrapper getSocketWrapper() {
+        return socketWrapper;
     }
 }

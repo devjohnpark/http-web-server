@@ -1,7 +1,7 @@
 package org.dochi.webserver.config;
 
 public class KeepAlive {
-    private int keepAliveTimeout = 1000; // default: 1000 ms
+    private int keepAliveTimeout = 10000; // default: 1000 ms
     private int maxKeepAliveRequests = 60; // default: 60
 
     public int getKeepAliveTimeout() { return keepAliveTimeout; }
