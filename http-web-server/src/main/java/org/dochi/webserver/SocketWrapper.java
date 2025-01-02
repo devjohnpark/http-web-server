@@ -3,20 +3,30 @@ package org.dochi.webserver;
 import org.dochi.webserver.config.KeepAlive;
 
 import java.net.Socket;
+import java.net.SocketException;
 
 public class SocketWrapper {
     private Socket socket = null;
-    private final KeepAlive keepAlive;
+    private final int keepAliveTimeout;
+    private final int maxKeepAliveRequests;
 
-    public SocketWrapper(KeepAlive keepAlive) {
-        this.keepAlive = keepAlive;
+    public SocketWrapper(int keepAliveTimeout, int maxKeepAliveRequests) {
+        this.keepAliveTimeout = keepAliveTimeout;
+        this.maxKeepAliveRequests = maxKeepAliveRequests;
     }
 
     public void setSocket(Socket socket) { this.socket = socket; }
 
-    public Socket getSocket() { return socket; }
+    public Socket getSocket() {
+        if (socket == null) {
+            throw new IllegalStateException("Socket not set");
+        }
+        return socket;
+    }
 
-    public boolean isReusable() { return !(socket != null && socket.isConnected()); }
+    public boolean isUsing() { return socket != null && !socket.isClosed(); }
 
-    public KeepAlive getKeepAlive() { return keepAlive; }
+    public int getKeepAliveTimeout() { return keepAliveTimeout; }
+
+    public int getMaxKeepAliveRequests() { return maxKeepAliveRequests; }
 }

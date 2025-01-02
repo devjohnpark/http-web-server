@@ -67,9 +67,6 @@ class HttpRequestTest {
         createHttpRequest("http_req_post_negative_content-length.txt");
 
         // then
-//        int length = Integer.parseInt("-1");
-//        assertEquals(Math.max(length, 0), 0);
-
         assertEquals(0, httpRequest.getContentLength());
         assertThat(httpRequest.getRequestParameter("userId")).isNull();
         assertThat(httpRequest.getRequestParameter("password")).isNull();

@@ -28,6 +28,10 @@ public class ServerExecutor {
 
     public static void execute() {
         List<ServerLifecycle> allWebServers = new ArrayList<>(servers.values());
+        if (allWebServers.isEmpty()) {
+            log.error("No web servers found.");
+            throw new IllegalStateException("No web servers found.");
+        }
         try(ExecutorService executor = Executors.newFixedThreadPool(allWebServers.size())) {
             for (ServerLifecycle serverLifecycle : allWebServers) {
                 executor.submit(serverLifecycle::start);
@@ -38,7 +42,6 @@ public class ServerExecutor {
 
     private static void registerShutdownHook(List<ServerLifecycle> allWebServers) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.info("Execute hook just before jvm shutdown.");
             for (ServerLifecycle serverLifecycle : allWebServers) {
                 serverLifecycle.stop();
             }

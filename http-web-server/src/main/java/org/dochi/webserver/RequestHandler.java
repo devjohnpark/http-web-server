@@ -1,6 +1,7 @@
 package org.dochi.webserver;
 
-import org.dochi.http.http1.HttpProcessor;
+import org.dochi.http.processor.Http1Processor;
+import org.dochi.http.processor.HttpProcessor;
 import org.dochi.http.request.HttpRequest;
 import org.dochi.http.response.HttpResponse;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+// SocketWrapper(Socket)과 RequestMapper 객체를 가지고 프로토콜 별로 요청 핸들링
 public class RequestHandler implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
     private final SocketWrapper socketWrapper;
@@ -35,7 +37,7 @@ public class RequestHandler implements Runnable {
                 OutputStream out = socketWrapper.getSocket().getOutputStream();
              )
         {
-            HttpProcessor httpProcessor = new HttpProcessor(new HttpRequest(in), new HttpResponse(out));
+            HttpProcessor httpProcessor = new Http1Processor(new HttpRequest(in), new HttpResponse(out));
             httpProcessor.process(socketWrapper, requestMapper);
         }  catch (IOException e) {
             log.error("Error get socket i/o stream: {}", e.getMessage());

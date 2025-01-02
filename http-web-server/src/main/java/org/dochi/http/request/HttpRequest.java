@@ -20,6 +20,7 @@ public class HttpRequest {
 
     public boolean prepareRequest() throws IOException, IllegalArgumentException {
         if ((requestLine = getRequestLine()) == null) {
+            log.debug("RequestLine is null");
             return false;
         }
         setHeaders();

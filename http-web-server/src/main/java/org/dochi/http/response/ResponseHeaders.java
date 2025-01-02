@@ -19,7 +19,6 @@ Content-Encoding: gzip
 
 public class ResponseHeaders {
     private final Map<String, String> headers = new HashMap<>();
-    private boolean includeDateHeader = true;
     public static final String SERVER = "Server";
     public static final String DATE = "Date";
     public static final String CONTENT_TYPE = "Content-Type";

@@ -15,7 +15,7 @@ class SocketWrapperTest {
 
     @BeforeEach
     void setUp() {
-        socketWrapper = new SocketWrapper(new KeepAlive());
+        socketWrapper = new SocketWrapper(1000, 100);
     }
 
     @Test
@@ -26,11 +26,19 @@ class SocketWrapperTest {
 
     @Test
     void getSocket() {
-        assertNull(socketWrapper.getSocket());
+        assertThrows(IllegalStateException.class, () -> socketWrapper.getSocket());
     }
 
     @Test
     void getKeepAlive() {
-        assertNotNull(socketWrapper.getKeepAlive());
+        assertEquals(1000, socketWrapper.getKeepAliveTimeout());
+        assertEquals(100, socketWrapper.getMaxKeepAliveRequests());
+    }
+
+    @Test
+    void isUsing() {
+        assertFalse(socketWrapper.isUsing());
+        socketWrapper.setSocket(new Socket());
+        assertTrue(socketWrapper.isUsing());
     }
 }

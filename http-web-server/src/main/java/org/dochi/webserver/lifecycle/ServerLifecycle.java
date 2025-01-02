@@ -35,6 +35,6 @@ public class ServerLifecycle extends LifecycleBase {
 
     public void stop() {
         super.stop();
-        log.info("Web server shutdown - Host: {}, Port: {}.", webServer.getHostName(), webServer.getPort());
+        log.info("Web Server stopped - Host: {}, Port: {}.", webServer.getHostName(), webServer.getPort());
     }
 }

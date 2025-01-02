@@ -1,7 +1,7 @@
 package org.dochi.webserver.config;
 
 public class ThreadPool {
-    private int minSpareThreads = 10;
+    private int minSpareThreads = 100;
     private int maxThreads = 200;
 
     public void setMinSpareThreads(int minSpareThreads) {

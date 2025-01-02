@@ -18,18 +18,19 @@ public class Connector {
     }
 
     public void connect(ServerConfig serverConfig) throws IOException {
+        RequestMapper requestMapper = new RequestMapper(serverConfig.getWebService().getServices());
         WorkerPoolExecutor workerPoolExecutor = new WorkerPoolExecutor(serverConfig.getThreadPool());
-        RequestHandlerPool requestHandlerPool = new RequestHandlerPool(serverConfig, new RequestMapper(serverConfig.getWebService().getServices()));
+        RequestHandlerPool requestHandlerPool = new RequestHandlerPool(serverConfig.getThreadPool().getMinSpareThreads(), serverConfig.getKeepAlive(), requestMapper);
 
         Socket establishedSocket;
         while ((establishedSocket = listenSocket.accept()) != null) {
             // 사용가능한 RequestHandler 객체 가져오기
-            RequestHandler requestHandler = requestHandlerPool.getAvailableRequestHandler(serverConfig);
+            RequestHandler requestHandler = requestHandlerPool.getAvailableRequestHandler(serverConfig.getKeepAlive(), requestMapper);
 
-            // 새로운 연결된 소켓 설정
+            // 새롭게 연결된 소켓 설정
             requestHandler.getSocketWrapper().setSocket(establishedSocket);
 
-            // 실행 및 pool 반환
+            // requestHandler의 run() 실행 후 requestHandlerPool에 requestHandler 반환
             workerPoolExecutor.executeRequest(requestHandler, requestHandlerPool);
         }
     }
