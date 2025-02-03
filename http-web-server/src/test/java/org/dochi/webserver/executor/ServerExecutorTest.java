@@ -1,6 +1,6 @@
 package org.dochi.webserver.executor;
 
-import org.dochi.webserver.WebServer;
+import org.dochi.webserver.attribute.WebServer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

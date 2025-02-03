@@ -1,6 +1,6 @@
 package org.dochi.http.response;
 
-import org.dochi.http.request.HttpVersion;
+import org.dochi.http.request.data.HttpVersion;
 
 public class StatusLine {
     private HttpVersion version;

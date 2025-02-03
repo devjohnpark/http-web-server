@@ -1,6 +1,6 @@
 package org.dochi.webserver.executor;
 
-import org.dochi.webserver.WebServer;
+import org.dochi.webserver.attribute.WebServer;
 import org.dochi.webserver.lifecycle.ServerLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +24,7 @@ public class ServerExecutor {
             throw new IllegalArgumentException("Web server has already exists.");
         }
         servers.put(webServer.getPort(), new ServerLifecycle(webServer));
+        // 단일 서버 실행/종료를 위한 cli 대기 스레드 생성
     }
 
     public static void execute() {

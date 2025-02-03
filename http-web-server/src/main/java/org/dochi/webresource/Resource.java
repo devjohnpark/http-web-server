@@ -1,25 +1,28 @@
 package org.dochi.webresource;
 
 public class Resource {
-    private byte[] data;
-    private String contentType;
+    private byte[] data = null;
+    private String mimeType = null;
 
     public Resource() {}
 
-    public Resource(byte[] data, String format) {
+    public Resource(byte[] data, String mimeType) {
         this.data = data;
-        this.contentType = format;
+        this.mimeType = mimeType;
     }
 
     public byte[] getData() {
         return data;
     }
 
-    public String getContentType() {
-        return contentType;
+    public String getContentType(String mediaType) {
+        if (mediaType == null) {
+            return null;
+        }
+        return ResourceType.fromMimeType(mimeType).getContentType(mediaType);
     }
 
     public boolean isEmpty() {
-        return data == null || contentType == null;
+        return data == null;
     }
 }

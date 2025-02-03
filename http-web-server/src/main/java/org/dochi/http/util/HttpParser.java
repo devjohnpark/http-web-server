@@ -1,5 +1,8 @@
 package org.dochi.http.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,10 +14,16 @@ import java.util.Map;
 // &: query parameter 간의 분리
 // =: key, value 간의 분리
 public class HttpParser {
+    private static final Logger log = LoggerFactory.getLogger(HttpParser.class);
+
     private HttpParser() {}
     
     public static Map<String, String> parseQueryString(String queryString) {
         return parseValues(queryString, "&");
+    }
+
+    public static Map<String, String> parseContentDisposition(String contentDispositionValues) {
+        return parseValues(contentDispositionValues, ";");
     }
 
     private static Map<String, String> parseValues(String values, String separator) {
@@ -55,17 +64,9 @@ public class HttpParser {
         return new Pair(pair[0].trim(), "");
     }
 
-    public static String[] parseHeaderValues(String headerValues) {
-        String[] values = headerValues.split(";");
-        for (int i = 0; i < values.length; i++) {
-            values[i] = values[i].trim();
-        }
-        return values;
-    }
-
-    public static Pair parseHeader(String header) {
-        Pair pair = getKeyValue(header, ":");
-        return setEmptyValue(header, pair);
+    public static Pair parseHeaderLine(String headerLine) {
+        Pair pair = getKeyValue(headerLine, ":");
+        return setEmptyValue(headerLine, pair);
     }
 
     private static Pair setEmptyValue(String header, Pair pair) {

@@ -1,12 +1,12 @@
 package org.dochi.webserver.lifecycle;
 
-import org.dochi.webserver.Connector;
-import org.dochi.webserver.WebServer;
+import org.dochi.webserver.socket.Connector;
+import org.dochi.webserver.attribute.WebServer;
+import org.dochi.webserver.socket.SocketTaskExecutorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 
 public class ServerLifecycle extends LifecycleBase {
@@ -21,20 +21,29 @@ public class ServerLifecycle extends LifecycleBase {
 
     public void start() {
         super.start();
-        log.info("Web Server started - Host: {}, Port: {}.", webServer.getHostName(), webServer.getPort());
+        logStartedWebServer(webServer);
         try(ServerSocket serverSocket = new ServerSocket()) {
-            // 도메인 이름을 IP 주소로 변환해서 유효성 검증한다.
-            // IP가 시스템의 네트워크 인터페이스(eth0)에 할당되어 있어야함 (ip addr로 확인가능)
-            serverSocket.bind(new InetSocketAddress(webServer.getHostName(), webServer.getPort()));
             Connector connector = new Connector(serverSocket);
-            connector.connect(webServer.getConfig());
+            connector.connect(
+                    SocketTaskExecutorFactory.getInstance().createExecutor(webServer.getConfig()),
+                    webServer.getHostName(),
+                    webServer.getPort()
+            );
         } catch (IOException e) {
-            log.error("Socket accept error on the Web Server - Host: {}, Port: {}.", webServer.getHostName(), webServer.getPort());
+            logAcceptError(webServer, e);
         }
     }
 
     public void stop() {
         super.stop();
-        log.info("Web Server stopped - Host: {}, Port: {}.", webServer.getHostName(), webServer.getPort());
+        log.info("Web server stopped [Host: {}, Port: {}]", webServer.getHostName(), webServer.getPort());
+    }
+
+    private void logStartedWebServer(WebServer webServer) {
+        log.info("Web server started [Host: {}, Port: {}]", webServer.getHostName(), webServer.getPort());
+    }
+
+    private void logAcceptError(WebServer webServer, IOException e) {
+        log.error("Server socket accept error: {} [Host: {}, Port: {}]", webServer.getHostName(), webServer.getPort(), e.getMessage());
     }
 }

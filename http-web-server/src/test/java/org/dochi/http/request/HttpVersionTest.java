@@ -1,5 +1,6 @@
 package org.dochi.http.request;
 
+import org.dochi.http.request.data.HttpVersion;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

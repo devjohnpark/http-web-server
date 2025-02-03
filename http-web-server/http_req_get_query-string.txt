@@ -1,0 +1,3 @@
+GET /user?name=john%20park&password=1234 HTTP/1.1
+Connection: keep-alive
+

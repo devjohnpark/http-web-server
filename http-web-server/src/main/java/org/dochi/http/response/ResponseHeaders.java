@@ -34,8 +34,8 @@ public class ResponseHeaders {
         headers.put(key, value);
     }
 
-    public void addContentLength(Integer contentLength) {
-        addHeader(CONTENT_LENGTH, contentLength != null ? String.valueOf(contentLength) : null);
+    public void addContentLength(int contentLength) {
+        addHeader(CONTENT_LENGTH, String.valueOf(contentLength));
     }
 
     public Map<String, String> getHeaders() {
@@ -67,7 +67,10 @@ public class ResponseHeaders {
         addHeader(KEEP_ALIVE, keepAlive.toString());
     }
 
-    public void clearHeaders() {
+    public void clear() {
+        if (headers.isEmpty()) {
+            return;
+        }
         headers.clear();
     }
 }

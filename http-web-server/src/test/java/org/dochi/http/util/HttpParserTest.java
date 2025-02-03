@@ -150,10 +150,10 @@ class HttpParserTest {
     }
 
     @Test
-    void parseHeader_correct_input() {
+    void parseHeader_Line_correct_input() {
         String header = "Host: www.example.com";
 
-        HttpParser.Pair actual = HttpParser.parseHeader(header);
+        HttpParser.Pair actual = HttpParser.parseHeaderLine(header);
 
         HttpParser.Pair expected = new HttpParser.Pair("Host", "www.example.com");
 
@@ -162,28 +162,13 @@ class HttpParserTest {
 
 
     @Test
-    void parseHeader_non_value() {
+    void parseHeader_Line_non_value() {
         String header = "Host";
 
-        HttpParser.Pair actual = HttpParser.parseHeader(header);
+        HttpParser.Pair actual = HttpParser.parseHeaderLine(header);
 
         HttpParser.Pair expected = new HttpParser.Pair("Host", "");
 
         assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void parseHeaderValues() {
-        String headerValues = "text/html; charset=utf-8";
-        String[] tokens = HttpParser.parseHeaderValues(headerValues);
-        assertThat(tokens[0]).isEqualTo("text/html");
-        assertThat(tokens[1]).isEqualTo("charset=utf-8");
-    }
-
-    @Test
-    void parseHeaderValues_non() {
-        String headerValues = "text/html";
-        String[] tokens = HttpParser.parseHeaderValues(headerValues);
-        assertThat(tokens.length).isEqualTo(1);
     }
 }

@@ -1,13 +1,12 @@
 package org.dochi.http.api;
 
-import org.dochi.http.request.HttpRequest;
-import org.dochi.http.response.HttpResponse;
-import org.dochi.webresource.WebResourceProvider;
+import org.dochi.http.response.Http11ResponseProcessor;
+import org.dochi.webserver.config.WebServiceConfig;
 
 import java.io.IOException;
 
 public interface HttpApiHandler {
-    void init(WebResourceProvider webResourceProvider);
-    void handleApi(HttpRequest request, HttpResponse response) throws IOException;
+    void init(WebServiceConfig config);
+    void service(HttpApiRequest request, Http11ResponseProcessor response) throws IOException;
     void destroy();
 }
