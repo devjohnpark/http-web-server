@@ -15,7 +15,7 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
     @Override
-    public void start() {
+    public void start() throws LifecycleException {
         for (Lifecycle lifecycle : lifecycles) {
             lifecycle.init();
             lifecycle.start();
@@ -23,7 +23,7 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
     @Override
-    public void stop() {
+    public void stop() throws LifecycleException {
         for (Lifecycle lifecycle : lifecycles) {
             lifecycle.destroy();
             lifecycle.stop();
@@ -31,12 +31,12 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
     @Override
-    public void init() {
+    public void init() throws LifecycleException {
         // Nothing by default
     }
 
     @Override
-    public void destroy() {
+    public void destroy() throws LifecycleException{
         // Nothing by default
     }
 }

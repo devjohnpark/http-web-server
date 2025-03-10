@@ -1,11 +1,8 @@
 package org.dochi.http.request.data;
 
 import org.dochi.http.request.multipart.Multipart;
-import org.dochi.http.request.multipart.Part;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Request implements Cloneable {
     private final RequestMetadata metadata = new RequestMetadata();
@@ -13,19 +10,19 @@ public class Request implements Cloneable {
     private final RequestParameters parameters = new RequestParameters();
     private final Multipart multipart = new Multipart();
 
-    public RequestMetadata getMetadata() {
+    public RequestMetadata metadata() {
         return metadata;
     }
 
-    public RequestHeaders getHeaders() {
+    public RequestHeaders headers() {
         return headers;
     }
 
-    public RequestParameters getParameters() {
+    public RequestParameters parameters() {
         return parameters;
     }
 
-    public Multipart getMultipart() {
+    public Multipart multipart() {
         return multipart;
     }
 

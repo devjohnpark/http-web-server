@@ -6,7 +6,7 @@ import org.dochi.http.monitor.ContentLengthValidator;
 import org.dochi.http.monitor.MessageSizeMonitor;
 import org.dochi.http.request.multipart.Part;
 import org.dochi.http.request.stream.Http11RequestStream;
-import org.dochi.http.request.stream.HttpBufferedInputStream;
+import org.dochi.http.request.stream.SocketBufferedInputStream;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.webresource.ResourceType;
 import org.dochi.webserver.config.HttpReqConfig;
@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-// Http11RequestProcessor로 변경
 public class Http11RequestProcessor extends AbstractHttpRequestProcessor {
     private static final Logger log = LoggerFactory.getLogger(Http11RequestProcessor.class);
     private final ContentLengthValidator contentLengthValidator;
@@ -29,20 +28,16 @@ public class Http11RequestProcessor extends AbstractHttpRequestProcessor {
 
     @Override
     public boolean isProcessHeader(MessageSizeMonitor sizeMonitor) throws IOException, HttpStatusException {
-        if (isProcessRequestLine(sizeMonitor)) {
-            processHeaders(sizeMonitor);
-            return true;
-        }
-        return false;
+        return processRequestLine(sizeMonitor) && processHeaders(sizeMonitor);
     }
 
-    private boolean isProcessRequestLine(MessageSizeMonitor sizeMonitor) throws IOException, HttpStatusException {
+    private boolean processRequestLine(MessageSizeMonitor sizeMonitor) throws IOException, HttpStatusException {
         String requestLine = requestStream.readLineString(sizeMonitor);
         if (isEOFOnCloseWait(requestLine)) {
             return false;
         }
         try {
-            request.getMetadata().addRequestLine(requestLine);
+            request.metadata().addRequestLine(requestLine);
             return true;
         } catch (IllegalArgumentException e) {
             throw new HttpStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -53,20 +48,20 @@ public class Http11RequestProcessor extends AbstractHttpRequestProcessor {
         return requestLine == null;
     }
 
-    private void processHeaders(MessageSizeMonitor sizeMonitor) throws IOException, HttpStatusException {
+    private boolean processHeaders(MessageSizeMonitor sizeMonitor) throws IOException, HttpStatusException {
         String line;
         while ((line = requestStream.readLineString(sizeMonitor)) != null) {
             if (line.isEmpty()) {
-                return;
+                return true;
             }
-            request.getHeaders().addHeaderLine(line);
+            request.headers().addHeaderLine(line);
         }
         throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Unexpected end of stream while reading HTTP header");
     }
 
     @Override
     public byte[] getAllBody() throws IOException, HttpStatusException {
-        return contentLengthValidator.validateContentOnRead(request.getHeaders().getContentLength(), contentLength ->
+        return contentLengthValidator.validateContentOnRead(request.headers().getContentLength(), contentLength ->
             requestStream.readAllBody(contentLength, sizeMonitor.getBodyMonitor())
         );
     }
@@ -75,10 +70,10 @@ public class Http11RequestProcessor extends AbstractHttpRequestProcessor {
     @Override
     public Part getPart(String partName) throws IOException, HttpStatusException {
         ResourceType resourceType = ResourceType.MULTIPART;
-        String contentType = request.getHeaders().getContentType();
-        String boundary = resourceType.getMediaTypeParamValue(contentType);
+        String contentType = request.headers().getContentType();
+        String boundary = resourceType.getContentTypeParamValue(contentType);
         if (shouldProcessMultipart(resourceType, contentType)) {
-            contentLengthValidator.validateContentOnRead(request.getHeaders().getContentLength(), contentLength -> {
+            contentLengthValidator.validateContentOnRead(request.headers().getContentLength(), contentLength -> {
                 multipartProcessor.processParts(
                         requestStream,
                         boundary,
@@ -88,13 +83,13 @@ public class Http11RequestProcessor extends AbstractHttpRequestProcessor {
                 }
             );
         }
-        return request.getMultipart().getPart(partName);
+        return request.multipart().getPart(partName);
     }
 
     private boolean shouldProcessMultipart(ResourceType resourceType, String contentType) {
-        return !request.getMultipart().isLoad() && resourceType.isEqualMimeType(contentType);
+        return !request.multipart().isLoad() && resourceType.isEqualMimeType(contentType);
     }
 
     @Override
-    public HttpBufferedInputStream getInputStream() { return requestStream.getInputStream(); }
+    public SocketBufferedInputStream getInputStream() { return requestStream.getInputStream(); }
 }

@@ -10,7 +10,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 
-public class Http11RequestStream extends HttpBufferedInputStream implements HttpCrlfLineReader, HttpBodyReader {
+public class Http11RequestStream extends SocketBufferedInputStream implements HttpCrlfLineReader, HttpBodyReader {
     private static final Logger log = LoggerFactory.getLogger(Http11RequestStream.class);
     private static final int CR = '\r';  // Carriage Return
     private static final int LF = '\n';  // Line Feed

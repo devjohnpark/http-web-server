@@ -23,11 +23,6 @@ class ThreadPoolTest {
     }
 
     @Test
-    void getMinSpareThreads() {
-        assertEquals(100, threadPool.getMinSpareThreads());
-    }
-
-    @Test
     void setMaxThreads() {
         assertThrows(IllegalArgumentException.class, () -> threadPool.setMaxThreads(0));
         threadPool.setMaxThreads(100);

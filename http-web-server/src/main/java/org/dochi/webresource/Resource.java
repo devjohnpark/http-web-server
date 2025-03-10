@@ -15,11 +15,8 @@ public class Resource {
         return data;
     }
 
-    public String getContentType(String mediaType) {
-        if (mediaType == null) {
-            return null;
-        }
-        return ResourceType.fromMimeType(mimeType).getContentType(mediaType);
+    public String getContentType(String parameter) {
+        return ResourceType.fromMimeType(mimeType).getContentType(parameter);
     }
 
     public boolean isEmpty() {

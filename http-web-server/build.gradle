@@ -3,7 +3,7 @@ plugins {
     id 'java'
 }
 
-group = 'org.doci'
+group = 'org.dochi'
 version = '1.0.0-SNAPSHOT'
 
 repositories {
@@ -41,12 +41,17 @@ tasks.named('test') {
 }
 
 def jarManifestAttributes = [
-        'Main-Class': 'com.hello_webserver.webserver.WebServer'
+        'Main-Class': 'org.dochi.webserver.WebServerLauncher'
 ]
 
 // Build to jar file task (./gradlew build, ./gradlew jar)
 // When run the ./gradlew build command, the default `jar` task is applied.
 tasks.withType(Jar).configureEach {
+    // set main class path
+    manifest {
+        attributes(jarManifestAttributes)
+    }
+
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // remove duplication task
 
     // include all runtime dependencies in the JAR file
@@ -54,8 +59,7 @@ tasks.withType(Jar).configureEach {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 
-    // set main class path
-    manifest {
-        attributes(jarManifestAttributes)
+    from('webapp') {
+        into('webapp')
     }
 }

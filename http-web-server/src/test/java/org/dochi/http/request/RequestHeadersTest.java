@@ -8,7 +8,7 @@
 //
 //    @Test
 //    void add_get_headers() {
-//        RequestHeaders headers = new RequestHeaders();
+//        MimeHeaders headers = new MimeHeaders();
 //        String keepAlive = "keep-alive";
 //        String cookie = "fdafasdfasdfasfsadf";
 //        String contentType = "text/html; charset=utf-8";
@@ -26,7 +26,7 @@
 //
 //    @Test
 //    void add_get_headers_negative_content_length() {
-//        RequestHeaders headers = new RequestHeaders();
+//        MimeHeaders headers = new MimeHeaders();
 //        String contentType = "text/html; charset=utf-8";
 //        int contentLength = -1;
 //

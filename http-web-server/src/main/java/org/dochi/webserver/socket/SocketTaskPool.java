@@ -9,16 +9,15 @@ import java.util.function.Supplier;
 
 public class SocketTaskPool {
     private static final Logger log = LoggerFactory.getLogger(SocketTaskPool.class);
+    // 큐가 비었을 때 대기(blocking)가 필요할때 사용
+    // take() 호출시 요소 풀에 반환될때까지 blocking)
+    // poll() 호출시에는 blocking 하지 않고 null 반환
     private final LinkedBlockingQueue<SocketTask> queue;
-//    private final HttpApiMapper requestMapper;
-//    private final KeepAlive keepAlive;
     private final Supplier<SocketTask> supplier;
 
     public SocketTaskPool(ThreadPool threadPool, Supplier<SocketTask> supplier) {
         this.queue = new LinkedBlockingQueue<>();
-//        this.requestMapper = new HttpApiMapper(httpApiService);
         this.supplier = supplier;
-//        this.keepAlive = keepAlive;
         this.initPool(threadPool.getMinSpareThreads(), supplier);
         log.info("SocketTaskPool initialized [Total size: {}]", queue.size());
     }
@@ -38,14 +37,14 @@ public class SocketTaskPool {
 //    private void initPool(ThreadPool threadPool, KeepAlive keepAlive, HttpApiMapper requestMapper) {
 //        int poolSize = threadPool.getMinSpareThreads();
 //        for (int i = 0; i < poolSize; i++) {
-//            requestHandlerQueue.offer(new SocketTaskHandler(new SocketWrapper(keepAlive), requestMapper)); // 큐의 끝에 삽입
+//            requestHandlerQueue.offer(new SocketTaskHandler(new BioSocketWrapper(keepAlive), requestMapper)); // 큐의 끝에 삽입
 //        }
 //        log.info("SocketTaskPool initialized, Total size: {}.", requestHandlerQueue.size());
 //    }
 
-    private void initPool(int poolSize, Supplier<SocketTask> requestHandlerSupplier) {
+    private void initPool(int poolSize, Supplier<SocketTask> socketTasks) {
         for (int i = 0; i < poolSize; i++) {
-            queue.offer(requestHandlerSupplier.get()); // 공급자를 통해 객체 생성 및 큐에 추가
+            queue.offer(socketTasks.get()); // 공급자를 통해 객체 생성 및 큐에 추가
         }
     }
 
@@ -57,10 +56,18 @@ public class SocketTaskPool {
         return socketTask;
     }
 
+//    public SocketTask get() throws InterruptedException {
+////        SocketTask socketTask = queue.poll();
+////        if (socketTask == null || socketTask.getSocketWrapper().isUsing()) {
+////            socketTask = supplier.get(); // SocketTask 구현체 생성
+////        }
+//        return queue.take();
+//    }
+
 //    public SocketTaskHandler getAvailableRequestHandler(KeepAlive keepAlive, HttpApiMapper requestMapper) {
 //        SocketTaskHandler requestHandler = requestHandlerQueue.poll();
 //        if (requestHandler == null || requestHandler.getSocketWrapper().isUsing()) {
-//            requestHandler = new SocketTaskHandler(new SocketWrapper(keepAlive), requestMapper);
+//            requestHandler = new SocketTaskHandler(new BioSocketWrapper(keepAlive), requestMapper);
 //        }
 //        return requestHandler;
 //    }

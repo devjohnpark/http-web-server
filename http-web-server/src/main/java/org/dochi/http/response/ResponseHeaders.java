@@ -43,7 +43,7 @@ public class ResponseHeaders {
     }
 
     public void addConnection(boolean isKeepAlive) {
-        addHeader(CONNECTION, isKeepAlive ? "Keep-Alive" : "close");
+        addHeader(CONNECTION, isKeepAlive ? "keep-alive" : "close");
     }
 
     public void addKeepAlive(int timeout, int maxRequests) {

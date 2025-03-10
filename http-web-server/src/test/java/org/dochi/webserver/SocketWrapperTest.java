@@ -1,6 +1,6 @@
 //package org.dochi.webserver;
 //
-//import org.dochi.webserver.socket.SocketWrapper;
+//import org.dochi.webserver.socket.BioSocketWrapper;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //
@@ -11,11 +11,11 @@
 //import java.net.Socket;
 //
 //class SocketWrapperTest {
-//    private SocketWrapper socketWrapper;
+//    private BioSocketWrapper socketWrapper;
 //
 //    @BeforeEach
 //    void setUp() {
-//        socketWrapper = new SocketWrapper(1000, 100);
+//        socketWrapper = new BioSocketWrapper(1000, 100);
 //    }
 //
 //    @Test

@@ -2,10 +2,10 @@ package org.dochi.webserver.lifecycle;
 
 public interface Lifecycle {
 
-    default void start() { }
+    default void start() throws LifecycleException { }
 
-    default void stop() { }
+    default void stop() throws LifecycleException { }
 
-    void init();
-    void destroy();
+    void init() throws LifecycleException;
+    void destroy() throws LifecycleException;
 }

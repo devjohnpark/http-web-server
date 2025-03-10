@@ -2,7 +2,7 @@
 //
 //import org.dochi.http.api.Request;
 //import org.dochi.http.request.data.HttpVersion;
-//import org.dochi.http.request.data.RequestHeaders;
+//import org.dochi.http.request.data.MimeHeaders;
 //import org.dochi.webresource.ResourceType;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;

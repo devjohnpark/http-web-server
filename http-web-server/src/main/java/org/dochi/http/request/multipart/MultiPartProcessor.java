@@ -130,7 +130,7 @@ public class MultiPartProcessor {
         if (name == null) {
             throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Header has no name for part from multipart/form-data format.");
         }
-        request.getMultipart().getParts().put(name, createPart(section.getHeaders(), section.getParameters(), section.getBody()));
+        request.multipart().getParts().put(name, createPart(section.getHeaders(), section.getParameters(), section.getBody()));
     }
 
     private Part createPart(MultipartHeaders headers, MultipartParameters parameters, byte[] body) throws IOException {

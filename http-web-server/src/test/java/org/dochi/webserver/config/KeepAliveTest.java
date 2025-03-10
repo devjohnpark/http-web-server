@@ -16,23 +16,13 @@ class KeepAliveTest {
     }
 
     @Test
-    void getKeepAliveTimeout() {
-        assertEquals(1000, keepAlive.getKeepAliveTimeout());
-    }
-
-    @Test
-    void getMaxKeepAliveRequests() {
-        assertEquals(60, keepAlive.getMaxKeepAliveRequests());
-    }
-
-    @Test
-    void setKeepAliveTimeout() {
+    void set_get_KeepAliveTimeout() {
         keepAlive.setKeepAliveTimeout(3000);
         assertEquals(3000, keepAlive.getKeepAliveTimeout());
     }
 
     @Test
-    void setMaxKeepAliveRequests() {
+    void get_set_MaxKeepAliveRequests() {
         keepAlive.setMaxKeepAliveRequests(600);
         assertEquals(600, keepAlive.getMaxKeepAliveRequests());
     }

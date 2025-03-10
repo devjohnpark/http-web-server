@@ -12,7 +12,6 @@ import java.net.Socket;
 public class Connector {
     private static final Logger log = LoggerFactory.getLogger(Connector.class);
     private final ServerSocket listenSocket;
-    private String protocol;
 
     public Connector(ServerSocket listenSocket) {
         this.listenSocket = listenSocket;
@@ -26,7 +25,14 @@ public class Connector {
         Socket establishedSocket;
         while ((establishedSocket = listenSocket.accept()) != null) {
             log.info("Accepted new client connection [Client IP: {}, Port: {}]", establishedSocket.getInetAddress(), establishedSocket.getPort());
+//            establishedSocket.setReceiveBufferSize(1024000);
+
+            //            System.out.println(establishedSocket.getReceiveBufferSize()); // 408300
+//            System.out.println(establishedSocket.getSendBufferSize()); // 146988
+//            establishedSocket.setReceiveBufferSize(524288); // 512 * 1024 = 512KB (524288)
+//            establishedSocket.setSendBufferSize(524288); // 512 * 1024 = 512KB
             socketTaskExecutor.execute(establishedSocket);
         }
     }
+
 }

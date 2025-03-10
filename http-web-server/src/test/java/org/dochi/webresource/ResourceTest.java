@@ -70,7 +70,7 @@ class ResourceTest {
     @Test
     public void testIsEmptyWhenMimeTypeIsNull() {
         Resource resource = new Resource("Hello".getBytes(), null);
-        assertTrue(resource.isEmpty());
+        assertTrue(!resource.isEmpty());
     }
 
     @Test

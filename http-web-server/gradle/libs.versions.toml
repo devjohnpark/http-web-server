@@ -3,7 +3,7 @@
 
 [versions]
 junit-jupiter = "5.10.2"
-logback-classic = "1.5.6"
+logback-classic = "1.5.17"
 assertj-core = "3.25.3"
 slf4j-api = "2.0.13"
 

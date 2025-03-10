@@ -3,7 +3,7 @@ package org.dochi.http.request.stream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class HttpBufferedInputStream extends InputStream {
+public abstract class SocketBufferedInputStream extends InputStream {
     private static final int DEFAULT_BUFFER_SIZE = 8192;
     private final InputStream inputStream;
     private final byte[] buffer;
@@ -11,11 +11,11 @@ public abstract class HttpBufferedInputStream extends InputStream {
     private int bufferSize = 0;
     private boolean isBufferEnabled = true;
 
-    protected HttpBufferedInputStream(InputStream inputStream) {
+    protected SocketBufferedInputStream(InputStream inputStream) {
         this(inputStream, DEFAULT_BUFFER_SIZE);
     }
 
-    protected HttpBufferedInputStream(InputStream inputStream, int bufferSize) {
+    protected SocketBufferedInputStream(InputStream inputStream, int bufferSize) {
         this.inputStream = inputStream;
         this.buffer = new byte[bufferSize];
     }
@@ -66,7 +66,7 @@ public abstract class HttpBufferedInputStream extends InputStream {
 //        return decodedChars.length;
 //    }
 
-    public HttpBufferedInputStream getInputStream() {
+    public SocketBufferedInputStream getInputStream() {
         isBufferEnabled = false;
         return this;
     }

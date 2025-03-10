@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 public class ServerLifecycle extends LifecycleBase {
     private static final Logger log = LoggerFactory.getLogger(ServerLifecycle.class);
@@ -19,8 +21,10 @@ public class ServerLifecycle extends LifecycleBase {
         this.addLifeCycle(new WebServiceLifecycle(webServer.getConfig().getWebService()));
     }
 
-    public void start() {
+    public void start() throws LifecycleException {
+        log.info("Starting server...");
         super.start();
+        log.info("ServerLifeCycle started");
         logStartedWebServer(webServer);
         try(ServerSocket serverSocket = new ServerSocket()) {
             Connector connector = new Connector(serverSocket);
@@ -32,9 +36,10 @@ public class ServerLifecycle extends LifecycleBase {
         } catch (IOException e) {
             logAcceptError(webServer, e);
         }
+        log.info("try-with-resources: Socket Closed.");
     }
 
-    public void stop() {
+    public void stop() throws LifecycleException {
         super.stop();
         log.info("Web server stopped [Host: {}, Port: {}]", webServer.getHostName(), webServer.getPort());
     }

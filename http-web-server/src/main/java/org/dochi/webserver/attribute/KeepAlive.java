@@ -1,8 +1,8 @@
 package org.dochi.webserver.attribute;
 
 public class KeepAlive {
-    private static final int DEFAULT_KEEP_ALIVE_TIMEOUT = 1000; // default: 1000 ms
-    private static final int DEFAULT_MAX_REQUESTS = 60;
+    private static final int DEFAULT_KEEP_ALIVE_TIMEOUT = 20000; // default: 20000 ms
+    private static final int DEFAULT_MAX_REQUESTS = 100; // default: 100
 
     private int keepAliveTimeout = DEFAULT_KEEP_ALIVE_TIMEOUT;
     private int maxKeepAliveRequests = DEFAULT_MAX_REQUESTS;

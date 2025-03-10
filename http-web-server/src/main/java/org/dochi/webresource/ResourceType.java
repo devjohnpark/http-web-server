@@ -39,11 +39,13 @@ public enum ResourceType {
         return mimeType;
     }
 
-    public String getContentType(String mediaType) {
-        if (this == TEXT || this == HTML || this == JS || this == XML || this == CSS) {
-            return mimeType + "; charset=" + mediaType;
-        } else if (this == MULTIPART) {
-            return mimeType + "; boundary=" + mediaType;
+    public String getContentType(String parameter) {
+        if (parameter != null && !parameter.isEmpty()) {
+            if (this == TEXT || this == HTML || this == JS || this == XML || this == CSS) {
+                return mimeType + "; charset=" + parameter;
+            } else if (this == MULTIPART) {
+                return mimeType + "; boundary=" + parameter;
+            }
         }
         return mimeType;
     }
@@ -55,7 +57,7 @@ public enum ResourceType {
         return contentType.split(";")[0].equalsIgnoreCase(mimeType);
     }
 
-    public String getMediaTypeParamValue(String contentType) {
+    public String getContentTypeParamValue(String contentType) {
         if (contentType == null || contentType.isEmpty()) {
             return null;
         }

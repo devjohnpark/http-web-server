@@ -3,13 +3,16 @@ package org.dochi.http.response;
 import org.dochi.http.request.data.HttpVersion;
 import org.dochi.http.util.DateFormatter;
 import org.dochi.webresource.ResourceType;
+import org.dochi.webresource.SplitFileResource;
 import org.dochi.webserver.config.HttpResConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
@@ -19,7 +22,7 @@ public class Http11ResponseProcessor implements HttpResponseProcessor {
     private final StatusLine statusLine = new StatusLine(HttpVersion.HTTP_1_1, HttpStatus.OK);
     private final ResponseHeaders headers = new ResponseHeaders();
     private final HttpResConfig httpResConfig;
-    private boolean isDefaultDateHeader = true;
+    private boolean isDateHeader = true;
 
     public Http11ResponseProcessor(OutputStream out, HttpResConfig httpResConfig) {
         this.bos = new BufferedOutputStream(out);
@@ -51,30 +54,30 @@ public class Http11ResponseProcessor implements HttpResponseProcessor {
         return this;
     }
 
-    private void addStatus(HttpStatus status) {
+    public void addStatus(HttpStatus status) {
         this.statusLine.setStatus(status);
     }
 
-    private void addDateHeaders(String date) {
+    public void addDateHeaders(String date) {
         this.headers.addHeader(ResponseHeaders.DATE, date);
     }
 
-    private void addContentHeaders(String contentType, int contentLength) {
+    public void addContentHeaders(String contentType, int contentLength) {
         this.headers.addHeader(ResponseHeaders.CONTENT_TYPE, contentType);
         this.headers.addContentLength(contentLength);
     }
 
     public void inActiveDateHeader() {
-        this.isDefaultDateHeader = false;
+        this.isDateHeader = false;
     }
 
     public void activeDateHeader() {
-        this.isDefaultDateHeader = true;
+        this.isDateHeader = true;
     }
 
     // send하면 clear 가능
     // http api에서 send를 호출안하며 refresh 안됨
-    public void refresh() {
+    public void recycle() {
         headers.clear();
     }
 
@@ -84,22 +87,47 @@ public class Http11ResponseProcessor implements HttpResponseProcessor {
 
     // 테스트 필요
     public void send(HttpStatus status) throws IOException {
-        send(status, new byte[0], null);
+//        send(status, new byte[0], null);
+        send(status, null, null);
     }
 
+    //
     public void send(HttpStatus status, byte[] body, String contentType) throws IOException {
+        addDefaultHeader(status, getContentLength(body), contentType);
+        writeMessage(body);
+//        writeStatusLine();
+//        writeHeaders();
+//        writeBody(body);
+
+    }
+
+    private static int getContentLength(byte[] body) {
+        int contentLength = 0;
+        if (body != null) {
+            contentLength = body.length;
+        }
+        return contentLength;
+    }
+
+    private void addDefaultHeader(HttpStatus status, int contentLength, String contentType) {
         addStatus(status);
-        if (isDefaultDateHeader) {
+        if (isDateHeader) {
             addDateHeaders(DateFormatter.getCurrentDate());
         }
-        if (body == null) {
-            body = new byte[0];
-        }
-        // 204 No Content일 경우에만, contentType과 content length 생략
+        // NO_CONTENT면, Content_Length도 없어야함
         if (status != HttpStatus.NO_CONTENT) {
-            addContentHeaders(contentType, body.length);
+            addContentHeaders(contentType, contentLength);
         }
-        writeHttpResMessage(body);
+//        // 204 No Content일 경우에만, contentType과 content length 생략
+//        if (status != HttpStatus.NO_CONTENT || body != null) {
+//            addContentHeaders(contentType, contentLength);
+//        }
+    }
+
+    private void writeMessage(byte[] body) throws IOException {
+        writeStatusLine();
+        writeHeaders();
+        writeBody(body);
     }
 
     public void sendError(HttpStatus status) throws IOException {
@@ -110,13 +138,28 @@ public class Http11ResponseProcessor implements HttpResponseProcessor {
         if (errorMessage == null) {
             errorMessage = status.getDescription();
         }
-        send(status, errorMessage.getBytes(), ResourceType.TEXT.getContentType("UTF-8"));
+        headers.addConnection(false);
+        send(status, errorMessage.getBytes(), ResourceType.TEXT.getContentType(null));
     }
 
-    private void writeHttpResMessage(byte[] body) throws IOException {
-        writeStatusLine();
-        writeHeaders();
-        writeBody(body);
+
+    // prevention using buffer for memory rapidly increment but maintain sending speed.
+    public void sendSplitFile(HttpStatus status, SplitFileResource splitFileResource) throws IOException {
+        addDefaultHeader(status, (int) splitFileResource.getFileSize(), splitFileResource.getContentType(null));
+        writeMessage(null);
+        int bytesRead;
+        final byte[] buffer = new byte[8192];
+        try(InputStream in = splitFileResource.getInputStream()) {
+            while ((bytesRead = in.read(buffer)) != -1) {
+                try {
+                    bos.write(buffer, 0, bytesRead);
+                    bos.flush(); // 즉시 TCP 버퍼로 전달 (시스템 콜 비용 발생)
+                } catch (SocketException e) {
+                    log.debug("Send split file failed: {}", e.getMessage());
+                    throw e; // 네트워크 오류 전파
+                }
+            }
+        }
     }
 
     private void writeStatusLine() throws IOException {
@@ -138,4 +181,10 @@ public class Http11ResponseProcessor implements HttpResponseProcessor {
         }
         bos.flush(); // 스트림 버퍼의 데이터를 OS의 네트워크 스택인 TCP(socket) 버퍼에 즉시 전달 보장 (DataOutputStream은 8바이트의 버퍼 하나 존재)
     }
+
+    public OutputStream getOutputStream() {
+        return bos;
+    }
+
+    public ResponseHeaders getHeaders() { return headers; }
 }

@@ -17,7 +17,7 @@ public abstract class AbstractHttpRequestProcessor implements HttpRequestProcess
     private static final Logger log = LoggerFactory.getLogger(AbstractHttpRequestProcessor.class);
 
 //    protected final RequestMetadata requestMetadata = new RequestMetadata();
-//    protected final RequestHeaders headers = new RequestHeaders();
+//    protected final MimeHeaders headers = new MimeHeaders();
 //    protected final RequestParameters parameters = new RequestParameters();
 
     // maxFileSize = 10485760,       // 10MB (파일 크기 제한), 무한대 -1 -> BigInt
@@ -45,9 +45,9 @@ public abstract class AbstractHttpRequestProcessor implements HttpRequestProcess
     protected abstract boolean isProcessHeader(MessageSizeMonitor sizeMonitor) throws IOException, HttpStatusException;
 
     protected void processParameters() throws IOException, HttpStatusException {
-        request.getParameters().addRequestParameters(request.getMetadata().getQueryString());
-        if (ResourceType.URL.isEqualMimeType(request.getHeaders().getContentType())) {
-            request.getParameters().addRequestParameters(getAllBodyAsString());
+        request.parameters().addRequestParameters(request.metadata().getQueryString());
+        if (ResourceType.URL.isEqualMimeType(request.headers().getContentType())) {
+            request.parameters().addRequestParameters(getAllBodyAsString());
         }
     }
 
@@ -55,9 +55,8 @@ public abstract class AbstractHttpRequestProcessor implements HttpRequestProcess
         return new String(getAllBody(), StandardCharsets.UTF_8);
     }
 
-    public void refresh() throws IOException {
+    public void recycle() throws IOException {
         request.clear();
-//        multipartProcessor.clear();
         sizeMonitor.clear();
     }
 
@@ -65,7 +64,7 @@ public abstract class AbstractHttpRequestProcessor implements HttpRequestProcess
 
 //    public BufferedReader getReader() throws IOException {
 //        return new BufferedReader(new InputStreamReader(
-//                new BufferedRequestStream(HttpBufferedInputStream requestStream) {
+//                new BufferedRequestStream(SocketBufferedInputStream requestStream) {
 //                    super(requestStream.getInputStream());
 //                    count = requestStream.copyBuffer(buf);
 //                }
@@ -82,7 +81,7 @@ public abstract class AbstractHttpRequestProcessor implements HttpRequestProcess
 
 //    public BufferedReader getReader() {
 //        class BufferedRequestStream extends BufferedReader {
-//            public BufferedRequestStream(HttpBufferedInputStream requestStream) {
+//            public BufferedRequestStream(SocketBufferedInputStream requestStream) {
 //                super(new InputStreamReader(requestStream.getInputStream(), StandardCharsets.UTF_8));
 ////                count = requestStream.copyBuffer(cb);
 //
@@ -94,7 +93,7 @@ public abstract class AbstractHttpRequestProcessor implements HttpRequestProcess
 
 //    public BufferedInputStream getInputStream() {
 //        class BufferedRequestStream extends BufferedInputStream {
-//            public BufferedRequestStream(HttpBufferedInputStream requestStream) {
+//            public BufferedRequestStream(SocketBufferedInputStream requestStream) {
 //                super(requestStream.getInputStream());
 //                count = requestStream.copyBuffer(buf);
 //            }
@@ -104,25 +103,25 @@ public abstract class AbstractHttpRequestProcessor implements HttpRequestProcess
 
 //    public InputStream getInputStream() { return requestStream.getRequestStream(); }
 
-    public HttpMethod getMethod() { return request.getMetadata().getMethod(); }
+    public HttpMethod getMethod() { return request.metadata().getMethod(); }
 
-    public String getPath() { return request.getMetadata().getPath(); }
+    public String getPath() { return request.metadata().getPath(); }
 
-    public HttpVersion getHttpVersion() { return request.getMetadata().getHttpVersion(); }
+    public HttpVersion getHttpVersion() { return request.metadata().getHttpVersion(); }
 
-    public String getQueryString() { return request.getMetadata().getQueryString(); }
+    public String getQueryString() { return request.metadata().getQueryString(); }
 
-    public String getRequestURI() { return request.getMetadata().getRequestURI(); }
+    public String getRequestURI() { return request.metadata().getRequestURI(); }
 
-    public String getRequestParameterValue(String key) { return request.getParameters().getRequestParameterValue(key); }
+    public String getRequestParameterValue(String key) { return request.parameters().getRequestParameterValue(key); }
 
-    public String getHeader(String key) { return request.getHeaders().getHeader(key); }
+    public String getHeader(String key) { return request.headers().getHeader(key); }
 
-    public String getCookie() { return request.getHeaders().getCookie(); }
+    public String getCookie() { return request.headers().getCookie(); }
 
-    public String getContentType() { return request.getHeaders().getContentType(); }
+    public String getContentType() { return request.headers().getContentType(); }
 
-    public int getContentLength() { return request.getHeaders().getContentLength(); }
+    public int getContentLength() { return request.headers().getContentLength(); }
 
-    public String getConnection() { return request.getHeaders().getConnection(); }
+    public String getConnection() { return request.headers().getConnection(); }
 }

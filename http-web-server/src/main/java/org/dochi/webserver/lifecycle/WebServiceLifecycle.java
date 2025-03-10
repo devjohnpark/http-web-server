@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
 
 public class WebServiceLifecycle implements Lifecycle {
@@ -18,17 +19,25 @@ public class WebServiceLifecycle implements Lifecycle {
     }
 
     @Override
-    public void init() {
+    public void init() throws LifecycleException {
         for (HttpApiHandler service: webService.getServices().values()) {
-            service.init(webService.getServiceConfig());
+            try {
+                service.init(webService.getServiceConfig());
+            } catch (RuntimeException e) {
+                throw new LifecycleException(e.getMessage(), e);
+            }
         }
         log.info("{} initialized", webService.getClass().getSimpleName());
     }
 
     @Override
-    public void destroy() {
+    public void destroy() throws LifecycleException {
         for (HttpApiHandler service: webService.getServices().values()) {
-            service.destroy();
+            try {
+                service.destroy();
+            } catch (RuntimeException e) {
+                throw new LifecycleException(e.getMessage(), e);
+            }
         }
         log.info("{} destroyed", webService.getClass().getSimpleName());
     }

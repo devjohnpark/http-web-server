@@ -68,8 +68,8 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
 
     // 요청과 응답 리소스 정리
     private void refreshResource() throws IOException {
-        request.refresh();
-        response.refresh();
+        request.recycle();
+        response.recycle();
     }
 
     // try 구문에서 예외가 발생했을때 리소스 정리
