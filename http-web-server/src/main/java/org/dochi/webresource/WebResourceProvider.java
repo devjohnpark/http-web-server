@@ -94,7 +94,7 @@ public class WebResourceProvider implements ResourceProvider {
             try {
                 // JAR 파일의 위치를 URI로 반환: jar:file:/path/to/build/libs/app.jar!/ -> JAR 파일을 열고 내부 리소스에 접근할 수 있는 FileSystem의 진입점
                 // URL.toURI(): URL을 URI로 변환
-                // "jar:" URI 스키마(Scheme)로, JAR 파일을 나타내서 FileSystems.newFileSystem()은 jar: 스키마를 인식하여 JAR 압축 파일을 파일 시스템처럼 열 수 있게 한다. (일반 파일 URI(file:)와 구분하며, JAR 내부 리소스 접근을 명시)
+                // "jar:" URI 스키마(Scheme)로, JAR 파일을 나타내서 FileSystems.newFileSystem()은 jar: 스키마를 인식하여 압축 파일인 JAR 포맷을 마운트해서 파일 시스템이 읽을수 있도록한다. (일반 파일 URI(file:)와 구분하며, JAR 내부 리소스 접근을 명시)
                 // "!": JAR 파일과 그 안의 리소스 트리를 분리하는 표식
                 // !/ 이후 경로를 JAR 내부 루트로 설정
                 // jar:file:/path/to/app.jar!/webapp/index.html → webapp/index.html은 JAR 내부 경로
@@ -129,9 +129,9 @@ public class WebResourceProvider implements ResourceProvider {
             if (in != null) {
                 return in.readAllBytes();
             }
-            log.error("Resource not found: {}", resourcePath);
+            log.error("Resource not found in jar: {}", resourcePath);
         } catch (IOException e) {
-            log.error("Failed to read resource path: {}, exception: {}", resourcePath, e.getMessage());
+            log.error("Failed to read resource path in jar: {}, exception: {}", resourcePath, e.getMessage());
         }
         return null;
     }

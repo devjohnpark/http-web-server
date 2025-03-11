@@ -58,7 +58,7 @@ public class ServerExecutor {
                 executor.submit(() -> {
                     try {
                         serverLifecycle.start();
-                    } catch (LifecycleException e) {
+                    } catch (Exception e) {
                         // 서버 인스턴스 하나라도 예외 발생하면 ExecutorService 정료됨 (모든 서버 인스턴스 종료)
                         // ThreadPoolExecutor의 내부 클래스 Worker.runWorker()에서 예외 발생시, processWorkerExit()에서 tryTerminate() 호출하여 ExecutorService 종료
                         log.error("Server exit - ServerLifecycle occur exception: ", e);
@@ -79,7 +79,7 @@ public class ServerExecutor {
         for (ServerLifecycle serverLifecycle : allWebServers) {
             try {
                 serverLifecycle.stop();
-            } catch (LifecycleException e) {
+            } catch (Exception e) {
                 log.error("ServerLifecycle occur exception: ", e);
             }
         }

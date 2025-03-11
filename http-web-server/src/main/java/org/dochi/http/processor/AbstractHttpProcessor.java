@@ -36,15 +36,18 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     }
 
     protected void processRequests(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
+        int processCount = 0;
         try {
             while (shouldContinue(socketWrapper)) {
                 httpApiMapper.getHttpApiHandler(request.getPath()).service(request, response);
                 refreshResource();
+                processCount++;
             }
         } catch (Exception e) {
             processException(e);
             safeRefreshResource();
         }
+        log.debug("Processed keep-alive requests count: {}", processCount);
     }
 
 

@@ -21,11 +21,7 @@ public class WebServiceLifecycle implements Lifecycle {
     @Override
     public void init() throws LifecycleException {
         for (HttpApiHandler service: webService.getServices().values()) {
-            try {
-                service.init(webService.getServiceConfig());
-            } catch (RuntimeException e) {
-                throw new LifecycleException(e.getMessage(), e);
-            }
+            service.init(webService.getServiceConfig());
         }
         log.info("{} initialized", webService.getClass().getSimpleName());
     }
@@ -33,11 +29,7 @@ public class WebServiceLifecycle implements Lifecycle {
     @Override
     public void destroy() throws LifecycleException {
         for (HttpApiHandler service: webService.getServices().values()) {
-            try {
-                service.destroy();
-            } catch (RuntimeException e) {
-                throw new LifecycleException(e.getMessage(), e);
-            }
+            service.destroy();
         }
         log.info("{} destroyed", webService.getClass().getSimpleName());
     }

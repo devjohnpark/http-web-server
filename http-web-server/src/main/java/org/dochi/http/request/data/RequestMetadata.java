@@ -30,6 +30,7 @@ public class RequestMetadata implements RequestMetadataGetter {
     }
 
     private void addRequestURI(String requestURI) {
+        this.requestURI = requestURI;
         Pair pair = parseRequestUri(requestURI);
         path = pair.key();
         queryString = pair.value();

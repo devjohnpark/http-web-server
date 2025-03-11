@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.SocketException;
 
 // BioSocketWrapper(Socket)과 HttpApiMapper 객체를 가지고 클라이언트의 요청 프로세싱
 public class SocketTaskHandler implements SocketTask {
@@ -36,7 +35,6 @@ public class SocketTaskHandler implements SocketTask {
     public void run() {
         try {
             handleSocketTask(socketWrapper.getSocket());
-//            handleSocketTask(socketWrapper.getSocket(), socketWrapper.getKeepAliveTimeout());
         } catch (RuntimeException e) {
             log.error("Socket RuntimeException: {}", e.getMessage());
         }
