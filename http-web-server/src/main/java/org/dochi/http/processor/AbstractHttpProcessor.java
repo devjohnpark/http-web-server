@@ -5,6 +5,7 @@ import org.dochi.http.api.HttpApiMapper;
 import org.dochi.http.request.processor.HttpRequestProcessor;
 import org.dochi.http.response.Http11ResponseProcessor;
 import org.dochi.http.response.HttpStatus;
+import org.dochi.webserver.socket.SocketState;
 import org.dochi.webserver.socket.SocketWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+
+import static org.dochi.webserver.socket.SocketState.*;
 
 
 public abstract class AbstractHttpProcessor implements HttpProcessor {
@@ -24,61 +27,46 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
         this.response = response;
     }
 
+//     SocketWrapper - read(Buffer), write(Buffer), close()
+//     SocketState.CLOSE를 반환받으면, process()을 호출한 객체에서 SocketWrapper.close() 호출
+//     SocketState를 반환하는 process 메서드로 수정
+//     SocketState를 반환받은 메서드에서 close나 upgrade 로직을 실행하도록 아키텍쳐 짠다.
+//     스레드간에 재활용되는 인스턴스 변수중 중요 변수는 volatile 로 선언
+//     HttpProcessor를 재활용하는 아키텍쳐로 수정
+//     HttpApiHandler를 저장하는 Container 구현
+//     추후, Endpoint, Acceptor, Connector, Protocol 관련 아키첵쳐 수정
     @Override
-    public void process(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
+    public SocketState process(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
+        SocketState state = CLOSED;
         try {
             socketWrapper.startConnectionTimeout(socketWrapper.getKeepAliveTimeout());
-            processRequests(socketWrapper, httpApiMapper);
+            state = service(socketWrapper, httpApiMapper);
         } catch (SocketException e) {
             log.error("Call setSoTimeout() but socket is already closed: {}", e.getMessage());
             sendError(HttpStatus.BAD_REQUEST, "socket is already closed");
         }
+        return state;
     }
 
-    protected void processRequests(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
-        int processCount = 0;
-        try {
-            while (shouldContinue(socketWrapper)) {
-                httpApiMapper.getHttpApiHandler(request.getPath()).service(request, response);
-                refreshResource();
-                processCount++;
-            }
-        } catch (Exception e) {
-            processException(e);
-            safeRefreshResource();
-        }
-        log.debug("Processed keep-alive requests count: {}", processCount);
-    }
+    protected abstract SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper);
 
 
-    protected boolean shouldContinue(SocketWrapper socketWrapper) throws Exception {
-        // 다음 두 조건 중 하나라도 부합하지 않으면 false 반환
-        // 1. SocketState.CLOSING -> false -> break
-        // 2. !request.isPrepareHeader() -> false -> break
-        if (socketWrapper.isClosing() || !request.isPrepareHeader()) {
-            return false;
-        }
-        // 3. keep-alive 조건 안맞으면 다음 요청부터 작업 중자하기 위해서 CLOSING 설정
-        if (!shouldNextRequest(socketWrapper)) {
-            socketWrapper.markClosing();
-        }
-        // 4. shouldContinue을 오버라이딩해서 upgrade 연결이면 false -> break;
-        return true;
-    }
+    // 헤더 형식이 올바르다. -> 정상 응답 (shouldContinue return true)
+    // 헤더 형식이 올바르지 않다. -> throw HttpStatusException() -> response 4XX
+    // 입력 소켓이 메세지 첫줄에 EOF 상태 or IOException -> 응답하지 않고 리소스 정리 (refreshResource() or safeRefreshResource() 호출
 
-    protected abstract boolean shouldNextRequest(SocketWrapper socketWrapper);
-
+    protected abstract boolean shouldKeepAlive(SocketWrapper socketWrapper);
 
     // 요청과 응답 리소스 정리
-    private void refreshResource() throws IOException {
+    protected void recycle() throws IOException {
         request.recycle();
         response.recycle();
     }
 
     // try 구문에서 예외가 발생했을때 리소스 정리
-    private void safeRefreshResource() {
+    protected void safeRecycle() {
         try {
-            refreshResource();
+            recycle();
         } catch (IOException e) {
             processException(e);
         }
@@ -88,17 +76,23 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     // 입출력시 예기치 못한 IOException, Exception은 서버의 문제이므로 500 응답
     protected void processException(Exception e) {
         switch (e) {
+            // SocketTimeoutException시, 연결 종료 -> 연결 끊은 이후, 클라리언트가 요청을 보내면 SocketException 발생
             case SocketTimeoutException socketTimeoutException -> {
                 // Socket의 soSetTimeout()으로 입력 시간 설정 이후, SocketInputStream 객체의 read() 메서드 의해 blocking 중인 상태에서 유효 시간이 만료되면 SocketTimeoutException 예외 던짐
                 // 1. 서버가 요청을 처리하는 동안 타임아웃이 발생: 408 Request Timeout 응답 (write()는 setSoTimeout와 관련 없음)
                 // 2. 소켓 닫아서 클라이언트와의 연결은 4-way handshake를 통해 정상적으로 종료된다.
                 // 3. 클라이언트는 커넥션이 끊어지면, 요청을 반복해서 보내도 문제가 없는 경우에 요청을 다시 보낸다.
-                sendError(HttpStatus.REQUEST_TIMEOUT, "Socket read timeout occurred.");
+                ;
+
+                log.error("Socket read timeout occurred: {}", e.getMessage());
             }
-            case SocketException socketException ->
-                // 클라이언트가 연결 끊은 이후 read() 호출시 SocketException("Connection reset") 던짐 내부적으로 ConnectionReset 예외 발생
+            case SocketException socketException -> {
+                // NioSocketImpl.implRead() 메서드에 기재
+                // 클라이언트가 연결 끊은 이후, read() 호출시 SocketException("Connection reset") 던짐 내부적으로 ConnectionReset 예외 발생
                 // 클라이언트가 연결 끊은 이후, write() 호출시 SocketException("Socket closed") 던짐
-                log.debug("Socket was read or write after the client closed connection: {}", e.getMessage());
+//                log.error("Socket was read or write after the client closed connection: {}", e.getMessage());
+                log.error("Socket was read or write after the client closed connection: ", e);
+            }
             case HttpStatusException httpStatusException -> {
                 sendError(httpStatusException.getHttpStatus(), e.getMessage());
             }
