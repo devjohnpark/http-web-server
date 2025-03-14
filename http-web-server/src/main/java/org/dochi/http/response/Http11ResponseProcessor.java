@@ -91,14 +91,9 @@ public class Http11ResponseProcessor implements HttpResponseProcessor {
         send(status, null, null);
     }
 
-    //
     public void send(HttpStatus status, byte[] body, String contentType) throws IOException {
         addDefaultHeader(status, getContentLength(body), contentType);
         writeMessage(body);
-//        writeStatusLine();
-//        writeHeaders();
-//        writeBody(body);
-
     }
 
     private static int getContentLength(byte[] body) {
@@ -150,6 +145,7 @@ public class Http11ResponseProcessor implements HttpResponseProcessor {
         int bytesRead;
         final byte[] buffer = new byte[8192];
         try(InputStream in = splitFileResource.getInputStream()) {
+            // byte[]를 생성하는 대신 BufferedOutputStream 자식 클래스를 작성해서 buf 넘긴다.
             while ((bytesRead = in.read(buffer)) != -1) {
                 try {
                     bos.write(buffer, 0, bytesRead);
@@ -179,7 +175,7 @@ public class Http11ResponseProcessor implements HttpResponseProcessor {
         if (body != null) {
             bos.write(body, 0, body.length);
         }
-        bos.flush(); // 스트림 버퍼의 데이터를 OS의 네트워크 스택인 TCP(socket) 버퍼에 즉시 전달 보장 (DataOutputStream은 8바이트의 버퍼 하나 존재)
+        bos.flush(); // 스트림 버퍼의 데이터를 OS의 네트워크 스택인 TCP(socket) 버퍼에 즉시 전달 보장
     }
 
     public OutputStream getOutputStream() {
