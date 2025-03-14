@@ -27,14 +27,6 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
         this.response = response;
     }
 
-//     SocketWrapper - read(Buffer), write(Buffer), close()
-//     SocketState.CLOSE를 반환받으면, process()을 호출한 객체에서 SocketWrapper.close() 호출
-//     SocketState를 반환하는 process 메서드로 수정
-//     SocketState를 반환받은 메서드에서 close나 upgrade 로직을 실행하도록 아키텍쳐 짠다.
-//     스레드간에 재활용되는 인스턴스 변수중 중요 변수는 volatile 로 선언
-//     HttpProcessor를 재활용하는 아키텍쳐로 수정
-//     HttpApiHandler를 저장하는 Container 구현
-//     추후, Endpoint, Acceptor, Connector, Protocol 관련 아키첵쳐 수정
     @Override
     public SocketState process(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
         SocketState state = CLOSED;
@@ -50,47 +42,38 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
 
     protected abstract SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper);
 
-
-    // 헤더 형식이 올바르다. -> 정상 응답 (shouldContinue return true)
-    // 헤더 형식이 올바르지 않다. -> throw HttpStatusException() -> response 4XX
-    // 입력 소켓이 메세지 첫줄에 EOF 상태 or IOException -> 응답하지 않고 리소스 정리 (refreshResource() or safeRefreshResource() 호출
-
     protected abstract boolean shouldKeepAlive(SocketWrapper socketWrapper);
 
-    // 요청과 응답 리소스 정리
+    // clear resource of request and response
     protected void recycle() throws IOException {
         request.recycle();
         response.recycle();
     }
 
-    // try 구문에서 예외가 발생했을때 리소스 정리
     protected void safeRecycle() {
         try {
             recycle();
         } catch (IOException e) {
-            processException(e);
+            log.error("Recycle failed: ", e);
         }
     }
 
-    // RuntimeException 처리하는 선택권이 개발자에게 있기 때문에, catch를 하지 않아 전파된 RuntimeException은 클라이언트의 잘못된 요청이라 간주하고 400 응답
-    // 입출력시 예기치 못한 IOException, Exception은 서버의 문제이므로 500 응답
+    // Because the developer has the option to handle RuntimeException, RuntimeException propagated by not catching it is considered to be an invalid request from the client and a 400 response is sent.
+    // Unexpected IOException on input/output, 500 response because Exception is a server problem.
     protected void processException(Exception e) {
         switch (e) {
-            // SocketTimeoutException시, 연결 종료 -> 연결 끊은 이후, 클라리언트가 요청을 보내면 SocketException 발생
             case SocketTimeoutException socketTimeoutException -> {
-                // Socket의 soSetTimeout()으로 입력 시간 설정 이후, SocketInputStream 객체의 read() 메서드 의해 blocking 중인 상태에서 유효 시간이 만료되면 SocketTimeoutException 예외 던짐
-                // 1. 서버가 요청을 처리하는 동안 타임아웃이 발생: 408 Request Timeout 응답 (write()는 setSoTimeout와 관련 없음)
-                // 2. 소켓 닫아서 클라이언트와의 연결은 4-way handshake를 통해 정상적으로 종료된다.
-                // 3. 클라이언트는 커넥션이 끊어지면, 요청을 반복해서 보내도 문제가 없는 경우에 요청을 다시 보낸다.
-                ;
-
-                log.error("Socket read timeout occurred: {}", e.getMessage());
+//                After setting the input time with soSetTimeout() on a Socket, a timeout occurs while the server is reading the request: 408 Request Timeout response (include 'Connection: close' header)
+//                SocketTimeoutException exception thrown when valid time expires while being blocked by read() method of SocketInputStream object (write() is not related to setSoTimeout)
+//                A SocketTimeoutException is thrown if the client has not read all the data in the socket receive buffer while receiving all the data from the web server after sending the request.
+//                Therefore, if you read the data in the socket buffer multiple times through system calls, you must give the client a response before the client realizes it.
+                log.error("Socket read timeout occurred: ", e);
+                sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage());
             }
             case SocketException socketException -> {
-                // NioSocketImpl.implRead() 메서드에 기재
-                // 클라이언트가 연결 끊은 이후, read() 호출시 SocketException("Connection reset") 던짐 내부적으로 ConnectionReset 예외 발생
-                // 클라이언트가 연결 끊은 이후, write() 호출시 SocketException("Socket closed") 던짐
-//                log.error("Socket was read or write after the client closed connection: {}", e.getMessage());
+                // reference: NioSocketImpl.implRead()
+                //  If call Socket.read() after client close the socket after the client close the socket, occurred a situation that throws SocketException("Connection reset") internally in Socket
+                //  If call Socket.write() after client close the socket after the client close the socket, occurred a situation that throws SocketException("Socket closed") internally in Socket
                 log.error("Socket was read or write after the client closed connection: ", e);
             }
             case HttpStatusException httpStatusException -> {
