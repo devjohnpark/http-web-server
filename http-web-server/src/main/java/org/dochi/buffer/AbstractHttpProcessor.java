@@ -1,12 +1,11 @@
-package org.dochi.http.processor;
+package org.dochi.buffer;
 
-import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.api.HttpApiMapper;
+import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.request.processor.HttpRequestProcessor;
 import org.dochi.http.response.Http11ResponseProcessor;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.webserver.socket.SocketState;
-import org.dochi.webserver.socket.SocketWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +13,14 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
-import static org.dochi.webserver.socket.SocketState.*;
+import static org.dochi.webserver.socket.SocketState.CLOSED;
 
-
+// 1. AbstractHttpProcessor: Request, Response 객체를 생성
+// 2. AbstractHttpProcessor 구현체의 service(Request, Response, Adapter) 호출
+// 3. Adapter 객체가 HttpApiRequest 구현체와 HttpApiResponse 구현체에 각각 Request, Response 객체 주입
+// 4. HttpApiRequest 구현체에서 this.inputBuffer.setRequest(Request), InputBuffer로 멀티 파트등의 본문 파싱을 수행한 뒤에 Request에 해당 정보 저장 가능하기 위해서
+// 4. Adapter 객체가 Request의 객체의 path를 확인해서 부합하는 HttpApiHandler 찾아낸다.
+// 5. 찾아낸 HttpApiHandler 객체의 service(HttpApiRequest, HttpApiResponse) 메서드를 객체를 넘겨서 호출
 public abstract class AbstractHttpProcessor implements HttpProcessor {
     private static final Logger log = LoggerFactory.getLogger(AbstractHttpProcessor.class);
     protected final HttpRequestProcessor request;
@@ -28,22 +32,19 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     }
 
     @Override
-    public SocketState process(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
+    public SocketState process(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) {
         SocketState state = CLOSED;
         try {
             socketWrapper.startConnectionTimeout(socketWrapper.getKeepAliveTimeout());
             state = service(socketWrapper, httpApiMapper);
         } catch (SocketException e) {
-            log.error("Set connection timeout but socket is already closed: {}", e.getMessage());
-//            sendError(HttpStatus.BAD_REQUEST, "socket is already closed");
-            sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage());
+            log.error("Call setSoTimeout() but socket is already closed: {}", e.getMessage());
+            sendError(HttpStatus.BAD_REQUEST, "socket is already closed");
         }
         return state;
     }
 
-    protected abstract SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper);
-
-    protected abstract boolean shouldKeepAlive(SocketWrapper socketWrapper);
+    protected abstract SocketState service(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper);
 
     // clear resource of request and response
     protected void recycle() throws IOException {

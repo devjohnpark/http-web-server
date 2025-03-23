@@ -1,7 +1,7 @@
 //package org.dochi.http.request.data;
 //
-//import org.dochi.http.util.Http11Parser;
-//import org.dochi.http.util.Http11Parser.Pair;
+//import org.dochi.http.util.HttpParser;
+//import org.dochi.http.util.HttpParser.Pair;
 //
 //public class RequestLine {
 //    private final HttpMethod method;
@@ -17,7 +17,7 @@
 //    }
 //
 //    public static RequestLine createFromRequestLine(String requestLine) {
-//        String[] tokens = Http11Parser.parseRequestLine(requestLine);
+//        String[] tokens = HttpParser.parseRequestLine(requestLine);
 //        HttpMethod method = HttpMethod.valueOf(tokens[0]);
 //        Uri uri = getUri(tokens[1]);
 //        HttpVersion version = HttpVersion.fromString(tokens[2]);
@@ -25,7 +25,7 @@
 //    }
 //
 //    private static Uri getUri(String uri) {
-//        Pair pair = Http11Parser.parseRequestUri(uri);
+//        Pair pair = HttpParser.parseRequestUri(uri);
 //        String path = pair.key();
 //        String queryString = pair.value();
 //        return new Uri(path, queryString);

@@ -32,7 +32,7 @@ public interface HttpRequestProcessor extends HttpApiRequest {
     // 매우중요: HttpProcessor에서 HttpRequestProcessor을 제어하므로 해당 객체에서만 호출 필요
     boolean isPrepareHeader() throws IOException;
     void recycle() throws IOException;
-    SocketBufferedInputStream getInputStream();
+//    SocketBufferedInputStream getInputStream();
     Request getParsedRequest();
 }
 

@@ -26,11 +26,7 @@ class SocketWrapperBaseTest {
 
         new Thread(() -> {
             while (!serverSocket.isClosed()) { // 여러 클라이언트 요청 처리 가능하도록 변경
-                try (Socket socket = serverSocket.accept();
-                     OutputStream out = socket.getOutputStream()) {
-                    // write boolean true;
-                    // flush();
-                    // 클라 read -> assertTrue(socketWrapper.read());
+                try (Socket socket = serverSocket.accept(); OutputStream out = socket.getOutputStream()) {
                     out.write(new byte[] { 10, 20, 30, 40, 50 });
                     out.flush();
                 } catch (IOException e) {
