@@ -1,5 +1,6 @@
 package org.dochi.buffer;//package org.dochi.inputbuffer;
 
+import org.dochi.buffer.internal.Request;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.response.HttpStatus;
 import org.slf4j.Logger;
@@ -16,18 +17,28 @@ public class Http11InputBuffer implements InputBuffer {
     private static final int SEPARATOR_SIZE = 1;
     private static final int CRLF_SIZE = 2;
 
-    private final Request request;
+//    private final Request request;
     private final ByteBuffer buffer;
 //    private final SocketInputBuffer socketInputBuffer;
     private SocketWrapperBase<?> socketWrapper; // Http11InputBuffer Pool를 위해 변수로 선언
     private final ParseRequestLine parseRequestLine;
     private final ParseHeaderField parseHeaderField;
 
-    public Http11InputBuffer(Request request, int headerMaxSize) {
-        this.request = request;
+//    public Http11InputBuffer(Request request, int headerMaxSize) {
+//        this.request = request;
+////        this.socketInputBuffer = new SocketInputBuffer();
+//        this.buffer = initBuffer(headerMaxSize);
+////        this.parseRequestLine = new ParseRequestLine(request);
+//        this.parseRequestLine = new ParseRequestLine();
+//        this.parseHeaderField = new ParseHeaderField();
+//    }
+
+    public Http11InputBuffer(int headerMaxSize) {
+//        this.request = request;
 //        this.socketInputBuffer = new SocketInputBuffer();
         this.buffer = initBuffer(headerMaxSize);
-        this.parseRequestLine = new ParseRequestLine(request);
+//        this.parseRequestLine = new ParseRequestLine(request);
+        this.parseRequestLine = new ParseRequestLine();
         this.parseHeaderField = new ParseHeaderField();
     }
 
@@ -65,44 +76,47 @@ public class Http11InputBuffer implements InputBuffer {
 //    }
 
 //    // HttpApiRequest에 주입할 body 읽기용 버퍼를 초기화할때, 기존의 헤더 읽을때 버퍼링한 body의 데이터도 포함될수 있으니 가져다 복사해야하기 위해 버퍼 넘김
-//    public ByteBuffer getByteBuffer() {
-//        return this.buffer;
-//    }
-
-    // HttpApiRequest에 주입할 body 읽기용 버퍼를 초기화할때, 기존의 헤더 읽을때 버퍼링한 body의 데이터도 포함될수 있으니 가져다 복사해야하기 위해 버퍼 복사
-    @Override
-    public int duplicate(ByteBuffer buffer) {
-        if (buffer == null) {
-            throw new IllegalStateException("buffer is null");
-        }
-        int bytesToTransfer = this.buffer.remaining();
-        if (this.buffer.hasRemaining() && bytesToTransfer <= buffer.remaining()) {
-//            System.arraycopy(this.buffer.array(), this.buffer.position(),
-//                    buffer.array(), buffer.position(),
-//                    bytesToTransfer);
-
-            // 실제로 System.arraycopy()와 ByteBuffer의 get() or put()의 속도 차이 비교 필요
-//            // 배열 복사를 피하기: System.arraycopy()는 배열 복사를 직접 수행하는 방식이라, ByteBuffer의 API를 사용하면 내부 최적화가 가능하여 더 빠를 수 있다. (비교해봐야함)
-//            // 메모리 접근 최적화: ByteBuffer의 get()과 put() 메서드는 내부 메모리 접근을 최적화하여 성능을 개선한다.
-            // ByteBuffer의 get() or put(): 네이티브 memcpy() 기반의 블록 복사: 블록 복사(Block Copy)는 메모리에서 특정 크기의 데이터를 한 번에 복사하는 방식 (하나씩 검색하지 않음)
-            // CPU의 최적화된 명령어(SIMD, AVX, SSE 등)를 활용 가능, 캐시 최적화 적용 가능 (CPU L1/L2 캐시 활용)
-//            Direct ByteBuffer 사용 호환: ByteBuffer의 allocateDirect() 메서드를 사용하면, JVM 힙 메모리가 아닌 운영체제의 네이티브 메모리에 할당되어 입출력 성능을 향상시킬 수 있다.
-//            this.buffer.get(buffer.array(), buffer.position(), bytesToTransfer);
-//
-//            this.buffer.position(this.buffer.position() + bytesToTransfer);
-
-            buffer.put(this.buffer);
-
-            return bytesToTransfer;
-        }
-        return 0;
+    public ByteBuffer getByteBuffer() {
+        return this.buffer;
     }
+
+//    // HttpApiRequest에 주입할 body 읽기용 버퍼를 초기화할때, 기존의 헤더 읽을때 버퍼링한 body의 데이터도 포함될수 있으니 가져다 복사해야하기 위해 버퍼 복사
+//    @Override
+//    public int duplicate(ByteBuffer buffer) {
+//        if (buffer == null) {
+//            throw new IllegalStateException("buffer is null");
+//        }
+//        int bytesToTransfer = this.buffer.remaining();
+//        if (this.buffer.hasRemaining() && bytesToTransfer <= buffer.remaining()) {
+////            System.arraycopy(this.buffer.array(), this.buffer.position(),
+////                    buffer.array(), buffer.position(),
+////                    bytesToTransfer);
+//
+//            // 실제로 System.arraycopy()와 ByteBuffer의 get() or put()의 속도 차이 비교 필요
+////            // 배열 복사를 피하기: System.arraycopy()는 배열 복사를 직접 수행하는 방식이라, ByteBuffer의 API를 사용하면 내부 최적화가 가능하여 더 빠를 수 있다. (비교해봐야함)
+////            // 메모리 접근 최적화: ByteBuffer의 get()과 put() 메서드는 내부 메모리 접근을 최적화하여 성능을 개선한다.
+//            // ByteBuffer의 get() or put(): 네이티브 memcpy() 기반의 블록 복사: 블록 복사(Block Copy)는 메모리에서 특정 크기의 데이터를 한 번에 복사하는 방식 (하나씩 검색하지 않음)
+//            // CPU의 최적화된 명령어(SIMD, AVX, SSE 등)를 활용 가능, 캐시 최적화 적용 가능 (CPU L1/L2 캐시 활용)
+////            Direct ByteBuffer 사용 호환: ByteBuffer의 allocateDirect() 메서드를 사용하면, JVM 힙 메모리가 아닌 운영체제의 네이티브 메모리에 할당되어 입출력 성능을 향상시킬 수 있다.
+////            this.buffer.get(buffer.array(), buffer.position(), bytesToTransfer);
+////
+////            this.buffer.position(this.buffer.position() + bytesToTransfer);
+//
+//            buffer.put(this.buffer);
+//
+//            return bytesToTransfer;
+//        }
+//        return 0;
+//    }
 
     // SocketProcessor.run() -> doRun() -> HttpProcessor를 가져와서 SocketWrapper를 초기화해서 사용
     public void recycle() {
         buffer.position(0);
         buffer.limit(0);
-        request.recycle();
+
+//        request.recycle();
+
+
 //        socketInputBuffer.recycle();
     }
 
@@ -132,6 +146,39 @@ public class Http11InputBuffer implements InputBuffer {
 //        }
 //        return 0;
 //    }
+//
+//    // doRead(ByteBuffer buffer)
+//    // 전달받은 버퍼에 내부 버퍼를 버퍼링
+//    @Override
+//    public int doRead(ByteBuffer buffer) throws IOException {
+//        if (buffer == null) {
+//            throw new IllegalStateException("buffer is null");
+//        }
+//        int bufferingLimitSize = buffer.capacity() - buffer.limit();
+//        if (bufferingLimitSize <= 0) {
+//            // 클라이언트가 보낸 요청 메세지의 헤더나 바디의 크기 초과
+//            throw new IllegalStateException("Request message size exceeds buffer capacity");
+//        }
+//
+//        // duplicate: 내부 버퍼에 남은 데이터 있으면 그대로 복사
+//        int bytesToTransfer = this.buffer.remaining();
+//        if (this.buffer.hasRemaining() && bytesToTransfer <= buffer.remaining()) {
+//            buffer.put(this.buffer);
+//
+//            return bytesToTransfer;
+//        }
+//
+//        // 내부 버퍼에 남은 버퍼 없으면 소켓으로 읽어온다.
+//        if (this.socketWrapper == null) {
+//            throw new IllegalStateException("No socket wrapper is initialized");
+//        }
+//        int bytesRead = this.socketWrapper.read(buffer.array(), buffer.position(), bufferingLimitSize);
+//        if (bytesRead > 0) {
+//            // 읽은 데이터 크기만큼 기존 limit 증가
+//            buffer.limit(buffer.limit() + bytesRead);
+//        }
+//        return bytesRead;
+//    }
 
 
     @Override
@@ -147,7 +194,13 @@ public class Http11InputBuffer implements InputBuffer {
         if (this.socketWrapper == null) {
             throw new IllegalStateException("No socket wrapper is initialized");
         }
-        int bytesRead = this.socketWrapper.read(buffer.array(), buffer.position(), bufferingLimitSize);
+
+        // 버퍼를 채운 지점 부터
+        int bytesRead = this.socketWrapper.read(buffer.array(), buffer.limit(), bufferingLimitSize);
+
+        // 읽은 인덱스 후 인덱스부터 limit 지정까지
+//        int bytesRead = this.socketWrapper.read(buffer.array(), buffer.position(), bufferingLimitSize);
+
         if (bytesRead > 0) {
             // 읽은 데이터 크기만큼 기존 limit 증가
             buffer.limit(buffer.limit() + bytesRead);
@@ -155,8 +208,8 @@ public class Http11InputBuffer implements InputBuffer {
         return bytesRead;
     }
 
-    public boolean parseHeader() throws IOException {
-        return parseRequestLine() && parseHeaders();
+    public boolean parseHeader(Request request) throws IOException {
+        return parseRequestLine(request) && parseHeaders(request);
     }
 
 //    private boolean parseRequestLine() throws IOException {
@@ -171,7 +224,7 @@ public class Http11InputBuffer implements InputBuffer {
 
 //    private boolean parseRequestLine() throws IOException {
 //        int parseValuesCnt = 0;
-//        while ((parseValuesCnt = HttpParser.parseValuesInCRLF(buffer, parseRequestLine.getRequestLine(), ' ')) != 3) {
+//        while ((parseValuesCnt = Http11Parser.parseValuesInCRLF(buffer, parseRequestLine.getRequestLine(), ' ')) != 3) {
 //            if (parseValuesCnt == -1) {
 //                if (fill(buffer) <= 0) {
 //                    return false;
@@ -181,16 +234,13 @@ public class Http11InputBuffer implements InputBuffer {
 //        return true;
 //    }
 
-    private boolean parseRequestLine() throws IOException {
-        int parseValuesCnt = HttpParser.parseValuesCrlfLine(this, buffer, parseRequestLine.getRequestLine(), ' ');
-        if (parseValuesCnt == 3) return true;
+    private boolean parseRequestLine(Request request) throws IOException {
+        int parseValuesCnt = parseValuesCRLF(parseRequestLine.setRequestLine(request), ' '); // Http11Parser.parseValuesCrlfLine(this, buffer, parseRequestLine.setRequestLine(request), ' ');
+        if (parseValuesCnt == 3) { return true; }
         else if (parseValuesCnt == -1) return false;
         else throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request line");
     }
 
-    private static boolean validateRequestLine(int parseValuesCnt) {
-        return parseValuesCnt == 3;
-    }
 
 //    private boolean parseHeaders() throws IOException {
 //        MimeHeaderField headerField = request.headers().createHeader();
@@ -205,12 +255,13 @@ public class Http11InputBuffer implements InputBuffer {
 //        return false;
 //    }
 
-    private boolean parseHeaders() throws IOException {
+    private boolean parseHeaders(Request request) throws IOException {
         MimeHeaderField headerField = request.headers().createHeader();
-        parseHeaderField.setHeaderField(headerField);
+//        parseHeaderField.setHeaderField(headerField);
         int parseValuesCnt = 0;
-        while ((parseValuesCnt = HttpParser.parseValuesCrlfLine(this, buffer, parseHeaderField.getHeaderField(), ':')) != -1) {
-            if (isBlankLine(parseValuesCnt)) return true;
+//        while ((parseValuesCnt = Http11Parser.parseValuesCrlfLine(this, buffer, parseHeaderField.setHeaderField(headerField), ':')) != -1) {
+        while ((parseValuesCnt = parseValuesCRLF(parseHeaderField.setHeaderField(headerField), ':')) != -1) {
+            if (isBlankLine(request, parseValuesCnt)) return true;
             else if (parseValuesCnt > 2) throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request header");
             validHeaderFieldName(headerField);
             headerField = request.headers().createHeader();
@@ -219,7 +270,7 @@ public class Http11InputBuffer implements InputBuffer {
         return false;
     }
 
-    private boolean isBlankLine(int parseValuesCnt) {
+    private boolean isBlankLine(Request request, int parseValuesCnt) {
         if (parseValuesCnt == 0) {
             request.headers().removeHeader(); // remove MessageBytes when blank line
             return true;
@@ -301,28 +352,41 @@ public class Http11InputBuffer implements InputBuffer {
     // - 요청 라인과 헤더를 파싱하며, 바디 데이터를 읽어 처리하는 것은 HttpServletRequest 이다.
     // - 버퍼에 남은 데이터는 외부에서 doRead 호출해서 바디 최대값으로 초기화된 바디용 버퍼에 복사한다.
 
-//    private int parseValuesCRLF(MessageBytes[] elements, int separator) throws IOException {
-//        validateNullElements(elements);
-//        int count = 0;
-//        int previousByte = -1;
-//        int currentByte;
-//        int start = buffer.position();
-//        while ((currentByte = getByte()) != -1) {
-//            if (isSeparator(separator, currentByte) && !isExceedElementCount(count, elements.length)) {
-//                elements[count++].setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
-//                start = buffer.position();
-//            } else if (skipSpaceSuffixSeparator(separator, previousByte, currentByte)) {
-//                start++;
-//            } else if (isCRLF(previousByte, currentByte)) {  // 마지막 chunk 파싱 (chunk / chunk + \r\n)
-//                if (count > 0) {
-//                    elements[count++].setBytes(buffer.array(), start, buffer.position() - start - CRLF_SIZE);
-//                }
-//                return count;
-//            }
-//            previousByte = currentByte;
-//        }
-//        return -1;
-//    }
+    private int parseValuesCRLF(MessageBytes[] elements, int separator) throws IOException {
+        validateNullElements(elements);
+        int count = 0;
+        int previousByte = -1;
+        int currentByte;
+        int start = buffer.position();
+        while ((currentByte = readByte()) != -1) {
+            if (isSeparator(separator, currentByte) && !isExceedElementCount(count, elements.length)) {
+                elements[count++].setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
+                start = buffer.position();
+            } else if (skipSpaceSuffixSeparator(separator, previousByte, currentByte)) {
+                start++;
+            } else if (isCRLF(previousByte, currentByte)) {  // 마지막 chunk 파싱 (chunk / chunk + \r\n)
+                if (count > 0) {
+                    elements[count++].setBytes(buffer.array(), start, buffer.position() - start - CRLF_SIZE);
+                }
+                return count;
+            }
+            previousByte = currentByte;
+        }
+        return -1;
+    }
+
+    private int readByte() throws IOException {
+        // doRead == 0 이면, len == 0 일때이다.
+        // len == 0 값이 들어올경우
+
+        // 버퍼에 남은 데이터가 없을때 + 버퍼링
+        // 이때 버퍼링한 값이 -1이면, EOF 이므로 그대로 -1 반환
+        // 버퍼링한 값이 0 이면, 버퍼에 남은 데이터도 없으므로 무엇을 반환해야하나. -1을 반환하면 더이상 읽을 값이 없단 의미이다.,
+        if (!this.buffer.hasRemaining() && this.doRead(buffer) <= 0) {
+            return -1;
+        }
+        return buffer.get() & 0xFF;
+    }
 
 
 //    private int getNextByte() throws IOException {
@@ -410,58 +474,66 @@ public class Http11InputBuffer implements InputBuffer {
 //        }
 //    }
 
-//    private boolean skipSpaceSuffixSeparator(int separator, int previousByte, int currentByte) {
-//        return isSeparator(separator, previousByte) && currentByte == ' ';
-//    }
-//
-//    private void validateNullElements(MessageBytes[] elements) {
-//        if (elements == null) {
-//            throw new IllegalArgumentException("Elements array cannot be null");
-//        }
-//
-//        for (MessageBytes element : elements) {
-//            if (element == null) {
-//                throw new IllegalArgumentException("Elements array elements cannot be null");
-//            }
-//        }
-//    }
+    private boolean skipSpaceSuffixSeparator(int separator, int previousByte, int currentByte) {
+        return isSeparator(separator, previousByte) && currentByte == ' ';
+    }
 
-//    private static boolean isSeparator(int separator, int currentByte) {
-//        return currentByte == separator;
-//    }
-//
-//    private boolean isExceedElementCount(int elementCurrentCount, int elementMaxCount) {
-//        return elementCurrentCount + 1 >= elementMaxCount;
-//    }
-//
-//    private boolean isCRLF(int prevByte, int currByte) {
-//        return prevByte == CR && currByte == LF;
-//    }
+    private void validateNullElements(MessageBytes[] elements) {
+        if (elements == null) {
+            throw new IllegalArgumentException("Elements array cannot be null");
+        }
+
+        for (MessageBytes element : elements) {
+            if (element == null) {
+                throw new IllegalArgumentException("Elements array elements cannot be null");
+            }
+        }
+    }
+
+    private static boolean isSeparator(int separator, int currentByte) {
+        return currentByte == separator;
+    }
+
+    private boolean isExceedElementCount(int elementCurrentCount, int elementMaxCount) {
+        return elementCurrentCount + 1 >= elementMaxCount;
+    }
+
+    private boolean isCRLF(int prevByte, int currByte) {
+        return prevByte == CR && currByte == LF;
+    }
 
     private static class ParseRequestLine {
         private final MessageBytes[] requestLine = new MessageBytes[3];
 
-        public ParseRequestLine(Request request) {
+//        public ParseRequestLine(Request request) {
+//            this.requestLine[0] = request.method();
+//            this.requestLine[1] = request.requestURI();
+//            this.requestLine[2] = request.protocol();
+//        }
+
+        public MessageBytes[] setRequestLine(Request request) {
             this.requestLine[0] = request.method();
             this.requestLine[1] = request.requestURI();
-            this.requestLine[2] = request.version();
+            this.requestLine[2] = request.protocol();
+            return this.requestLine;
         }
 
-        public MessageBytes[] getRequestLine() {
-            return requestLine;
-        }
+//        public MessageBytes[] getRequestLine() {
+//            return requestLine;
+//        }
     }
 
     private static class ParseHeaderField {
         private final MessageBytes[] headerField = new MessageBytes[2];
 
-        public void setHeaderField(MimeHeaderField headerField) {
+        public MessageBytes[] setHeaderField(MimeHeaderField headerField) {
             this.headerField[0] = headerField.getName();
             this.headerField[1] = headerField.getValue();
+            return this.headerField;
         }
 
-        public MessageBytes[] getHeaderField() {
-            return headerField;
-        }
+//        public MessageBytes[] getHeaderField() {
+//            return headerField;
+//        }
     }
 }

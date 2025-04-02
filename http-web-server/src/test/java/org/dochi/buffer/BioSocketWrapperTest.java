@@ -8,6 +8,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,14 +30,23 @@ class BioSocketWrapperTest {
     private Thread serverThread;
     private ServerSocket serverSocket;
 
+    private CountDownLatch latch;
+
     // 클라이언트가 요청 메세지를 보낸 시점에 서버의 스레드 실행이 종료되기 때문에
     @BeforeEach
-    void connect() throws IOException {
+    void connect() throws IOException, InterruptedException {
+
+        CountDownLatch serverReadyLatch = new CountDownLatch(1);
+
         serverSocket = new ServerSocket(0); // 사용 가능한 포트 자동 할당
         serverThread = new Thread(() -> {
             log.debug("Starting server...");
             if (!serverSocket.isClosed()) {
                 try {
+
+                    // 서버가 accept()를 호출하기 직전에 신호를 보냄
+                    serverReadyLatch.countDown();
+
                     // blocking 되므로 해당 메서드를 실행하는 스레드 외의 서버 스레드로 실행
                     serverConnectedSocket = new BioSocketWrapper(serverSocket.accept(), new SocketConfig(new KeepAlive()));
                 } catch (IOException e) {
@@ -44,12 +55,14 @@ class BioSocketWrapperTest {
             }
         });
 
-
         serverThread.start();
+
+        serverReadyLatch.await();
+
+        log.debug("Server started.");
 
         clientConnectedSocket = new BioSocketWrapper(new Socket("localhost", serverSocket.getLocalPort()), new SocketConfig(new KeepAlive()));
 
-        log.debug("after starting server");
     }
 
     @AfterEach
@@ -124,5 +137,17 @@ class BioSocketWrapperTest {
         readThread.start();
         Thread.sleep(connectionTimeout); // 충분한 시간 대기하여 타임아웃 발생 유도
         clientConnectedSocket.write(clientBuffer, 0, clientBuffer.length); // 이후에 데이터 전송
+    }
+
+    protected void sendHttp11TextMessageToServer(String header, String body) throws IOException {
+        if (header == null) {
+            return;
+        }
+        if (body == null) {
+            body = "";
+        }
+        String message = header + "\r\n\r\n" + body;
+        clientBuffer = message.getBytes(StandardCharsets.ISO_8859_1);
+        clientConnectedSocket.write(clientBuffer, 0, clientBuffer.length);
     }
 }

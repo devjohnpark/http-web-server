@@ -35,7 +35,6 @@ public class MultiPartProcessor {
 //        validateMultipartData(currentBoundary);
 //    }
 
-
     public MultiPartProcessor(MessageSizeMonitor sizeMonitor) {
         this.sizeMonitor = sizeMonitor;
         this.section = new MultipartSection();

@@ -1,30 +1,37 @@
 //package org.dochi.buffer;
 //
-//import org.dochi.http.api.HttpApiMapper;
+//import org.dochi.buffer.internal.Adapter;
 //import org.dochi.http.request.data.HttpVersion;
 //import org.dochi.http.request.data.RequestHeaders;
-//import org.dochi.http.request.processor.Http11RequestProcessor;
-//import org.dochi.http.request.stream.Http11RequestStream;
-//import org.dochi.http.response.Http11ResponseProcessor;
-//import org.dochi.webserver.config.HttpConfig;
 //import org.dochi.webserver.socket.SocketState;
 //import org.dochi.webserver.socket.SocketWrapper;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
-//
-//import java.io.InputStream;
-//import java.io.OutputStream;
 //
 //import static org.dochi.webserver.socket.SocketState.*;
 //
 //public class Http11Processor extends AbstractHttpProcessor {
 //    private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
 //
-//    public Http11Processor(SocketWrapperBase<?> socketWrapper, HttpConfig config) {
-//        super(
-//                new Http11InputBuffer(socketWrapper, config.getHttpReqConfig().getRequestHeaderMaxSize()),
-//                new Http11ResponseProcessor(out, config.getHttpResConfig())
-//        );
+////    public Http11Processor(SocketWrapperBase<?> socketWrapper, HttpConfig config) {
+//////        super(
+//////                new Http11InputBuffer(z, config.getHttpReqConfig().getRequestHeaderMaxSize()),
+//////                new Http11ResponseProcessor(out, config.getHttpResConfig())
+//////        );
+////
+////
+////    }
+//
+//    private final Http11InputBuffer inputBuffer;
+//
+//    // Http11InputBuffer를 connector.Request.InternalInputStream의 ByteBuffer에게 복사
+//    // internal.Requset.setInputBuffer() 한번만 호출
+//    //
+//
+//    public Http11Processor(Adapter internalAdapter) {
+//        super(internalAdapter);
+//        this.inputBuffer = new Http11InputBuffer(8192);
+//        request.setInputBuffer(inputBuffer);
 //    }
 //
 //    public boolean shouldKeepAlive(SocketWrapper socketWrapper) {
@@ -57,17 +64,46 @@
 //    }
 //
 //    private boolean isUpgradeRequest(SocketWrapper socketWrapper) {
-//        return  request.getHeader(RequestHeaders.UPGRADE) != null;
+//        return request.getHeader(RequestHeaders.UPGRADE) != null;
 //    }
 //
+//    // internalAdapter.service(data.Rquest, data.Response)
+//    // ddatpter.
 //    @Override
-//    protected SocketState service(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) {
+//    protected SocketState service(SocketWrapperBase<?> socketWrapper) {
 //        SocketState state = OPEN;
 //        int processCount = 0;
 //        try {
+////            request.recycle(); // inputbuffer도 recycle
+////            response.
 //            recycle();
+//
+//            // Recycle Logic: high level -> low level
+//            // 1. Before header parsing: internal.Request.recycle() -> InputBuffer.recycle()
+//            // 2. After header parsing: connector.Request.recycle() -> internal.Request.recycle() & InternalInputStream.recycle()
+//
+//            // Recycle 로직은 생성자의 매개변수로 받아들이는 객체나 생성자 내에서 생성되는 객체의 recycle를 수행한다.
+//
+//
+//            // internal.Request: low level 데이터를 저장 (프로토콜별 데이터를 해석하는 InputBuffer 포함)
+//            // Recycle: request.recycle() -> inputbuffer.recycl()
+//
+//            // connector.Request: developer에게 제공하는 공통화된 요청 처리 객체
+//            // Recycle: request.recycle() ->
+//
+//            // Invalid header parsing
+//            // internal.Request.recycle()
+//            // -> InputBuffer.recycle()
+//
+//            // Valid header parsing
+//            // connector.Request.recycle()
+//            // -> internal.Request.recycle()
+//            // -> internal.InternalInputStream.recycle()
+//            //      -> InputBuffer.recycle()
+//
+//
 //            while (state == OPEN) {
-//                if (!request.isPrepareHeader()) {
+//                if (!inputBuffer.parseHeader(request)) {
 //                    request.recycle(); // memory visibility
 //                    // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
 //                    // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
@@ -83,6 +119,8 @@
 //                } else if (!shouldNext(socketWrapper)) {
 //                    state = CLOSED;
 //                }
+//
+//                // adapter에서 connector.Request/Response.recycle() 호출
 //                httpApiMapper.getHttpApiHandler(request.getPath()).service(request, response);
 //
 //                // response.flush()
@@ -91,11 +129,19 @@
 //                // 1. Rapping flush method by custom OutputStream.
 //                // 2. The custom OutputStream declares boolean-isFlushed variable.
 //                // 3. If call rapped flush method, According to isFlushed value(true/false), flush() to be called or not.
-//                recycle();
+////                recycle();
+//
+//                inputBuffer.recycle();
+//                outputBuffer.recycle();
+//
+//
+//
 //                processCount++;
 //            }
 //        } catch (Exception e) {
 //            processException(e);
+////            request.recycle(); // inputbuffer도 recycle
+////            response.recycle(); // Ou
 //            safeRecycle();
 //            state = CLOSED;
 //        }
