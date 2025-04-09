@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+
+// BioSocket
 class BioSocketWrapperTest {
     private static final Logger log = LoggerFactory.getLogger(BioSocketWrapperTest.class);
 
@@ -27,6 +29,7 @@ class BioSocketWrapperTest {
 
     protected BioSocketWrapper serverConnectedSocket;
     protected BioSocketWrapper clientConnectedSocket;
+
     private Thread serverThread;
     private ServerSocket serverSocket;
 
@@ -88,6 +91,21 @@ class BioSocketWrapperTest {
         }
     }
 
+//    protected void doHttp11Request(String header, String body) throws IOException {
+//        if (header == null) {
+//            return;
+//        }
+//        if (body == null) {
+//            body = "";
+//        }
+//        doRequest(header + "\r\n" + body);
+//    }
+
+//    private void doRequest(String message) throws IOException {
+//        clientBuffer = message.getBytes(StandardCharsets.ISO_8859_1);
+//        clientConnectedSocket.write(clientBuffer, 0, clientBuffer.length);
+//    }
+
     @Test
     void server_connected_socket_read() throws IOException {
         clientConnectedSocket.write(clientBuffer, 0, clientBuffer.length);
@@ -137,17 +155,5 @@ class BioSocketWrapperTest {
         readThread.start();
         Thread.sleep(connectionTimeout); // 충분한 시간 대기하여 타임아웃 발생 유도
         clientConnectedSocket.write(clientBuffer, 0, clientBuffer.length); // 이후에 데이터 전송
-    }
-
-    protected void sendHttp11TextMessageToServer(String header, String body) throws IOException {
-        if (header == null) {
-            return;
-        }
-        if (body == null) {
-            body = "";
-        }
-        String message = header + "\r\n\r\n" + body;
-        clientBuffer = message.getBytes(StandardCharsets.ISO_8859_1);
-        clientConnectedSocket.write(clientBuffer, 0, clientBuffer.length);
     }
 }

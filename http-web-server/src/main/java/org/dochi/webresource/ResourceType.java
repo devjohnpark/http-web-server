@@ -5,7 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 
-
+// ResourceType -> MediaType
+// MediaType: text/html; charset=utf8는 하나의 미디어 타입(media type)
+// text/html은 그 타입(type/subtype)
+// charset=utf8은 파라미터(parameter)
 public enum ResourceType {
     TEXT(".txt", "text/plain"),
     HTML(".html", "text/html"),
@@ -35,6 +38,7 @@ public enum ResourceType {
         return extension;
     }
 
+    // MediaType
     public String getMimeType() {
         return mimeType;
     }

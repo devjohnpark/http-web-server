@@ -25,6 +25,7 @@ public abstract class SocketWrapperBase<E> {
 
     protected abstract void close() throws IOException;
 
+    protected abstract void flush() throws IOException;
     // SocketWrapper를 HttpProcessor로 넘겼을때 getSocket() 메서드를 넘기면 실제 소켓객체가 넘겨지기 때문에 문제가된다.
     // 따라서 Socket의 set, get 로직을 제거하고 소켓을 초기화해라.
 //    protected E getSocket() {

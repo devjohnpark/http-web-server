@@ -1,6 +1,6 @@
-package org.dochi.buffer.internal;
+package org.dochi.internal;
 
-import org.dochi.buffer.connector.Connector;
+import org.dochi.connector.Connector;
 
 // reference web service container
 public class Adapter {

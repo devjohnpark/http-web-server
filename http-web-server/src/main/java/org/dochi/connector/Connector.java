@@ -1,4 +1,4 @@
-package org.dochi.buffer.connector;
+package org.dochi.connector;
 
 import org.dochi.http.request.data.HttpVersion;
 import org.dochi.webserver.lifecycle.LifecycleBase;

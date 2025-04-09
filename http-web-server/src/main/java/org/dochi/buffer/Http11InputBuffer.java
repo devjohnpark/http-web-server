@@ -1,13 +1,15 @@
 package org.dochi.buffer;//package org.dochi.inputbuffer;
 
-import org.dochi.buffer.internal.Request;
+import org.dochi.internal.Request;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.response.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 
 public class Http11InputBuffer implements InputBuffer {
@@ -21,8 +23,8 @@ public class Http11InputBuffer implements InputBuffer {
     private final ByteBuffer buffer;
 //    private final SocketInputBuffer socketInputBuffer;
     private SocketWrapperBase<?> socketWrapper; // Http11InputBuffer Pool를 위해 변수로 선언
-    private final ParseRequestLine parseRequestLine;
-    private final ParseHeaderField parseHeaderField;
+//    private final ParseRequestLine parseRequestLine;
+//    private final ParseHeaderField parseHeaderField;
 
 //    public Http11InputBuffer(Request request, int headerMaxSize) {
 //        this.request = request;
@@ -38,8 +40,8 @@ public class Http11InputBuffer implements InputBuffer {
 //        this.socketInputBuffer = new SocketInputBuffer();
         this.buffer = initBuffer(headerMaxSize);
 //        this.parseRequestLine = new ParseRequestLine(request);
-        this.parseRequestLine = new ParseRequestLine();
-        this.parseHeaderField = new ParseHeaderField();
+//        this.parseRequestLine = new ParseRequestLine();
+//        this.parseHeaderField = new ParseHeaderField();
     }
 
     public ByteBuffer initBuffer(int maxSize) {
@@ -234,12 +236,78 @@ public class Http11InputBuffer implements InputBuffer {
 //        return true;
 //    }
 
+    // string으로 파싱하면 임시 객체가 생긴다 -> GC
+    // request-uri를 파싱하지말고 path와 query string으로 파싱, 단 query string은 null 일수 있기 때문에 MessgageBytes에 null 메서드 필요
+    // /path?name=johnpark&age=20
+    // 기본 space나 crlf까지 파싱 + 추가적으로 ?까지 파싱 로직
+    // path, query string으로 파싱한 뒤에, connector.Request에서 query string이 null이 아니면 파라매터 파싱 수행
+    // 파라매터 파싱은 Query String의 key를 byte 단위로 찾아서 반환 혹은 String으로 변환해서 hashmap으로 찾아서 반환
+
+    // 헤더의 key와 다르게 파라매터의 key는 요청마다 다르다.
+    // 그리고 헤더와 다르게 파라메터는 API의 중요 데이터이기 때문에 대부분 값을 파싱해서 사용된다.
+    // 따라서 파라메터는 HashMap으로 저장해서 사용하도록한다.
+
     private boolean parseRequestLine(Request request) throws IOException {
-        int parseValuesCnt = parseValuesCRLF(parseRequestLine.setRequestLine(request), ' '); // Http11Parser.parseValuesCrlfLine(this, buffer, parseRequestLine.setRequestLine(request), ' ');
-        if (parseValuesCnt == 3) { return true; }
-        else if (parseValuesCnt == -1) return false;
-        else throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request line");
+        int elementCnt = 0;
+        int querySeparator = -1;
+        int previousByte = -1;
+        int currentByte;
+        int start = this.buffer.position();
+        while ((currentByte = getByte()) != -1) {
+            if (currentByte == ' ') {
+                elementCnt++;
+                if (elementCnt == 1) {
+                    request.method().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
+                } else if (elementCnt == 2) { // GET /user?name=john%20park&password=1234 HTTP/1.1
+                    request.requestURI().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
+                    if (querySeparator != -1) {
+                        request.path().setBytes(buffer.array(), start, querySeparator - start - SEPARATOR_SIZE);
+                        request.queryString().setBytes(buffer.array(), querySeparator, buffer.position() - querySeparator - SEPARATOR_SIZE);
+                    } else {
+                        request.path().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
+                    }
+                    request.requestURI().setCharset(StandardCharsets.UTF_8);
+                    request.path().setCharset(StandardCharsets.UTF_8);
+                    request.queryString().setCharset(StandardCharsets.UTF_8);
+                }
+                start = buffer.position();
+            } else if (currentByte == '?') {
+                querySeparator = this.buffer.position();
+            } else if (previousByte == '\r' && currentByte == '\n') {
+                if (elementCnt != 2) {
+                    throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request line");
+                }
+                request.protocol().setBytes(buffer.array(), start, buffer.position() - start - CRLF_SIZE);
+                return true;
+            }
+            previousByte = currentByte;
+        }
+        return false;
     }
+
+
+
+//    private boolean parseRequestLine(Request request) throws IOException {
+//        int parseValuesCnt = parseValuesCRLF(parseRequestLine.setRequestLine(request), ' '); // Http11Parser.parseValuesCrlfLine(this, buffer, parseRequestLine.setRequestLine(request), ' ');
+//        if (parseValuesCnt == 3) {
+////            byte[] uriBytes = request.requestURI().getByteChunk().getBuffer();
+////            int start = request.requestURI().getByteChunk().getStart();
+////            int end = request.requestURI().getByteChunk().getEnd();
+////
+////            for (int i = start; i < end; i++) {
+////                if (uriBytes[i] == '?') {
+////                    request.path().setBytes(uriBytes, start, i - start);
+////                    request.query().setBytes(uriBytes, i + 1, end - (i + 1));
+////                    return true;
+////                }
+////            }
+////            request.path().setBytes(uriBytes, start, end - start);
+//            return true;
+//        }
+//        else if (parseValuesCnt == -1) return false;
+//        else throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request line");
+//    }
+
 
 
 //    private boolean parseHeaders() throws IOException {
@@ -255,34 +323,34 @@ public class Http11InputBuffer implements InputBuffer {
 //        return false;
 //    }
 
-    private boolean parseHeaders(Request request) throws IOException {
-        MimeHeaderField headerField = request.headers().createHeader();
-//        parseHeaderField.setHeaderField(headerField);
-        int parseValuesCnt = 0;
-//        while ((parseValuesCnt = Http11Parser.parseValuesCrlfLine(this, buffer, parseHeaderField.setHeaderField(headerField), ':')) != -1) {
-        while ((parseValuesCnt = parseValuesCRLF(parseHeaderField.setHeaderField(headerField), ':')) != -1) {
-            if (isBlankLine(request, parseValuesCnt)) return true;
-            else if (parseValuesCnt > 2) throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request header");
-            validHeaderFieldName(headerField);
-            headerField = request.headers().createHeader();
-            parseHeaderField.setHeaderField(headerField);
-        }
-        return false;
-    }
+//    private boolean parseHeaders(Request request) throws IOException {
+//        MimeHeaderField headerField = request.headers().createHeader();
+////        parseHeaderField.setHeaderField(headerField);
+//        int parseValuesCnt = 0;
+////        while ((parseValuesCnt = Http11Parser.parseValuesCrlfLine(this, buffer, parseHeaderField.setHeaderField(headerField), ':')) != -1) {
+//        while ((parseValuesCnt = parseValuesCRLF(parseHeaderField.setHeaderField(headerField), ':')) != -1) {
+//            if (isBlankLine(request, parseValuesCnt)) return true;
+//            else if (parseValuesCnt > 2) throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request header");
+//            validHeaderFieldName(headerField);
+//            headerField = request.headers().createHeader();
+//            parseHeaderField.setHeaderField(headerField);
+//        }
+//        return false;
+//    }
 
-    private boolean isBlankLine(Request request, int parseValuesCnt) {
-        if (parseValuesCnt == 0) {
-            request.headers().removeHeader(); // remove MessageBytes when blank line
-            return true;
-        }
-        return false;
-    }
-
-    private void validHeaderFieldName(MimeHeaderField headerField) {
-        if (headerField.getName().getLength() == 0) {
-            throw new HttpStatusException(HttpStatus.BAD_REQUEST, "HTTP Header field name must not be empty");
-        }
-    }
+//    private boolean isBlankLine(Request request, int parseValuesCnt) {
+//        if (parseValuesCnt == 0) {
+//            request.headers().removeHeader(); // remove MessageBytes when blank line
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    private void validHeaderFieldName(MimeHeaderField headerField) {
+//        if (headerField.getName().getLength() == 0) {
+//            throw new HttpStatusException(HttpStatus.BAD_REQUEST, "HTTP Header field name must not be empty");
+//        }
+//    }
 
     // Http11InputBuffer에서 읽으면서 파싱을 수행하는 이유?
     // HTTP 요청 메시지를 처리하려면 소켓에서 데이터를 읽고, 이를 해석해야 한다.
@@ -352,36 +420,79 @@ public class Http11InputBuffer implements InputBuffer {
     // - 요청 라인과 헤더를 파싱하며, 바디 데이터를 읽어 처리하는 것은 HttpServletRequest 이다.
     // - 버퍼에 남은 데이터는 외부에서 doRead 호출해서 바디 최대값으로 초기화된 바디용 버퍼에 복사한다.
 
-    private int parseValuesCRLF(MessageBytes[] elements, int separator) throws IOException {
-        validateNullElements(elements);
-        int count = 0;
+
+//    // header 용
+//    private int parseValuesCRLF(MessageBytes[] elements, int separator) throws IOException {
+//        validateNullElements(elements);
+//        int count = 0;
+//        int previousByte = -1;
+//        int currentByte;
+//        int start = buffer.position();
+//        while ((currentByte = getByte()) != -1) {
+//            if (isSeparator(separator, currentByte) && !isExceedElementCount(count, elements.length)) {
+//                elements[count++].setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
+//                start = buffer.position();
+//            } else if (skipSpaceSuffixSeparator(separator, previousByte, currentByte)) {
+//                start++;
+//            } else if (isCRLF(previousByte, currentByte)) {  // 마지막 chunk 파싱 (chunk / chunk + \r\n)
+//                if (count > 0) {
+//                    elements[count++].setBytes(buffer.array(), start, buffer.position() - start - CRLF_SIZE);
+//                }
+//                return count;
+//            }
+//            previousByte = currentByte;
+//        }
+//        return -1;
+//    }
+
+
+    private boolean parseHeaders(Request request) throws IOException {
+        MimeHeaderField mimeHeaderField;
+        do {
+            mimeHeaderField = parseHeaderField(request);
+        } while (mimeHeaderField != null); // \r\n\r\n
+        return request.headers().size() > 0;
+    }
+
+    // 헤더 생성 시점 명확히
+    // name:_value 조건 만족시 헤더 생성
+    // :_ 발견해야함 (prev == : && cur == _)
+    // name:도 허용
+    private MimeHeaderField parseHeaderField(Request request) throws IOException {
         int previousByte = -1;
         int currentByte;
         int start = buffer.position();
-        while ((currentByte = readByte()) != -1) {
-            if (isSeparator(separator, currentByte) && !isExceedElementCount(count, elements.length)) {
-                elements[count++].setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
+        MimeHeaderField headerField = null;
+        int headerSize = -1;
+        while ((currentByte = getByte()) != -1) {
+            if (currentByte == ':') {
+                // 헤더 위치 보장 필요
+                headerField = request.headers().createHeader();
+                headerField.getName().setBytes(buffer.array(), start, buffer.position() - start - 1);
+                headerSize = request.headers().size(); // 생성된 헤더 개수 업데이트
                 start = buffer.position();
-            } else if (skipSpaceSuffixSeparator(separator, previousByte, currentByte)) {
+            } else if (previousByte == ':' && currentByte == ' ') {
                 start++;
-            } else if (isCRLF(previousByte, currentByte)) {  // 마지막 chunk 파싱 (chunk / chunk + \r\n)
-                if (count > 0) {
-                    elements[count++].setBytes(buffer.array(), start, buffer.position() - start - CRLF_SIZE);
+            } else if (previousByte == '\r' && currentByte == '\n') {
+                if (headerSize != -1 && headerSize < request.headers().size()) { // 헤더 이름 없이 헤더 값이 생성될수 없음
+                    throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request header");
                 }
-                return count;
+                if (headerField != null && headerSize == request.headers().size()) { // 헤더 필드 이름과 값 매칭
+                    headerField.getValue().setBytes(buffer.array(), start, buffer.position() - start - 2);
+                }
+                return headerField;
             }
             previousByte = currentByte;
         }
-        return -1;
+        throw new EOFException();
     }
 
-    private int readByte() throws IOException {
+    private int getByte() throws IOException {
         // doRead == 0 이면, len == 0 일때이다.
         // len == 0 값이 들어올경우
-
         // 버퍼에 남은 데이터가 없을때 + 버퍼링
         // 이때 버퍼링한 값이 -1이면, EOF 이므로 그대로 -1 반환
-        // 버퍼링한 값이 0 이면, 버퍼에 남은 데이터도 없으므로 무엇을 반환해야하나. -1을 반환하면 더이상 읽을 값이 없단 의미이다.,
+        // 버퍼링한 값이 0 이면, 버퍼에 남은 데이터도 없으므로 무엇을 반환해야하나. -1을 반환하면 더이상 읽을 값이 없단 의미이다.
         if (!this.buffer.hasRemaining() && this.doRead(buffer) <= 0) {
             return -1;
         }
@@ -474,66 +585,65 @@ public class Http11InputBuffer implements InputBuffer {
 //        }
 //    }
 
-    private boolean skipSpaceSuffixSeparator(int separator, int previousByte, int currentByte) {
-        return isSeparator(separator, previousByte) && currentByte == ' ';
-    }
+//    private boolean skipSpaceSuffixSeparator(int separator, int previousByte, int currentByte) {
+//        return isSeparator(separator, previousByte) && isSpace(currentByte);
+//    }
 
-    private void validateNullElements(MessageBytes[] elements) {
-        if (elements == null) {
-            throw new IllegalArgumentException("Elements array cannot be null");
-        }
 
-        for (MessageBytes element : elements) {
-            if (element == null) {
-                throw new IllegalArgumentException("Elements array elements cannot be null");
-            }
-        }
-    }
+//    private void validateNullElements(MessageBytes[] elements) {
+//        if (elements == null) {
+//            throw new IllegalArgumentException("Elements array cannot be null");
+//        }
+//
+//        for (MessageBytes element : elements) {
+//            validateElement(element);
+//        }
+//    }
+//
+//    private static void validateElement(MessageBytes element) {
+//        if (element == null) {
+//            throw new IllegalArgumentException("Elements array elements cannot be null");
+//        }
+//    }
 
-    private static boolean isSeparator(int separator, int currentByte) {
-        return currentByte == separator;
-    }
 
-    private boolean isExceedElementCount(int elementCurrentCount, int elementMaxCount) {
-        return elementCurrentCount + 1 >= elementMaxCount;
-    }
+//    private boolean isExceedElementCount(int elementCurrentCount, int elementMaxCount) {
+//        return elementCurrentCount + 1 >= elementMaxCount;
+//    }
 
-    private boolean isCRLF(int prevByte, int currByte) {
-        return prevByte == CR && currByte == LF;
-    }
 
-    private static class ParseRequestLine {
-        private final MessageBytes[] requestLine = new MessageBytes[3];
-
-//        public ParseRequestLine(Request request) {
+//    private static class ParseRequestLine {
+//        private final MessageBytes[] requestLine = new MessageBytes[3];
+//
+////        public ParseRequestLine(Request request) {
+////            this.requestLine[0] = request.method();
+////            this.requestLine[1] = request.requestURI();
+////            this.requestLine[2] = request.protocol();
+////        }
+//
+//        public MessageBytes[] setRequestLine(Request request) {
 //            this.requestLine[0] = request.method();
 //            this.requestLine[1] = request.requestURI();
 //            this.requestLine[2] = request.protocol();
+//            return this.requestLine;
 //        }
+//
+////        public MessageBytes[] getRequestLine() {
+////            return requestLine;
+////        }
+//    }
 
-        public MessageBytes[] setRequestLine(Request request) {
-            this.requestLine[0] = request.method();
-            this.requestLine[1] = request.requestURI();
-            this.requestLine[2] = request.protocol();
-            return this.requestLine;
-        }
-
-//        public MessageBytes[] getRequestLine() {
-//            return requestLine;
+//    private static class ParseHeaderField {
+//        private final MessageBytes[] headerField = new MessageBytes[2];
+//
+//        public MessageBytes[] setHeaderField(MimeHeaderField headerField) {
+//            this.headerField[0] = headerField.getName();
+//            this.headerField[1] = headerField.getValue();
+//            return this.headerField;
 //        }
-    }
-
-    private static class ParseHeaderField {
-        private final MessageBytes[] headerField = new MessageBytes[2];
-
-        public MessageBytes[] setHeaderField(MimeHeaderField headerField) {
-            this.headerField[0] = headerField.getName();
-            this.headerField[1] = headerField.getValue();
-            return this.headerField;
-        }
-
-//        public MessageBytes[] getHeaderField() {
-//            return headerField;
-//        }
-    }
+//
+////        public MessageBytes[] getHeaderField() {
+////            return headerField;
+////        }
+//    }
 }

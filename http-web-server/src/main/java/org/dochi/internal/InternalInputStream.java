@@ -1,11 +1,12 @@
-package org.dochi.buffer.internal;
+package org.dochi.internal;
 
 import org.dochi.buffer.InputBuffer;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
-
 
 
 // java 프로그래머한테 InputStream이 익숙하므로 InputBuffer를 InputStream/Reader로 감싸서 제공
@@ -14,12 +15,12 @@ import java.nio.ByteBuffer;
 // Request는 Reader/InputStream 객체로 개발자에게 제공
 // Response는 Writer/OutputStream 객체로 개발자에게 제공
 
+// 프로토콜 별로 호환되는 InputBuffer 구현체를 참조해서 본문을 읽는 입력스트림
 public class InternalInputStream extends InputStream {
     private final static int DEFAULT_BUFFER_SIZE = 8192;
     private final ByteBuffer inputStreamBuffer;
-
     private final InputBuffer inputBuffer;
-    private ByteBuffer sourceBuffer;;
+    private ByteBuffer sourceBuffer;
     private boolean isInputStreamBuffer = false;
 
     public InternalInputStream(InputBuffer inputBuffer) {
@@ -30,11 +31,13 @@ public class InternalInputStream extends InputStream {
         this.inputStreamBuffer = ByteBuffer.allocate(bufferSize);
         this.inputBuffer = inputBuffer;
         this.sourceBuffer = inputBuffer.getByteBuffer();
+//        this.sourceBuffer = ByteBuffer.wrap(inputBuffer.getBuffer());
     }
 
     public void recycle() {
         this.isInputStreamBuffer = false;
         this.sourceBuffer = inputBuffer.getByteBuffer();
+//        this.sourceBuffer = ByteBuffer.wrap(inputBuffer.getBuffer());
         inputStreamBuffer.position(0);
         inputStreamBuffer.limit(0);
     }
@@ -48,7 +51,6 @@ public class InternalInputStream extends InputStream {
         }
         return isInputStreamBuffer;
     }
-
 
     private int fill() throws IOException {
         if (inputStreamBuffer.hasRemaining()) {
@@ -69,8 +71,6 @@ public class InternalInputStream extends InputStream {
     // read(byte[] b, int off, int len): 매개변수로 받은 버퍼에 읽기를 사용 (단, 내부 버퍼를 데이터가 남아있으면 복사 후 읽기)
     // 내부 버퍼의 종류는 InputBuffer/InputStream 버퍼가 있다.
 
-    // multipart/form-data 일때 하나씩 데이터를 읽어가주고 파싱해서 헤더 요소를 String으로 저장하고
-    // 바디는 텍스트가 아닌 파일의 경우 용량이 크기 때문에 파일로 저장하고 텍스트는 애플리케이션 메모리에 저장
     @Override
     public int read() throws IOException {
         if (shouldInputStreamBuffer() && fill() < 0) {
@@ -84,6 +84,14 @@ public class InternalInputStream extends InputStream {
         return read(b, 0, b.length);
     }
 
+    // byte를 문자 인코딩을 통해 변환 필요
+    // 단, 버퍼 복사 비용을 줄여야한다.
+    // System.arraycopy()가 네이티브 최적화 덕분에 실제 실행 속도가 더 빠르다.
+    // ByteBuffer.get()은 채널 기반 입출력인 FileChannel, SocketChannel을 사용한다면, heap 영역 데이터 복사를 커치지 않고 네트워크나 파일 I/O시에 커널영역으로 직접 데이터를 복사하므로 더 빠르다.
+
+
+    // MultipartParser -> MultipartParser 내에 byte[] lineBuffer를 생성해서 read(lineBuffer, off, len) 호출해서 CRLF 단위로 파싱
+    // 바디는 텍스트가 아닌 파일의 경우 용량이 크기 때문에 파일로 저장하고 텍스트는 애플리케이션 메모리에 저장
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         if (b == null) {
@@ -110,6 +118,25 @@ public class InternalInputStream extends InputStream {
         }
         return fillCnt;
     }
+
+    public int readLine(byte[] b, int off, int len) throws IOException {
+        if (len <= 0) {
+            return 0;
+        } else {
+            int count = 0;
+            int c;
+            while((c = this.read()) != -1) {
+                b[off++] = (byte)c;
+                ++count;
+                if (c == '\n' || count == len) {
+                    break;
+                }
+            }
+
+            return count > 0 ? count : -1;
+        }
+    }
+
 
 //    // 매개변수로 받은 버퍼의 길이 만큼 못채웠을때 소켓 버퍼링을 통해 추가 읽기
 //    @Override

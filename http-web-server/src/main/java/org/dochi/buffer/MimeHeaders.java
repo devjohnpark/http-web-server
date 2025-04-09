@@ -1,5 +1,8 @@
 package org.dochi.buffer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MimeHeaders {
     private static final int DEFAULT_HEADER_FIELD_COUNT = 8;
     private int len = 0;
@@ -108,6 +111,10 @@ public class MimeHeaders {
         return headers[count++];
     }
 
+    public int size() {
+        return this.count;
+    }
+
     public void removeHeader() {
         if (count <= 0) {
             return;
@@ -140,8 +147,12 @@ public class MimeHeaders {
 //        headers[index].getValue().setBytes(buffer, start, length);
 //    }
 
-    // Header field를 hashmap으로 사용해서 O(1)로 데이터에 접근해야 성능이 빨라진다. InputBuffer를 사용했을땐 byte 배열을 탐색하면서 검색했다.
-    // ByteBuffer의 slice()로 인스턴스를 뽑아낼수 있는지 확인 -> 객체의 메모리 주소 값으로 해쉬맵에서 탐색가능한지? 가능할듯 slice(): position ~ limit 영역만 새 버퍼로 생성, 원본과 공유
+
+    // 헤더 수가 적은 경우(보통 10~30개 수준)는 배열 순회가 해시보다 빠를 수도 있다.
+    // 버퍼에서 헤더는 연손적으로 메모리상에 저장되기 때문에 캐시히트가 높다. (JIT 최적화 좋음)
+    // 반면, 해시 맵은 내부적으로 포인터 배열을 사용하고 해시 충돌이 발생했을 경우 Red-Black Tree로 변환해서 log(n)으로 처리 (해시 연산과 해시 충돌에서 오버헤드 발생)
+    // 포인터 배열을 사용하므로 메모리가 연속적으로 저장되지 않아서 캐시 히트가 낮을수 있다. (JIT 최적화 낮음)
+    // 수많은 클라이언트의 동시 요청을 처리할때 GC까지 고려해서 성능을 비교해야한다.
     public MessageBytes getValue(String name) {
         for(int i = 0; i < this.count; i++) {
             if (this.headers[i].getName().equalsIgnoreCase(name)) {

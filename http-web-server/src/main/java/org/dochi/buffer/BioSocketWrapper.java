@@ -39,6 +39,7 @@ public class BioSocketWrapper extends SocketWrapperBase<Socket> {
         socket.getOutputStream().write(buffer, off, len);
     }
 
+
     @Override
     protected void close() throws IOException {
         if (!socket.isClosed()) {
@@ -46,6 +47,11 @@ public class BioSocketWrapper extends SocketWrapperBase<Socket> {
             log.debug("Socket closed [Client: {}, Port: {}]",
                     socket.getInetAddress(), socket.getPort());
         }
+    }
+
+    @Override
+    protected void flush() throws IOException {
+        socket.getOutputStream().flush();
     }
 
     @Override

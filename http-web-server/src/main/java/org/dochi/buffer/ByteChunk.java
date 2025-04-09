@@ -1,7 +1,5 @@
 package org.dochi.buffer;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -72,8 +70,27 @@ public final class ByteChunk {
     public String toString() {
 //        CharBuffer cb = this.getCharset().decode(ByteBuffer.wrap(this.buffer, this.start, this.end - this.start));
 //        return new String(cb.array(), cb.arrayOffset(), cb.length());
+        if (end - start > 0) {
+            return new String(buffer, start, end - start, charset);
+        }
+        return "";
+    }
 
-        return new String(buffer, start, end - start, charset);
+    public int toInt() {
+//        if (end - start > 0) {
+//            return Integer.parseInt(toString());
+//        }
+//        return 0;
+        int result = 0;
+        for (int i = start; i < end; i++) {
+            byte b = buffer[i];
+            if (b < '0' || b > '9') {
+                throw new NumberFormatException("Invalid digit at index " + i + ": " + (char) b);
+            }
+            result = result * 10 + (b - '0');
+        }
+
+        return result;
     }
 
     public boolean equalsIgnoreCase(String s) {
@@ -81,18 +98,19 @@ public final class ByteChunk {
         if (buffer == null || s == null || len != s.length()) {
             return false;
         }
-
         int off = start;
         for (int i = 0; i < len; i++) {
             int b = buffer[off++] & 0xFF;
             char c = s.charAt(i);
 
-            // 대문자일 경우 소문자로 변환
+            // 아스키 알파벳일 때만 비트 연산 적용
+            // A: 0100 0001
+            // a: 0110 0001
             if (b >= 'A' && b <= 'Z') {
-                b += 32;
+                b |= 0x20; // 대문자와 소문자의 차이는 항상 0x20 (32)
             }
             if (c >= 'A' && c <= 'Z') {
-                c += 32;
+                c |= 0x20;
             }
 
             if (b != c) {
@@ -102,4 +120,31 @@ public final class ByteChunk {
 
         return true;
     }
+
+
+//    public boolean equalsIgnoreCase(String s) {
+//        int len = end - start;
+//        if (buffer == null || s == null || len != s.length()) {
+//            return false;
+//        }
+//        int off = start;
+//        for (int i = 0; i < len; i++) {
+//            int b = buffer[off++] & 0xFF;
+//            char c = s.charAt(i);
+//
+//            // 대문자일 경우 소문자로 변환
+//            if (b >= 'A' && b <= 'Z') {
+//                b += 32;
+//            }
+//            if (c >= 'A' && c <= 'Z') {
+//                c += 32;
+//            }
+//
+//            if (b != c) {
+//                return false;
+//            }
+//        }
+//
+//        return true;
+//    }
 }

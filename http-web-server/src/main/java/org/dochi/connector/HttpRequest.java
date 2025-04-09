@@ -1,9 +1,7 @@
-package org.dochi.buffer.connector;
+package org.dochi.connector;
 
-import org.dochi.buffer.internal.InternalInputStream;
+import org.dochi.internal.InternalInputStream;
 import org.dochi.http.exception.HttpStatusException;
-import org.dochi.http.request.data.HttpMethod;
-import org.dochi.http.request.data.HttpVersion;
 import org.dochi.http.request.multipart.Part;
 
 import java.io.IOException;
@@ -11,18 +9,17 @@ import java.io.InputStream;
 
 public interface HttpRequest {
     Part getPart(String partName) throws IOException, HttpStatusException;
-    InputStream getInputStream() throws IOException;
     String getMethod();
     String getRequestURI();
     String getPath();
     String getQueryString();
-    HttpVersion getHttpVersion();
+    String getProtocol();
     String getHeader(String key);
     String getCookie();
     String getContentType();
     int getContentLength();
-    String getConnection();
-    String getRequestParameter(String key);
-    InternalInputStream getDochiInputStream() throws IOException;
+    String getParameter(String key) throws IOException;
+    String getCharacterEncoding();
+    InternalInputStream getInputStream() throws IOException;
 }
 
