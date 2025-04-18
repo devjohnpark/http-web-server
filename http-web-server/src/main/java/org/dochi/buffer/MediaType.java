@@ -103,7 +103,7 @@ public class MediaType {
                 throw new IllegalStateException("Invalid parameter format in media type:" + mediaType);
             }
             parameterName = param[0].trim().toLowerCase();
-            parameterValue = param[1].trim().toLowerCase();
+            parameterValue = param[1].trim();
         }
 
         return new MediaType(type, subtype, parameterName, parameterValue);

@@ -15,17 +15,18 @@ public class Parameters {
 
     private final Map<String, String> parameters = new HashMap<String, String>();
 
-
-    public void addParameters(String queryString) {
-        if (queryString == null || queryString.isEmpty()) { return; }
-        parameters.putAll(parseQueryString(queryString));
+    public void addParameter(String key, String value) {
+        if (key == null || value == null || key.isEmpty()) { return; }
+        parameters.put(key, value);
     }
 
     public void addRequestParameters(String queryString) {
-        addParameters(setQueryString(queryString));
+        String decodedQueryString = urlDecoding(queryString);
+        if (decodedQueryString == null || decodedQueryString.isEmpty()) { return; }
+        parameters.putAll(parseQueryString(decodedQueryString));
     }
 
-    private String setQueryString(String queryString) {
+    private String urlDecoding(String queryString) {
         return queryString != null ? URLDecoder.decode(queryString, StandardCharsets.UTF_8) : null;
     }
 

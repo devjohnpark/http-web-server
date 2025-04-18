@@ -15,7 +15,7 @@ class RequestTest {
     }
 
     @Test
-    void path() {
+    void requestPath() {
     }
 
     @Test

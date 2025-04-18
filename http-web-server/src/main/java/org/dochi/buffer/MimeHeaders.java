@@ -115,13 +115,6 @@ public class MimeHeaders {
         return this.count;
     }
 
-    public void removeHeader() {
-        if (count <= 0) {
-            return;
-        }
-        --count;
-    }
-
     public MessageBytes getName(int n) {
         return n >= 0 && n < this.count ? this.headers[n].getName() : null;
     }

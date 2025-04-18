@@ -13,6 +13,4 @@ public class Connector extends LifecycleBase {
     public Connector() {
         this.httpVersion = HttpVersion.HTTP_1_1;
     }
-
-
 }

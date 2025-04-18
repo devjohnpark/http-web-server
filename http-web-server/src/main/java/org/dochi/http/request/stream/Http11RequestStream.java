@@ -20,7 +20,7 @@ public class Http11RequestStream extends SocketBufferedInputStream implements Ht
         super(in);
     }
 
-    public String readLineString(MessageSizeMonitor sizeMonitor) throws IOException {
+    public String readHeader(MessageSizeMonitor sizeMonitor) throws IOException {
         try {
             byte[] lineBytes = readLine(sizeMonitor.getSizeLimit());
             if (lineBytes != null) {
@@ -94,6 +94,7 @@ public class Http11RequestStream extends SocketBufferedInputStream implements Ht
         throw new NotFoundCrlfIOException("Unexpected end of stream for missing CRLF", lineBuffer.toString(StandardCharsets.UTF_8));
     }
 
+    // 복사 비용 발생
     private byte[] trimBuffer(ByteArrayOutputStream buffer, int newSize) {
         byte[] trimmedBuffer = new byte[newSize];
         System.arraycopy(buffer.toByteArray(), 0, trimmedBuffer, 0, newSize);

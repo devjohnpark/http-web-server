@@ -19,19 +19,27 @@ public class MultipartHeaders {
         headers.put(pair.key().toLowerCase(), pair.value());
     }
 
+    public void addHeader(String name, String value) {
+        if (name == null || name.isEmpty() || value.isEmpty()) {
+            return;
+        }
+        headers.put(name.toLowerCase(), value);
+    }
+
+
     public String getHeader(String key) {
-        return headers.get(key.toLowerCase());
+        return headers.get(key);
     }
 
     public String getContentDisposition() {
-        return getHeader(CONTENT_DISPOSITION);
+        return getHeader("content-disposition");
     }
 
     public String getContentType() {
-        return getHeader(CONTENT_TYPE);
+        return getHeader("content-type");
     }
 
-    public void clear() {
+    public void recycle() {
         if (!headers.isEmpty()) {
             headers.clear();
         }

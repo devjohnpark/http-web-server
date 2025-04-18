@@ -14,24 +14,49 @@ public class MultipartParameters {
     private static final String FILENAME_PARAMETER_KEY = "filename";
     private final Map<String, String> parameters = new HashMap<String, String>();
 
+
     public void addContentDispositionParameters(String contentDispositionHeaderValue) {
-        if (contentDispositionHeaderValue == null || contentDispositionHeaderValue.isEmpty()) { return; }
+        // Content-Disposition 헤더 이름 일치하는지 확인
+        if (contentDispositionHeaderValue == null || contentDispositionHeaderValue.equals("Content-Disposition")) { return; }
         parameters.putAll(parseContentDisposition(contentDispositionHeaderValue));
     }
 
-    public String getParameter(String key) {
-        String value = parameters.get(key);
+//    public void addParameter(String contentDispositionHeaderValue) {
+//        // Content-Disposition 헤더 이름 일치하는지 확인
+//        if (contentDispositionHeaderValue == null || contentDispositionHeaderValue.isEmpty()) { return; }
+//        parameters.putAll(parseContentDisposition(contentDispositionHeaderValue));
+//    }
+
+    public String getParameter(String name) {
+        if (name.equals(NAME_PARAMETER_KEY) || name.equals(FILENAME_PARAMETER_KEY)) {
+            // Content-Disposition 헤더의 파라매터만(name, filename)
+            return getContentDispositionParameters(name);
+        }
+        return parameters.get(name);
+    }
+
+    private String getContentDispositionParameters(String name) {
+        String value = parameters.get(name);
         if (value != null) {
             return value.replace("\"", "");
         }
         return null;
     }
 
+//    // Content-Disposition 헤더의 파라매터만(name, filename)
+//    public String getParameter(String key) {
+//        String value = parameters.get(key);
+//        if (value != null) {
+//            return value.replace("\"", "");
+//        }
+//        return null;
+//    }
+
     public String getNameParamValue() { return getParameter(NAME_PARAMETER_KEY); }
 
     public String getFileNameParamValue() { return getParameter(FILENAME_PARAMETER_KEY); }
 
-    public void clear() {
+    public void recycle() {
         if (!parameters.isEmpty()) {
             parameters.clear();
         }

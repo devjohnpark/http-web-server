@@ -24,24 +24,24 @@ class Http11RequestStreamTest {
     }
 
     @Test
-    void readLineString() throws IOException {
+    void readHeader() throws IOException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("HTTP/1.1 200 OK\r\n".getBytes(StandardCharsets.UTF_8));
         Http11RequestStream http11RequestStream = new Http11RequestStream(byteArrayInputStream);
-        assertEquals("HTTP/1.1 200 OK", http11RequestStream.readLineString(messageSizeManager.getHeaderMonitor()));
+        assertEquals("HTTP/1.1 200 OK", http11RequestStream.readHeader(messageSizeManager.getHeaderMonitor()));
     }
 
     @Test
     void readLine_invalid_lineString() throws IOException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream("HTTP/1.1 200 OK\n".getBytes(StandardCharsets.UTF_8));
         Http11RequestStream http11RequestStream = new Http11RequestStream(byteArrayInputStream);
-        assertThrows(HttpStatusException.class, () -> http11RequestStream.readLineString(messageSizeManager.getHeaderMonitor()));
+        assertThrows(HttpStatusException.class, () -> http11RequestStream.readHeader(messageSizeManager.getHeaderMonitor()));
     }
 
     @Test
     void readLine_String_EOF() throws IOException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[0]);
         Http11RequestStream http11RequestStream = new Http11RequestStream(byteArrayInputStream);
-        assertNull(http11RequestStream.readLineString(messageSizeManager.getHeaderMonitor()));
+        assertNull(http11RequestStream.readHeader(messageSizeManager.getHeaderMonitor()));
     }
 
     @Test

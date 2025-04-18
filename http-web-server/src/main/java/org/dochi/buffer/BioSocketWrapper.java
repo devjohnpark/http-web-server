@@ -23,25 +23,24 @@ import java.net.SocketException;
 public class BioSocketWrapper extends SocketWrapperBase<Socket> {
     private static final Logger log = LoggerFactory.getLogger(org.dochi.webserver.socket.BioSocketWrapper.class);
 
-    public BioSocketWrapper(Socket socket, SocketConfig config) {
+    public BioSocketWrapper(Socket socket, SocketConfig config) throws SocketException {
         super(socket, config);
     }
 
     // 클라와 연결된 소켓 버퍼(TCP Buffer)에 데이터가 입력될때까지 blocking (즉, 클라이언트가 보낸 데이터가 보낼때까지 blocking 됨)
     @Override
-    protected int read(byte[] buffer, int off, int len) throws IOException {
+    public int read(byte[] buffer, int off, int len) throws IOException {
         return socket.getInputStream().read(buffer, off, len);
     }
 
     // 클라와 연결된 소켓 버퍼(TCP Buffer)에 데이터를 출력될때까지 blocking (즉, 소켓 버퍼가 꽉차서 못보낼때까지 blocking 됨)
     @Override
-    protected void write(byte[] buffer, int off, int len) throws IOException {
+    public void write(byte[] buffer, int off, int len) throws IOException {
         socket.getOutputStream().write(buffer, off, len);
     }
 
-
     @Override
-    protected void close() throws IOException {
+    public void close() throws IOException {
         if (!socket.isClosed()) {
             socket.close();
             log.debug("Socket closed [Client: {}, Port: {}]",
@@ -50,7 +49,7 @@ public class BioSocketWrapper extends SocketWrapperBase<Socket> {
     }
 
     @Override
-    protected void flush() throws IOException {
+    public void flush() throws IOException {
         socket.getOutputStream().flush();
     }
 

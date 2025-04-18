@@ -32,7 +32,7 @@ public class Http11RequestProcessor extends AbstractHttpRequestProcessor {
     }
 
     private boolean processRequestLine(MessageSizeMonitor sizeMonitor) throws IOException, HttpStatusException {
-        String requestLine = requestStream.readLineString(sizeMonitor);
+        String requestLine = requestStream.readHeader(sizeMonitor);
         if (isEOFOnCloseWait(requestLine)) {
             return false;
         }
@@ -50,7 +50,7 @@ public class Http11RequestProcessor extends AbstractHttpRequestProcessor {
 
     private boolean processHeaders(MessageSizeMonitor sizeMonitor) throws IOException, HttpStatusException {
         String line;
-        while ((line = requestStream.readLineString(sizeMonitor)) != null) {
+        while ((line = requestStream.readHeader(sizeMonitor)) != null) {
             if (line.isEmpty()) {
                 return true;
             }

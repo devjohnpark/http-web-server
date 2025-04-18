@@ -1,14 +1,15 @@
 package org.dochi.internal;
 
 import org.dochi.buffer.*;
+import org.dochi.webserver.ApplicationBufferHandler;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 // parsed raw data, low level layer
 public final class Request {
     private final MessageBytes methodMB;
-    private final MessageBytes pathMB;
+    private final MessageBytes requestPathMB;
     private final MessageBytes queryStringMB;
     private final MessageBytes uriMB;
     private final MessageBytes protocolMB;
@@ -18,11 +19,12 @@ public final class Request {
     private String characterEncoding;
     private Charset charset;
     private final Parameters parameters;
-    private final InputBuffer inputBuffer;
+    private ApplicationBufferHandler handler;
+    private InputBuffer inputBuffer;
 
-    public Request(InputBuffer inputBuffer) {
-        this.inputBuffer = inputBuffer;
-        this.pathMB = MessageBytes.newInstance();
+    public Request() {
+//        this.inputBuffer = inputBuffer;
+        this.requestPathMB = MessageBytes.newInstance();
         this.queryStringMB = MessageBytes.newInstance();
         this.methodMB = MessageBytes.newInstance();
         this.uriMB = MessageBytes.newInstance();
@@ -35,7 +37,7 @@ public final class Request {
 
     public MessageBytes queryString() { return this.queryStringMB; }
 
-    public MessageBytes path() { return this.pathMB; }
+    public MessageBytes requestPath() { return this.requestPathMB; }
 
     public MessageBytes requestURI() { return this.uriMB; }
 
@@ -45,11 +47,19 @@ public final class Request {
 
     public Parameters parameters() { return this.parameters; }
 
+    public void setInputBuffer(InputBuffer inputBuffer) {
+        this.inputBuffer = inputBuffer;
+    }
+
     public InputBuffer getInputBuffer() {
         if (this.inputBuffer == null) {
             throw new IllegalStateException("Input buffer not set");
         }
         return this.inputBuffer;
+    }
+
+    public int doRead(ApplicationBufferHandler handler) throws IOException {
+        return this.getInputBuffer().doRead(handler);
     }
 
     // 헤더의 메모리 주소를 직접 참조하여, 처음 조회 O(N) 이후에 다음번 조회시 O(1)
@@ -67,7 +77,7 @@ public final class Request {
         return this.contentLengthMB.toInt();
     }
 
-    public Charset getCharsetFromContentType() throws UnsupportedEncodingException {
+    public Charset getCharsetFromContentType() {
         if (this.charset == null) {
             this.getCharacterEncoding();
             if (this.characterEncoding != null) {
@@ -101,12 +111,11 @@ public final class Request {
 
     public void recycle() {
         this.methodMB.recycle();
-        this.pathMB.recycle();
+        this.requestPathMB.recycle();
         this.queryStringMB.recycle();
         this.uriMB.recycle();
         this.protocolMB.recycle();
         this.headers.recycle();
-        this.inputBuffer.recycle();
         this.parameters.recycle();
         this.contentLengthMB = null;
         this.contentTypeMB = null;

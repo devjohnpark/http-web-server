@@ -7,9 +7,9 @@
 //    private final ByteBuffer buffer; // stream용 버퍼
 //
 //    // socket buffering to application buffer
-//    private final org.dochi.buffer.InputBuffer inputBuffer;
+//    private final org.dochi.internal.InputBuffer inputBuffer;
 //
-//    public InputBuffer(int bufferSize, org.dochi.buffer.InputBuffer inputBuffer) {
+//    public InputBuffer(int bufferSize, org.dochi.internal.InputBuffer inputBuffer) {
 //        this.buffer = initBuffer(bufferSize);
 //        this.inputBuffer = inputBuffer;
 //    }
