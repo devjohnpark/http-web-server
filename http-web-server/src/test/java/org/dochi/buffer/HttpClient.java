@@ -1,5 +1,7 @@
 package org.dochi.buffer;
 
+import org.dochi.inputbuffer.socket.SocketWrapperBase;
+
 import java.io.IOException;
 
 public class HttpClient {

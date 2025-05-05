@@ -1,8 +1,6 @@
 package org.dochi.buffer;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.dochi.inputbuffer.MimeHeaders;
 
 class MimeHeadersTest {
 

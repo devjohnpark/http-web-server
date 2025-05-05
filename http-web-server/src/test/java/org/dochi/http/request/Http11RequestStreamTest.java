@@ -98,7 +98,7 @@ class Http11RequestStreamTest {
 //    @Test
 //    void readLine2() throws IOException {
 //        String testDir = "./src/test/resources/";
-//        InputStream in = new FileInputStream(new File(testDir + "http_req_get.txt"));
+//        BufferedSocketInputStream in = new FileInputStream(new File(testDir + "http_req_get.txt"));
 //        BufferedReader br = new BufferedReader(new InputStreamReader(in));
 ////        String str1 = br.readLine();
 ////        String str2 = br.readLine();

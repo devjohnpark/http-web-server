@@ -55,8 +55,12 @@ public class SocketTaskHandler implements SocketTask {
         try (InputStream in = socket.getInputStream(); OutputStream out = socket.getOutputStream();) {
 
             // 추후 ProcessorHandler 객체로 처리
+            // HttpProcessor을 재활용하기 위해서는 네트워크 입출력 객체를 setter로 주입해야한다.
+            // BioSocketWrapper를 생성해서 Http
             HttpProcessor httpProcessor = new Http11Processor(in, out, httpConfig);
             httpProcessor.process(socketWrapper, httpApiMapper);
+
+
 //            SocketState state = httpProcessor.process(socketWrapper, httpApiMapper);
 
 

@@ -5,7 +5,7 @@ import org.dochi.http.request.data.RequestHeaders;
 import org.dochi.http.request.processor.Http11RequestProcessor;
 import org.dochi.http.request.data.HttpVersion;
 import org.dochi.http.request.stream.Http11RequestStream;
-import org.dochi.http.response.Http11ResponseProcessor;
+import org.dochi.http.response.processor.Http11ResponseProcessor;
 import org.dochi.webserver.config.HttpConfig;
 import org.dochi.webserver.socket.SocketState;
 import org.dochi.webserver.socket.SocketWrapper;
@@ -21,17 +21,17 @@ public class Http11Processor extends AbstractHttpProcessor {
 
     public Http11Processor(InputStream in, OutputStream out, HttpConfig config) {
         super(
-                new Http11RequestProcessor(new Http11RequestStream(in), config.getHttpReqConfig()),
+                new Http11RequestProcessor(in, config.getHttpReqConfig()),
                 new Http11ResponseProcessor(out, config.getHttpResConfig())
         );
     }
 
-    public boolean shouldKeepAlive(SocketWrapper socketWrapper) {
+    public boolean shouldPersistentConnection(SocketWrapper socketWrapper) {
         return isRequestKeepAlive() && isSeverKeepAlive(socketWrapper);
     }
 
     private boolean shouldNext(SocketWrapper socketWrapper) {
-        boolean isKeepAlive = shouldKeepAlive(socketWrapper);
+        boolean isKeepAlive = shouldPersistentConnection(socketWrapper);
         response.addConnection(isKeepAlive);
         if (isKeepAlive) {
            response.addKeepAlive(socketWrapper.getKeepAliveTimeout(), socketWrapper.getMaxKeepAliveRequests());
@@ -59,12 +59,12 @@ public class Http11Processor extends AbstractHttpProcessor {
         SocketState state = OPEN;
         int processCount = 0;
         try {
-            recycle();
+            recycle(); // memory visibility
+            // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
+            // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
             while (state == OPEN) {
                 if (!request.isPrepareHeader()) {
-                    request.recycle(); // memory visibility
-                    // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
-                    // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
+                    request.recycle();
                     state = CLOSED;
                     break;
                 } else if (isUpgradeRequest(socketWrapper)) {
@@ -78,7 +78,7 @@ public class Http11Processor extends AbstractHttpProcessor {
                     state = CLOSED;
                 }
                 httpApiMapper.getHttpApiHandler(request.getPath()).service(request, response);
-
+                response.flush();
                 // response.flush()
                 // Response object provides OutputStream object to developer, so it need flush() after processing HTTP API
                 // flush() has system call cost, it needs to remove inefficient action.
@@ -98,7 +98,7 @@ public class Http11Processor extends AbstractHttpProcessor {
     }
 
     private boolean isUpgradeRequest(SocketWrapper socketWrapper) {
-        return  request.getHeader(RequestHeaders.UPGRADE) != null;
+        return request.getHeader(RequestHeaders.UPGRADE) != null;
     }
 
 //    private void sendUpgrade() {

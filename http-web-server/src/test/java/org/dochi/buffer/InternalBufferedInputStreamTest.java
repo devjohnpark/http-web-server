@@ -15,7 +15,7 @@
 //import static org.junit.jupiter.api.Assertions.assertTrue;
 //import static org.junit.jupiter.api.Assertions.*;
 //
-//class InternalBufferedInputStreamTest extends Http11InputBufferTest2 {
+//class InternalBufferedInputStreamTest extends Http11InputBufferTest {
 //    private static final Logger log = LoggerFactory.getLogger(InternalBufferedInputStreamTest.class);
 //    InternalInputStream internalBufferedInputStream = new InternalInputStream(inputBuffer, 8192);
 //    private HttpClient httpClient = new HttpClient(clientConnectedSocket);

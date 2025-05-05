@@ -9,7 +9,7 @@
 //import org.slf4j.LoggerFactory;
 //
 //import java.io.IOException;
-//import java.io.InputStream;
+//import java.io.BufferedSocketInputStream;
 //import java.io.OutputStream;
 //import java.net.Socket;
 //
@@ -53,7 +53,7 @@
 //                socket.getInetAddress(), socket.getPort());
 //
 //        // SocketWrapper 내부로 I/O Stream 숨기기
-//        try (InputStream in = socket.getInputStream(); OutputStream out = socket.getOutputStream();) {
+//        try (BufferedSocketInputStream in = socket.getInputStream(); OutputStream out = socket.getOutputStream();) {
 //            // 추후 ProcessorHandler 객체로 처리
 //            HttpProcessor httpProcessor = new Http11Processor(in, out, httpConfig);
 //            SocketState state = httpProcessor.process(socketWrapper, httpApiMapper);

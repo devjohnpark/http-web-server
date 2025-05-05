@@ -9,14 +9,13 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-
-public class Http11RequestStream extends SocketBufferedInputStream implements HttpCrlfLineReader, HttpBodyReader {
+public class Http11RequestStream extends BufferedSocketInputStream implements HttpCrlfLineReader, HttpBodyReader {
     private static final Logger log = LoggerFactory.getLogger(Http11RequestStream.class);
     private static final int CR = '\r';  // Carriage Return
     private static final int LF = '\n';  // Line Feed
     private final ByteArrayOutputStream lineBuffer = new ByteArrayOutputStream();
 
-    public Http11RequestStream(InputStream in) {
+    public Http11RequestStream(java.io.InputStream in) {
         super(in);
     }
 

@@ -1,8 +1,10 @@
 package org.dochi.connector;
 
-import org.dochi.buffer.Http11InputBufferTest2;
+import org.dochi.buffer.Http11InputBufferTest;
 import org.dochi.buffer.HttpClient;
 import org.dochi.http.request.data.HttpVersion;
+import org.dochi.inputbuffer.connector.Connector;
+import org.dochi.inputbuffer.connector.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RequestTest extends Http11InputBufferTest2 {
+public class RequestTest extends Http11InputBufferTest {
     Request request = new Request(new Connector(HttpVersion.HTTP_1_1));
     private HttpClient httpClient;
 
@@ -20,10 +22,6 @@ public class RequestTest extends Http11InputBufferTest2 {
     void setInternalRequest() {
         httpClient = new HttpClient(clientConnectedSocket);
         request.setInternalRequest(super.request);
-    }
-
-    @Test
-    void recycle() {
     }
 
     @Test

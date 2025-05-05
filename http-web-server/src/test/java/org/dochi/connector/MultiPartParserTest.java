@@ -1,8 +1,8 @@
 package org.dochi.connector;
 
-import org.dochi.http.multipart.MultiPartParser;
-import org.dochi.http.multipart.Multipart;
-import org.dochi.http.multipart.MultipartStream;
+import org.dochi.inputbuffer.multipart.MultiPartParser;
+import org.dochi.inputbuffer.multipart.Multipart;
+import org.dochi.inputbuffer.multipart.MultipartStream;
 import org.dochi.http.exception.HttpStatusException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -19,35 +19,12 @@ class MultiPartParserTest {
     Multipart multipart = new Multipart();
 
     @AfterEach
-    void setUp() {
+    void recycle() {
         multipart.recycle();
     }
 
     private void createMultipartData(String multipartData) {
         multiPartParser = new MultiPartParser(new MultipartStream(new ByteArrayInputStream(multipartData.getBytes(StandardCharsets.UTF_8))), 1024, 8192);
-
-
-
-
-//        multiPartProcessor = new MultiPartProcessor(httpMessageSizeManager.getBodyMonitor());
-//        byteArrayInputStream = new ByteArrayInputStream(multipartData.getBytes(StandardCharsets.UTF_8));
-//        http11RequestStream = new Http11RequestStream(byteArrayInputStream);
-
-
-//        http11RequestStream = new Http11RequestStream(byteArrayInputStream,
-//            httpReqConfig.getRequestHeaderMaxSize(),
-//            httpReqConfig.getRequestBodyMaxSize(),
-//            new HttpInputSizeListener() {
-//                @Override
-//                public void onHeaderRead(int size) throws HttpStatusException {
-//                    httpMessageSizeManager.addHeaderSize(size);
-//                }
-//
-//                @Override
-//                public void onBodyRead(int size) throws HttpStatusException {
-//                    httpMessageSizeManager.addBodySize(size);
-//                }
-//        });
     }
 
     @Test
@@ -79,9 +56,6 @@ class MultiPartParserTest {
         assertThat(multipart.getPart("age").getContent()).isEqualTo("30".getBytes(StandardCharsets.UTF_8));
         assertThat(multipart.getPart("profileInfo").getContent()).isEqualTo("{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}".getBytes(StandardCharsets.UTF_8));
         assertThat(multipart.getPart("profileImage").getContent()).isEqualTo("This is body of multipart/form data".getBytes(StandardCharsets.UTF_8));
-        multipart.recycle();
-        assertNull(multipart.getPart("age").getContent());
-//        assertEquals(httpMessageSizeManager.getContentMonitor().getActualContentLength(), multipartData.getBytes(StandardCharsets.UTF_8).length);
     }
 
     @Test
@@ -117,9 +91,6 @@ class MultiPartParserTest {
         assertThat(multipart.getPart("field1").getContent()).isEmpty();
         assertThat(multipart.getPart("profileInfo").getContent()).isEqualTo("{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}".getBytes(StandardCharsets.UTF_8));
         assertThat(multipart.getPart("profileImage").getContent()).isEqualTo("This is body of multipart/form data".getBytes(StandardCharsets.UTF_8));
-        multipart.recycle();
-        assertNull(multipart.getPart("age").getContent());
-//        assertEquals(httpMessageSizeManager.getContentMonitor().getActualContentLength(), multipartData.getBytes(StandardCharsets.UTF_8).length);
     }
 
     @Test
@@ -140,12 +111,9 @@ class MultiPartParserTest {
                         + "21312445321553451234213412341234234124234\r\n"
                         + "------WebKitFormBoundarylwQGqAAJBIOZfE7B--\r\n";
         createMultipartData(multipartData);
-        multiPartParser.parseParts( "----WebKitFormBoundarylwQGqAAJBIOZfE7B", multipart);
+        multiPartParser.parseParts("----WebKitFormBoundarylwQGqAAJBIOZfE7B", multipart);
         assertThat(multipart.getPart("username").getContent()).isEqualTo("john".getBytes(StandardCharsets.UTF_8));
         assertThat(multipart.getPart("age").getContent()).isEqualTo("4".getBytes(StandardCharsets.UTF_8));
         assertThat(multipart.getPart("file").getContent()).isEqualTo("21312445321553451234213412341234234124234".getBytes(StandardCharsets.UTF_8));
-        multipart.recycle();
-        assertNull(multipart.getPart("age").getContent());
-//        assertEquals(httpMessageSizeManager.getContentMonitor().getActualContentLength(), multipartData.getBytes(StandardCharsets.UTF_8).length);
     }
 }

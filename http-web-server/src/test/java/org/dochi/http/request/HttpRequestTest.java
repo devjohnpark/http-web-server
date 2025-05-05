@@ -13,7 +13,7 @@
 //
 //    private void createHttpRequest(String fileName) throws IOException {
 //        String testDir = "./src/test/resources/";
-//        InputStream in = new FileInputStream(new File(testDir + fileName));
+//        BufferedSocketInputStream in = new FileInputStream(new File(testDir + fileName));
 //        httpRequest = new Request(in);
 //        httpRequest.isPrepareRequest();
 //    }

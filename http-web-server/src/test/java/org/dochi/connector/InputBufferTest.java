@@ -1,7 +1,9 @@
 package org.dochi.connector;
 
-import org.dochi.buffer.Http11InputBufferTest2;
+import org.dochi.buffer.Http11InputBufferTest;
 import org.dochi.buffer.HttpClient;
+import org.dochi.inputbuffer.connector.InputBuffer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -13,10 +15,10 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InputBufferTest extends Http11InputBufferTest2 {
+class InputBufferTest extends Http11InputBufferTest {
     private static final Logger log = LoggerFactory.getLogger(InputBufferTest.class);
     InputBuffer inputBuffer = new InputBuffer();
-    private HttpClient httpClient = new HttpClient(clientConnectedSocket);
+    private HttpClient httpClient;
 
 //    @BeforeEach
 //    void setUp() {
@@ -24,10 +26,14 @@ class InputBufferTest extends Http11InputBufferTest2 {
 //    }
 
     @BeforeEach
-    void recycle() {
+    void setUp() {
         httpClient = new HttpClient(clientConnectedSocket);
-        inputBuffer.recycle();
         inputBuffer.setRequest(request);
+    }
+
+    @AfterEach
+    void tearDown() {
+        inputBuffer.recycle();
     }
 
     // InputBuffer로 헤더를 파싱한 이후에 바디를 읽는 것을 테스트

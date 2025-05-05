@@ -1,5 +1,7 @@
 package org.dochi.buffer;
 
+import org.dochi.inputbuffer.socket.BioSocketWrapper;
+import org.dochi.inputbuffer.socket.SocketConfig;
 import org.dochi.webserver.attribute.KeepAlive;
 import org.junit.jupiter.api.*;
 
@@ -8,8 +10,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,11 +33,13 @@ class BioSocketWrapperTest {
     protected BioSocketWrapper clientConnectedSocket;
 
     private Thread serverThread;
+    private Thread clientThread;
     private ServerSocket serverSocket;
 
     private CountDownLatch latch;
 
     // 클라이언트가 요청 메세지를 보낸 시점에 서버의 스레드 실행이 종료되기 때문에
+    // Acceptor 객체를 생성
     @BeforeEach
     void connect() throws IOException, InterruptedException {
 
@@ -60,21 +64,19 @@ class BioSocketWrapperTest {
 
         serverThread.start();
 
-        serverReadyLatch.await();
+        boolean ready = serverReadyLatch.await(50, TimeUnit.MILLISECONDS);
 
-        log.debug("Server started.");
+        if (!ready) {
+            throw new RuntimeException("Server socket not ready");
+        }
 
         clientConnectedSocket = new BioSocketWrapper(new Socket("localhost", serverSocket.getLocalPort()), new SocketConfig(new KeepAlive()));
 
+        log.debug("Server started.");
     }
 
     @AfterEach
     void disconnect() throws IOException {
-        if (serverSocket != null && !serverSocket.isClosed()) {
-            serverSocket.close();
-            log.debug("Server socket close");
-        }
-
         if (clientConnectedSocket != null && !clientConnectedSocket.isClosed()) {
             clientConnectedSocket.close();
             log.debug("Client socket close");
@@ -83,6 +85,11 @@ class BioSocketWrapperTest {
         if (serverConnectedSocket != null && !serverConnectedSocket.isClosed()) {
             serverConnectedSocket.close();
             log.debug("Server socket wrapper close");
+        }
+
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            serverSocket.close();
+            log.debug("Server socket close");
         }
 
         if (serverThread != null && serverThread.isAlive()) {
