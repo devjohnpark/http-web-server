@@ -8,7 +8,10 @@
 	- HTTP API processing.
 - 0.0.1
 	- Support virtual servers by port and domain by.
-
+- 0.0.2
+	- Support keep alive feature in HTTP/1.0 and HTTP/1.1
+	- Improving exception handling
+	- Non-synchronized Buffer I/O Stream for improved I/O speed (allocating a thread to process each request)
 ---
 ## How to use
 
