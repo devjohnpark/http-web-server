@@ -12,6 +12,7 @@ public class SocketTaskPool {
     // 큐가 비었을 때 대기(blocking)가 필요할때 사용
     // take() 호출시 요소 풀에 반환될때까지 blocking)
     // poll() 호출시에는 blocking 하지 않고 null 반환
+    // thread-safe in multi-threading
     private final LinkedBlockingQueue<SocketTask> queue;
     private final Supplier<SocketTask> supplier;
 
@@ -21,26 +22,6 @@ public class SocketTaskPool {
         this.initPool(threadPool.getMinSpareThreads(), supplier);
         log.info("SocketTaskPool initialized [Total size: {}]", queue.size());
     }
-
-//    public SocketTaskPool(ThreadPool threadPool, KeepAlive keepAlive, WebService httpApiService) {
-//        this.requestHandlerQueue = new LinkedBlockingQueue<>();
-//        this.keepAlive = keepAlive;
-//        this.requestMapper = new HttpApiMapper(httpApiService);
-//        this.initPool(threadPool, keepAlive, requestMapper);
-//    }
-//
-//    public SocketTaskPool(ThreadPool threadPool, KeepAlive keepAlive, HttpApiMapper requestMapper) {
-//        this.requestHandlerQueue = new LinkedBlockingQueue<>();
-//        this.initPool(threadPool, keepAlive, requestMapper);
-//    }
-
-//    private void initPool(ThreadPool threadPool, KeepAlive keepAlive, HttpApiMapper requestMapper) {
-//        int poolSize = threadPool.getMinSpareThreads();
-//        for (int i = 0; i < poolSize; i++) {
-//            requestHandlerQueue.offer(new SocketTaskHandler(new BioSocketWrapper(keepAlive), requestMapper)); // 큐의 끝에 삽입
-//        }
-//        log.info("SocketTaskPool initialized, Total size: {}.", requestHandlerQueue.size());
-//    }
 
     private void initPool(int poolSize, Supplier<SocketTask> socketTasks) {
         for (int i = 0; i < poolSize; i++) {

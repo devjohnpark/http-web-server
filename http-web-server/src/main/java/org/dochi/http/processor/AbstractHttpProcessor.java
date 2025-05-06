@@ -61,12 +61,9 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     protected void processException(Exception e) {
         switch (e) {
             case SocketTimeoutException socketTimeoutException -> {
-//                After setting the input time with soSetTimeout() on a Socket, a timeout occurs while the server is reading the request: 408 Request Timeout response (include 'Connection: close' header)
 //                SocketTimeoutException exception thrown when valid time expires while being blocked by read() method of SocketInputStream object (write() is not related to setSoTimeout)
-//                A SocketTimeoutException is thrown if the client has not read all the data in the socket receive buffer while receiving all the data from the web server after sending the request.
-//                Therefore, if you read the data in the socket buffer multiple times through system calls, you must give the client a response before the client realizes it.
                 log.error("Socket read timeout occurred: ", e);
-//           b     sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage()); // non necessary need response when socket read timeout
+//              sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage()); // non necessary need response when socket read timeout
             }
             case SocketException socketException -> {
                 // reference: NioSocketImpl.implRead()
@@ -95,6 +92,7 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
             } else if (status.getCode() >= 400) {
                 response.sendError(status, errorMessage);
             }
+            response.flush();
         } catch (IOException e) {
             log.error("Failed to send error response: {}", e.getMessage());
         }

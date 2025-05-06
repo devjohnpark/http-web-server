@@ -53,7 +53,7 @@ public class BufferedSocketOutputStream extends OutputStream {
     private void flushBuffer() throws IOException {
         if (bufferPosition > 0) {
             outputStream.write(buffer, 0, bufferPosition);
-            outputStream.flush(); flush(); // 스트림 버퍼의 데이터를 OS의 네트워크 스택인 TCP(socket) 버퍼에 즉시 전달 보장
+            outputStream.flush(); // 스트림 버퍼의 데이터를 OS의 네트워크 스택인 TCP(socket) 버퍼에 즉시 전달 보장
             bufferPosition = 0;
         }
     }

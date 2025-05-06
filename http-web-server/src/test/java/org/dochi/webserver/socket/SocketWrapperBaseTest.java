@@ -15,7 +15,7 @@
 //class SocketWrapperBaseTest {
 //    // BioEndpoint 내에 ServerSocket 객채 감춘다.
 //    // BioEndpoint extends AbstractEndpoint<U>
-//    // AbstractEndpoint 내에 Acceptor<U> acceptor, SocketWrapperBase<U> socketWrapper
+//    // AbstractEndpoint 내에 Connector<U> acceptor, SocketWrapperBase<U> socketWrapper
 //    private static ServerSocket serverSocket;
 //    private SocketWrapperBase<Socket> socketWrapper;
 //

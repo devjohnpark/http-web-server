@@ -39,7 +39,7 @@ class BioSocketWrapperTest {
     private CountDownLatch latch;
 
     // 클라이언트가 요청 메세지를 보낸 시점에 서버의 스레드 실행이 종료되기 때문에
-    // Acceptor 객체를 생성
+    // Connector 객체를 생성
     @BeforeEach
     void connect() throws IOException, InterruptedException {
 
