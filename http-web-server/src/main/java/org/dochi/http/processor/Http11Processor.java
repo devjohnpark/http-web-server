@@ -55,51 +55,8 @@ public class Http11Processor extends AbstractHttpProcessor {
         return request.getHttpVersion().equals(HttpVersion.HTTP_1_0) && (connectionValue != null && connectionValue.equals("keep-alive"));
     }
 
-//    protected SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
-//        SocketState state = OPEN;
-//        int processCount = 0;
-//        try {
-//            recycle(); // memory visibility
-//            // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
-//            // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
-//            while (state == OPEN) {
-//                if (!request.isPrepareHeader()) {
-//                    request.recycle();
-//                    state = CLOSED;
-//                    break;
-//                } else if (isUpgradeRequest(socketWrapper)) {
-//                    // Current ignore HTTP/1.1 upgrade request, processing as HTTP/1.1 (Later support HTTP/2.0)
-//                    state = UPGRADING;
-//                    // 1. upgradeToken(); // upgradeToken = getHeader(Upgrade) & getHeader(HTTP2-Settings);
-//                    // 2. sendUpgrade(); // HTTP/1.1 response 101 status
-//                    // 3. break;
-//                    // After client preface request -> response as HTTP/2.0 using Http2Processor
-//                } else if (!shouldNext(socketWrapper)) {
-//                    state = CLOSED;
-//                }
-//                httpApiMapper.getHttpApiHandler(request.getPath()).service(request, response);
-//                response.flush();
-//                // response.flush()
-//                // Response object provides OutputStream object to developer, so it need flush() after processing HTTP API
-//                // flush() has system call cost, it needs to remove inefficient action.
-//                // 1. Rapping flush method by custom OutputStream.
-//                // 2. The custom OutputStream declares boolean-isFlushed variable.
-//                // 3. If call rapped flush method, According to isFlushed value(true/false), flush() to be called or not.
-//                recycle();
-//                processCount++;
-//            }
-//        } catch (Exception e) {
-//            processException(e);
-//            safeRecycle();
-//            state = CLOSED;
-//        }
-//        log.debug("Processed keep-alive requests count: {}", processCount);
-//        return state;
-//    }
-
     protected SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) throws IOException {
         SocketState state = OPEN;
-        int processCount = 0;
         while (state == OPEN) {
             if (!request.isPrepareHeader()) {
                 request.recycle();
@@ -123,8 +80,8 @@ public class Http11Processor extends AbstractHttpProcessor {
             // 1. Rapping flush method by custom OutputStream.
             // 2. The custom OutputStream declares boolean-isFlushed variable.
             // 3. If call rapped flush method, According to isFlushed value(true/false), flush() to be called or not.
-            recycle();
             processCount++;
+            recycle();
         }
         return state;
     }
