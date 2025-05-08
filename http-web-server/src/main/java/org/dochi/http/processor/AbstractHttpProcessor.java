@@ -30,16 +30,19 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     public SocketState process(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
         SocketState state = CLOSED;
         try {
-            socketWrapper.startConnectionTimeout(socketWrapper.getKeepAliveTimeout());
+            // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
+            // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
+            recycle(); // memory visibility
             state = service(socketWrapper, httpApiMapper);
-        } catch (SocketException e) {
-            log.error("Set connection timeout but socket is already closed: {}", e.getMessage());
-            sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage());
+        } catch (Exception e) {
+            processException(e);
+            safeRecycle();
         }
         return state;
     }
 
-    protected abstract SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper);
+//    protected abstract SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper);
+    protected abstract SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) throws IOException;
 
     protected abstract boolean shouldPersistentConnection(SocketWrapper socketWrapper);
 

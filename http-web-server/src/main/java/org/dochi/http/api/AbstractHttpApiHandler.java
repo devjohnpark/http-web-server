@@ -17,7 +17,7 @@ public abstract class AbstractHttpApiHandler implements HttpApiHandler {
 
     @Override
     public void init(WebServiceConfig config) {
-        log.debug("{}] init", this.getClass().getSimpleName());
+        log.debug("{} init", this.getClass().getSimpleName());
         this.webResourceProvider = config.getWebResourceProvider();
     }
 
