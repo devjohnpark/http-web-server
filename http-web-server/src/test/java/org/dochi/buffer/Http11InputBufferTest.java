@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class Http11InputBufferTest extends BioSocketWrapperTest {
     private static final Logger log = LoggerFactory.getLogger(Http11InputBufferTest.class);
 //    private final Http11InputBuffer inputBuffer = new Http11InputBuffer(request, 8912);
-    protected final int headerMaxSize = 400;
+    protected final int headerMaxSize = 1024;
     protected final Request request = new Request();
     protected Http11InputBuffer inputBuffer = new Http11InputBuffer(request, headerMaxSize);
 //    protected final Request request = new Request(inputBuffer);
@@ -45,6 +45,36 @@ public class Http11InputBufferTest extends BioSocketWrapperTest {
         assertEquals("", request.queryString().toString());
         assertEquals("HTTP/1.1", request.protocol().toString());
         assertEquals("keep-alive", request.headers().getHeader("Connection"));
+    }
+
+    @Test
+    void valid_get2() throws IOException {
+        String httpRequest = "GET / HTTP/1.1\r\n"
+                + "Host: localhost:8080\r\n"
+                + "Connection: keep-alive\r\n"
+                + "Cache-Control: max-age=0\r\n"
+                + "Upgrade-Insecure-Requests: 1\r\n"
+                + "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36\r\n"
+                + "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7\r\n"
+                + "Accept-Encoding: gzip, deflate, br, zstd\r\n"
+                + "Accept-Language: en-US,en;q=0.9,ko;q=0.8\r\n"
+                + "Cookie: Idea-4a91a283=4d2152c0-f6eb-498f-a7ac-9ebbf2816f9c\r\n"
+                + "Sec-Fetch-Dest: document\r\n"
+                + "Sec-Fetch-Mode: navigate\r\n"
+                + "Sec-Fetch-Site: none\r\n"
+                + "Sec-Fetch-User: ?1\r\n"
+                + "sec-ch-ua: \"Chromium\";v=\"136\", \"Google Chrome\";v=\"136\", \"Not.A/Brand\";v=\"99\"\r\n"
+                + "sec-ch-ua-mobile: ?0\r\n"
+                + "sec-ch-ua-platform: \"macOS\"\r\n"
+                + "\r\n";
+
+        httpClient.doRequest(httpRequest.getBytes(StandardCharsets.ISO_8859_1));
+        assertTrue(inputBuffer.parseHeader());
+        assertEquals("GET", request.method().toString());
+        assertEquals("", request.queryString().toString());
+        assertEquals("HTTP/1.1", request.protocol().toString());
+        assertEquals("keep-alive", request.headers().getHeader("Connection"));
+        assertEquals("localhost:8080", request.headers().getHeader("host"));
     }
 
     @Test

@@ -13,7 +13,7 @@ public class HttpReqConfig {
         return httpReqAttribute.getRequestHeaderMaxSize();
     }
 
-    public int getRequestBodyMaxSize() {
-        return httpReqAttribute.getRequestBodyMaxSize();
+    public int getRequestPayloadMaxSize() {
+        return httpReqAttribute.getRequestPayloadMaxSize();
     }
 }

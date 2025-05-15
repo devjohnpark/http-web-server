@@ -29,7 +29,7 @@ public abstract class AbstractHttpRequestProcessor implements HttpRequestProcess
     protected AbstractHttpRequestProcessor(InputStream in, HttpReqConfig httpReqConfig) {
         this.request = new Request();
         this.inputStream = new BufferedSocketInputStream(in);
-        this.sizeMonitor = new HttpMessageSizeManager(httpReqConfig.getRequestHeaderMaxSize(), httpReqConfig.getRequestBodyMaxSize());
+        this.sizeMonitor = new HttpMessageSizeManager(httpReqConfig.getRequestHeaderMaxSize(), httpReqConfig.getRequestPayloadMaxSize());
         this.multipartProcessor = new MultiPartProcessor(sizeMonitor.getBodyMonitor());
     }
 

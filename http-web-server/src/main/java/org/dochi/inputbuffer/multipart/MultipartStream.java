@@ -21,7 +21,7 @@ public class MultipartStream {
     }
 
     // \r\n\r\n까지 읽고 반환 혹은 \r\n\r\n을 제외하고 반환
-    // String.split(\r\n)으로 나눠서 header 저장
+    // String.split(\r\n)으로 나눠서 header 저장 (버퍼 복사가 없어서 더 빠름)
     //
 //    public byte[] readHeaders(int maxHeaderSize) throws IOException {
 //        baos.reset();

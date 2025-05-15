@@ -50,10 +50,10 @@ public class SocketWrapper {
         return socket != null && !socket.isClosed();
     }
 
-    public void startConnectionTimeout(int connectionTimeout) throws SocketException {
-        getSocket().setSoTimeout(connectionTimeout);
-        log.debug("Start connection timeout: {} [Client IP: {}]", connectionTimeout, getSocket().getInetAddress());
-    }
+//    public void startConnectionTimeout(int connectionTimeout) throws SocketException {
+//        getSocket().setSoTimeout(connectionTimeout);
+//        log.debug("Start connection timeout: {} [Client IP: {}]", connectionTimeout, getSocket().getInetAddress());
+//    }
 
     public int incrementKeepAliveCount() {
         return ++keepAliveCount;

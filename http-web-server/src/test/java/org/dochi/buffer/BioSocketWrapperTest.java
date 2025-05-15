@@ -55,7 +55,7 @@ class BioSocketWrapperTest {
                     serverReadyLatch.countDown();
 
                     // blocking 되므로 해당 메서드를 실행하는 스레드 외의 서버 스레드로 실행
-                    serverConnectedSocket = new BioSocketWrapper(serverSocket.accept(), new SocketConfig(new KeepAlive()));
+                    serverConnectedSocket = new BioSocketWrapper(serverSocket.accept(), new KeepAlive());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -70,7 +70,7 @@ class BioSocketWrapperTest {
             throw new RuntimeException("Server socket not ready");
         }
 
-        clientConnectedSocket = new BioSocketWrapper(new Socket("localhost", serverSocket.getLocalPort()), new SocketConfig(new KeepAlive()));
+        clientConnectedSocket = new BioSocketWrapper(new Socket("localhost", serverSocket.getLocalPort()), new KeepAlive());
 
         log.debug("Server started.");
     }

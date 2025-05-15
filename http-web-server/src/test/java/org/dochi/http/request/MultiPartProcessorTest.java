@@ -20,7 +20,7 @@ class MultiPartProcessorTest {
     ByteArrayInputStream byteArrayInputStream;
     Http11RequestStream http11RequestStream;
     HttpReqConfig httpReqConfig = new HttpReqConfig(new HttpReqAttribute());
-    HttpMessageSizeManager httpMessageSizeManager = new HttpMessageSizeManager(httpReqConfig.getRequestHeaderMaxSize(), httpReqConfig.getRequestBodyMaxSize());
+    HttpMessageSizeManager httpMessageSizeManager = new HttpMessageSizeManager(httpReqConfig.getRequestHeaderMaxSize(), httpReqConfig.getRequestPayloadMaxSize());
 
     private void createMultipartData(String multipartData) {
         multiPartProcessor = new MultiPartProcessor(httpMessageSizeManager.getBodyMonitor());

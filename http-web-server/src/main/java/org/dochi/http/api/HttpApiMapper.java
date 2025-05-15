@@ -1,5 +1,7 @@
 package org.dochi.http.api;
 
+import org.dochi.http.response.processor.HttpResponseProcessor;
+import org.dochi.inputbuffer.internal.Request;
 import org.dochi.webserver.attribute.WebService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,17 +18,19 @@ public class HttpApiMapper {
         this.webService = webService;
     }
 
-    public HttpApiHandler getHttpApiHandler(String path) {
-        HttpApiHandler httpApiHandler = webService.getServices().get(path);
-        if (httpApiHandler == null) {
-            return webService.getServices().get("/");
-        }
-        return httpApiHandler;
-
-//        HttpApiHandler httpApiHandler = requestMappings.get(path);
+//    public HttpApiHandler getHttpApiHandler(String path) {
+//        HttpApiHandler httpApiHandler = webService.getServices().get(path);
 //        if (httpApiHandler == null) {
-//            return requestMappings.get(rootPath);
+//            return webService.getServices().get("/");
 //        }
 //        return httpApiHandler;
+//    }
+
+    public HttpApiHandler getHttpApiHandler(String path) {
+//        HttpApiHandler httpApiHandler = webService.getServices().get(path);
+//        if (httpApiHandler == null) {
+//            return webService.getServices().get("/");
+//        }
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package org.dochi.http.processor;
 
 import org.dochi.http.api.HttpApiMapper;
+import org.dochi.inputbuffer.socket.SocketWrapperBase;
 import org.dochi.webserver.socket.SocketState;
 import org.dochi.webserver.socket.SocketWrapper;
 

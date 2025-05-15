@@ -1,5 +1,6 @@
 package org.dochi.inputbuffer.socket;
 
+import org.dochi.webserver.attribute.KeepAlive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ import java.net.SocketException;
 public class BioSocketWrapper extends SocketWrapperBase<Socket> {
     private static final Logger log = LoggerFactory.getLogger(BioSocketWrapper.class);
 
-    public BioSocketWrapper(Socket socket, SocketConfig config) throws SocketException {
+    public BioSocketWrapper(Socket socket, KeepAlive config) throws SocketException {
         super(socket, config);
     }
 

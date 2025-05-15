@@ -1,6 +1,7 @@
 package org.dochi.webserver.socket;
 
-import org.dochi.http.api.HttpApiMapper;
+//import org.dochi.http.api.HttpApiMapper;
+import org.dochi.http.buffer.api.HttpApiMapper;
 import org.dochi.webserver.config.*;
 import org.dochi.webserver.executor.WorkerPoolExecutor;
 
@@ -28,6 +29,20 @@ public class SocketTaskExecutorFactory {
         );
     }
 
+//    private SocketTaskPool createTaskPool(
+//            ServerConfig serverConfig,
+//            HttpConfig httpConfig,
+//            HttpApiMapper httpApiMapper) {
+//        return new SocketTaskPool(
+//                serverConfig.getThreadPool(),
+//                () -> new SocketTaskHandler(
+//                        new SocketWrapper(serverConfig.getKeepAlive()),
+//                        httpApiMapper,
+//                        httpConfig
+//                )
+//        );
+//    }
+
     private SocketTaskPool createTaskPool(
             ServerConfig serverConfig,
             HttpConfig httpConfig,
@@ -35,7 +50,6 @@ public class SocketTaskExecutorFactory {
         return new SocketTaskPool(
                 serverConfig.getThreadPool(),
                 () -> new SocketTaskHandler(
-                        new SocketWrapper(serverConfig.getKeepAlive()),
                         httpApiMapper,
                         httpConfig
                 )

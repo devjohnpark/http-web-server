@@ -96,14 +96,17 @@ public class MimeHeaders {
 //    }
 
     public MimeHeaderField createHeader() {
-        if (count >= len) {
-            int newLength = count * 2;
-            if (len > 0 && newLength > len) {
-                len = newLength;
+        if (this.count >= this.len) {
+            int newLength = this.count * 2;
+            if (this.len > 0 && newLength > this.len) {
+                this.len = newLength;
             }
             MimeHeaderField[] tmp = new MimeHeaderField[len];
-            System.arraycopy(headers, 0, tmp, 0, count);
-            headers = tmp;
+            System.arraycopy(this.headers, 0, tmp, 0, count);
+            for (int i = count; i < len; i++) {
+                tmp[i] = new MimeHeaderField();
+            }
+            this.headers = tmp;
         }
         return headers[count++];
     }

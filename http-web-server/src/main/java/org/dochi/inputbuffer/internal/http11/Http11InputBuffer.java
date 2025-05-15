@@ -316,7 +316,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     // 그리고 HttpXXInputBuffer 재활용하기 위해서 해당 클래스에 init(BioSocketWrapper) 메서드를 정의하였다.
     // 소켓 데이터의 읽기는 SocketWrapper가 책임지므로 SocketInputBuffer의 로직을 Http11inputBuffer에 위임하는 것이 합리적이고 레이어 줄이고 객체 생성비용을 아낀다.
 
-    private boolean parseHeaders() throws IOException {
+    public boolean parseHeaders() throws IOException {
         HeaderParseStatus status;
         do {
             status = parseHeaderField();
@@ -324,28 +324,25 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         return status == HeaderParseStatus.DONE && request.headers().size() > 0;
     }
 
-    // 헤더 생성 시점 명확히
-    // name:_value 조건 만족시 헤더 생성
-    // :_ 발견해야함 (prev == : && cur == _)
-    // name:도 허용
     private HeaderParseStatus parseHeaderField() throws IOException {
         int previousByte = -1;
         int currentByte;
-        int start = buffer.position();
-        MimeHeaderField headerField = null;
-        boolean isCreateHeader = false;
-        while ((currentByte = getByte()) != -1) {
-            if (currentByte == ':') {
-                validateHeader(isCreateHeader);
-                headerField = request.headers().createHeader();
-                isCreateHeader = true;
-                headerField.getName().setBytes(buffer.array(), start, buffer.position() - start - 1);
-                start = buffer.position();
-            } else if (previousByte == ':' && currentByte == ' ') {
-                start++;
+        int nameStart = buffer.position();
+        int nameEnd = nameStart;
+        int valueStart = nameStart;
+        int valueEnd = nameStart;
+        while ((currentByte = getByte()) != -1) { // 1 2
+            if (currentByte == ':' && buffer.position() > nameStart + 1 && nameStart == nameEnd) {
+                nameEnd = buffer.position() - 1;
+                valueStart = buffer.position();
+            } else if (previousByte == ':' && (currentByte == ' ' || currentByte == '\t')) {
+                valueStart++;
             } else if (previousByte == '\r' && currentByte == '\n') {
-                if (headerField != null) {
-                    headerField.getValue().setBytes(buffer.array(), start, buffer.position() - start - 2);
+                valueEnd = buffer.position() - 2;
+                if (nameStart < nameEnd && nameEnd < valueStart && valueStart < valueEnd) {
+                    MimeHeaderField headerField = request.headers().createHeader();
+                    headerField.getName().setBytes(buffer.array(), nameStart, nameEnd - nameStart);
+                    headerField.getValue().setBytes(buffer.array(), valueStart, valueEnd - valueStart);
                     return HeaderParseStatus.NEED_MORE;
                 }
                 return HeaderParseStatus.DONE;
@@ -354,6 +351,30 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         }
         return HeaderParseStatus.EOF;
     }
+
+//    private HeaderParseStatus parseHeaderField() throws IOException {
+//        int previousByte = -1;
+//        int currentByte;
+//        int start = buffer.position();
+//        MimeHeaderField headerField = null;
+//        while ((currentByte = getByte()) != -1) {
+//            if (currentByte == ':' && headerField == null) {
+//                headerField = request.headers().createHeader();
+//                headerField.getName().setBytes(buffer.array(), start, buffer.position() - start - 1);
+//                start = buffer.position();
+//            } else if (previousByte == ':' && (currentByte == ' ' || currentByte == '\t')) {
+//                start++;
+//            } else if (previousByte == '\r' && currentByte == '\n') {
+//                if (headerField != null) {
+//                    headerField.getValue().setBytes(buffer.array(), start, buffer.position() - start - 2);
+//                    return HeaderParseStatus.NEED_MORE;
+//                }
+//                return HeaderParseStatus.DONE;
+//            }
+//            previousByte = currentByte;
+//        }
+//        return HeaderParseStatus.EOF;
+//    }
 
     private void validateHeader(boolean isCreateHeader) {
         if (isCreateHeader) {

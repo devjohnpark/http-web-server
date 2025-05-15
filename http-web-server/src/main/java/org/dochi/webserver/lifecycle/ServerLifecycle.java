@@ -20,6 +20,25 @@ public class ServerLifecycle extends LifecycleBase {
         this.addLifeCycle(new WebServiceLifecycle(webServer.getConfig().getWebService()));
     }
 
+//    public void start() throws LifecycleException {
+//        log.info("Starting server...");
+//        super.start();
+//        log.info("ServerLifeCycle started");
+//        logStartedWebServer(webServer);
+//        try(ServerSocket serverSocket = new ServerSocket()) {
+//            Connector connector = new Connector(serverSocket);
+//            connector.connect(
+//                    SocketTaskExecutorFactory.getInstance().createExecutor(webServer.getConfig()),
+//                    webServer.getHostName(),
+//                    webServer.getPort()
+//            );
+//        } catch (IOException e) {
+//            logAcceptError(webServer, e);
+//        }
+//        log.info("try-with-resources: Socket Closed.");
+//    }
+
+
     public void start() throws LifecycleException {
         log.info("Starting server...");
         super.start();
@@ -30,7 +49,8 @@ public class ServerLifecycle extends LifecycleBase {
             connector.connect(
                     SocketTaskExecutorFactory.getInstance().createExecutor(webServer.getConfig()),
                     webServer.getHostName(),
-                    webServer.getPort()
+                    webServer.getPort(),
+                    webServer.getConfig()
             );
         } catch (IOException e) {
             logAcceptError(webServer, e);

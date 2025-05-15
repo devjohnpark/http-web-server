@@ -2,7 +2,7 @@
 //
 //import org.dochi.webserver.attribute.KeepAlive;
 //import org.dochi.webserver.config.ServerConfig;
-//import org.dochi.http.api.HttpApiMapper;
+//import org.dochi.http.api.InternalAdapter;
 //import org.dochi.webserver.socket.SocketTaskHandler;
 //import org.dochi.webserver.socket.SocketTaskPool;
 //import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +14,7 @@
 //    private SocketTaskPool socketTaskPool;
 //    private final int poolSize = 10;
 //    private final KeepAlive keepAlive = new KeepAlive();
-//    private final HttpApiMapper httpApiMapper = new HttpApiMapper(new ServerConfig().getWebService().getServices());
+//    private final InternalAdapter httpApiMapper = new InternalAdapter(new ServerConfig().getWebService().getServices());
 //
 //    @BeforeEach
 //    void setUp() {

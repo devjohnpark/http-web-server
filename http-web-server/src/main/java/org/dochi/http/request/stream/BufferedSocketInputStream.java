@@ -1,5 +1,9 @@
 package org.dochi.http.request.stream;
 
+import org.dochi.http.exception.HttpStatusException;
+import org.dochi.http.response.HttpStatus;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class BufferedSocketInputStream extends java.io.InputStream {

@@ -1,10 +1,10 @@
-package org.dochi.http.response.processor;
+package org.dochi.http.buffer.processor;
 
 import org.dochi.http.api.HttpApiResponse;
+import org.dochi.http.buffer.TempOutputBuffer;
 import org.dochi.http.request.data.HttpVersion;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.http.response.ResponseHeaders;
-import org.dochi.http.response.stream.BufferedSocketOutputStream;
 import org.dochi.http.util.DateFormatter;
 import org.dochi.webresource.ResourceType;
 import org.dochi.webserver.config.HttpResConfig;
@@ -16,22 +16,23 @@ import java.io.OutputStream;
 
 public abstract class AbstractHttpResponseProcessor implements HttpResponseProcessor {
     private static final Logger log = LoggerFactory.getLogger(AbstractHttpResponseProcessor.class);
-    protected final BufferedSocketOutputStream outStream;
     protected HttpVersion version = HttpVersion.HTTP_1_1;
     protected HttpStatus status = HttpStatus.OK;
     protected final ResponseHeaders headers = new ResponseHeaders();
     protected final HttpResConfig httpResConfig;
     private boolean isDateHeader = true;
     private boolean isCommitted = false;
+    protected final TempOutputBuffer tmpOutputBuffer;
 
-    protected AbstractHttpResponseProcessor(OutputStream out, HttpResConfig httpResConfig) {
-        this.outStream = new BufferedSocketOutputStream(out);
+    protected AbstractHttpResponseProcessor(HttpResConfig httpResConfig) {
+        this.tmpOutputBuffer = new TempOutputBuffer();
         this.httpResConfig = httpResConfig;
     }
 
+    @Override
     public void recycle() {
         headers.clear();
-        outStream.recycle();
+        tmpOutputBuffer.recycle();
         isDateHeader = true;
         isCommitted = false;
         version = HttpVersion.HTTP_1_1;
@@ -146,7 +147,7 @@ public abstract class AbstractHttpResponseProcessor implements HttpResponseProce
 //        }
     }
     public OutputStream getOutputStream() {
-        return outStream.getOutputStream();
+        return tmpOutputBuffer.getOutputStream();
     }
 
     private void writeMessage(byte[] body) throws IOException {
@@ -164,7 +165,7 @@ public abstract class AbstractHttpResponseProcessor implements HttpResponseProce
 
     public void flush() throws IOException {
         if (!isCommitted) {
-            outStream.flush();
+            tmpOutputBuffer.flush();
             isCommitted = true;
         }
     }

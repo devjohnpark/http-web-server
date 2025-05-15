@@ -12,16 +12,18 @@ import org.dochi.webserver.config.HttpReqConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class Http11RequestProcessor extends AbstractHttpRequestProcessor {
     private static final Logger log = LoggerFactory.getLogger(Http11RequestProcessor.class);
+    private static final int CR = '\r';  // Carriage Return
+    private static final int LF = '\n';  // Line Feed
+//    private final HttpReqConfig config;
+//    private final ByteArrayOutputStream lineBuffer = new ByteArrayOutputStream();
+
     private final ContentLengthValidator contentLengthValidator;
 
-    // BufferedReader readLine() -> lock과 같은 동기화 로직때문에 요청당 스레드를 할당하는 서버 모델에서는 속도가 느림 & CRLF 단위로만 못읽고 \n 단위로도 읽음[
     private final Http11RequestStream requestStream;
 
     public Http11RequestProcessor(InputStream in, HttpReqConfig httpReqConfig) {
@@ -47,6 +49,33 @@ public class Http11RequestProcessor extends AbstractHttpRequestProcessor {
             throw new HttpStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
+
+//    private boolean processRequestLine() throws IOException, HttpStatusException {
+//        int prev = -1, curr, count = 0;
+//        while ((curr = inputStream.read()) != -1) {
+//            if (prev == '\r' && curr == '\n') {
+//                break;
+//            }
+//            if (curr == -1) {
+//                return false;
+//            }
+//            if (count >= buf.length) {
+//                throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Request line size exceeds the limit bytes");
+//            }
+//            if (prev != -1) {
+//                buf[count++] = (byte) prev;
+//            }
+//            prev = curr;
+//            count++;
+//        }
+//        try {
+//
+//            request.metadata().addRequestLine(new String(buf, 0, count, StandardCharsets.ISO_8859_1));
+//            return true;
+//        } catch (IllegalArgumentException e) {
+//            throw new HttpStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+//        }
+//    }
 
     private boolean isEOFOnCloseWait(String requestLine) {
         return requestLine == null;

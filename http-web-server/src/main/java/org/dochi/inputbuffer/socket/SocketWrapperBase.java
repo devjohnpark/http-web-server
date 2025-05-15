@@ -1,5 +1,6 @@
 package org.dochi.inputbuffer.socket;
 
+import org.dochi.webserver.attribute.KeepAlive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ public abstract class SocketWrapperBase<E> {
     private int keepAliveCount = 0;
 
     // config -> endpoint로 변경해 소켓 버퍼 크기도 지정할수 있도록 향후 변경
-    public SocketWrapperBase(E socket, SocketConfig config) {
+    public SocketWrapperBase(E socket, KeepAlive config) {
         this.socket = socket;
         this.keepAliveTimeout = config.getKeepAliveTimeout();
         this.maxKeepAliveRequests = config.getMaxKeepAliveRequests();
@@ -42,11 +43,11 @@ public abstract class SocketWrapperBase<E> {
 //        return socket;
 //    }
 
-    protected abstract boolean isConnected();
+    public abstract boolean isConnected();
 
-    protected abstract boolean isClosed();
+    public abstract boolean isClosed();
 
-    protected abstract void startConnectionTimeout(int connectionTimeout) throws SocketException;
+    public abstract void startConnectionTimeout(int connectionTimeout) throws SocketException;
 
     public int incrementKeepAliveCount() { return ++keepAliveCount; }
 

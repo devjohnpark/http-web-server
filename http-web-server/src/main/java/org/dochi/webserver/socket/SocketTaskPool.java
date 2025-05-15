@@ -31,7 +31,14 @@ public class SocketTaskPool {
 
     public SocketTask get() {
         SocketTask socketTask = queue.poll();
-        if (socketTask == null || socketTask.getSocketWrapper().isUsing()) {
+//        if (socketTask == null || socketTask.getSocketWrapper().isUsing()) {
+//            socketTask = supplier.get(); // SocketTask 구현체 생성
+//        }
+//        if (socketTask == null || socketTask.getSocketWrapper().isConnected()) {
+//            socketTask = supplier.get(); // SocketTask 구현체 생성
+//        }
+
+        if (socketTask == null) {
             socketTask = supplier.get(); // SocketTask 구현체 생성
         }
         return socketTask;
@@ -45,7 +52,7 @@ public class SocketTaskPool {
 //        return queue.take();
 //    }
 
-//    public SocketTaskHandler getAvailableRequestHandler(KeepAlive keepAlive, HttpApiMapper requestMapper) {
+//    public SocketTaskHandler getAvailableRequestHandler(KeepAlive keepAlive, InternalAdapter requestMapper) {
 //        SocketTaskHandler requestHandler = requestHandlerQueue.poll();
 //        if (requestHandler == null || requestHandler.getSocketWrapper().isUsing()) {
 //            requestHandler = new SocketTaskHandler(new BioSocketWrapper(keepAlive), requestMapper);

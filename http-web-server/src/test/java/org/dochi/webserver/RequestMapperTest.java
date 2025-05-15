@@ -14,7 +14,7 @@
 //import static org.assertj.core.api.Assertions.assertThat;
 //
 //class RequestMapperTest {
-//    private HttpApiMapper requestMapper;
+//    private InternalAdapter requestMapper;
 //    private final WebResourceProvider webResourceProvider = new WebResourceProvider("webbapp");
 //
 //    @BeforeEach
@@ -24,7 +24,7 @@
 //                "/", new DefaultHttpApiHandler(),
 //                "/user/create", new LoginHttpApiHandler()
 //        );
-//        requestMapper = new HttpApiMapper(requestMappings);
+//        requestMapper = new InternalAdapter(requestMappings);
 //    }
 //
 //    @Test

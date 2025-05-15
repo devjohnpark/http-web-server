@@ -20,13 +20,13 @@ public interface HttpApiResponse {
 
     HttpApiResponse addStatus(HttpStatus status);
 
-    void addDateHeaders(String date);
+    HttpApiResponse addDateHeaders(String date);
 
-    void addContentHeaders(String contentType, int contentLength);
+    HttpApiResponse addContentHeaders(String contentType, int contentLength);
 
-    void inActiveDateHeader();
+    HttpApiResponse inActiveDateHeader();
 
-    void activeDateHeader();
+    HttpApiResponse activeDateHeader();
 
     void sendNoContent() throws IOException;
 

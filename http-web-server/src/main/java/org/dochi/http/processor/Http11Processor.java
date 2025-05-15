@@ -16,6 +16,7 @@ import java.io.*;
 
 import static org.dochi.webserver.socket.SocketState.*;
 
+// SocketWrapperBase로 setter 주입으로 변경
 public class Http11Processor extends AbstractHttpProcessor {
     private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
 
@@ -25,6 +26,7 @@ public class Http11Processor extends AbstractHttpProcessor {
                 new Http11ResponseProcessor(out, config.getHttpResConfig())
         );
     }
+
 
     public boolean shouldPersistentConnection(SocketWrapper socketWrapper) {
         return isRequestKeepAlive() && isSeverKeepAlive(socketWrapper);

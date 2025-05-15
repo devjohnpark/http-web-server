@@ -5,6 +5,7 @@ import org.dochi.http.request.data.RequestHeadersGetter;
 import org.dochi.http.request.data.RequestMetadataGetter;
 import org.dochi.http.request.data.RequestParametersGetter;
 import org.dochi.http.request.multipart.Part;
+import org.dochi.inputbuffer.external.HttpExternalRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
