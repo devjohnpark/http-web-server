@@ -7,7 +7,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class HttpParserTest {
+class Http11ParserTest {
     void parseQueryString_correct_input() {
         String queryString = "userId=john&password=1234&name=john park";
 

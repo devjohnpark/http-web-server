@@ -2,7 +2,6 @@ package org.dochi.http.api;
 
 import org.dochi.http.request.data.HttpMethod;
 import org.dochi.http.request.data.HttpVersion;
-import org.dochi.http.response.Http11ResponseProcessor;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.webresource.WebResourceProvider;
 import org.dochi.webserver.config.WebServiceConfig;
@@ -18,7 +17,7 @@ public abstract class AbstractHttpApiHandler implements HttpApiHandler {
 
     @Override
     public void init(WebServiceConfig config) {
-        log.debug("{}] init", this.getClass().getSimpleName());
+        log.debug("{} init", this.getClass().getSimpleName());
         this.webResourceProvider = config.getWebResourceProvider();
     }
 
@@ -32,7 +31,7 @@ public abstract class AbstractHttpApiHandler implements HttpApiHandler {
     }
 
     @Override
-    public void service(HttpApiRequest request, Http11ResponseProcessor response) throws IOException {
+    public void service(HttpApiRequest request, HttpApiResponse response) throws IOException {
         HttpMethod method = request.getMethod();
         if (HttpMethod.GET.equals(method)) {
             doGet(request, response);
@@ -49,27 +48,27 @@ public abstract class AbstractHttpApiHandler implements HttpApiHandler {
         }
     }
 
-    protected void doGet(HttpApiRequest request, Http11ResponseProcessor response) throws IOException {
+    protected void doGet(HttpApiRequest request, HttpApiResponse response) throws IOException {
         sendDefaultError(request, response);
     }
 
-    protected void doPost(HttpApiRequest request, Http11ResponseProcessor response) throws IOException {
+    protected void doPost(HttpApiRequest request, HttpApiResponse response) throws IOException {
         sendDefaultError(request, response);
     }
 
-    protected void doPut(HttpApiRequest request, Http11ResponseProcessor response) throws IOException {
+    protected void doPut(HttpApiRequest request, HttpApiResponse response) throws IOException {
         sendDefaultError(request, response);
     }
 
-    protected void doPatch(HttpApiRequest request, Http11ResponseProcessor response) throws IOException {
+    protected void doPatch(HttpApiRequest request, HttpApiResponse response) throws IOException {
         sendDefaultError(request, response);
     }
 
-    protected void doDelete(HttpApiRequest request, Http11ResponseProcessor response) throws IOException {
+    protected void doDelete(HttpApiRequest request, HttpApiResponse response) throws IOException {
         sendDefaultError(request, response);
     }
 
-    private void sendDefaultError(HttpApiRequest request, Http11ResponseProcessor response) throws IOException {
+    private void sendDefaultError(HttpApiRequest request, HttpApiResponse response) throws IOException {
         HttpVersion protocol = request.getHttpVersion();
         String errorMessage = String.format("http method %s not supported", request.getMethod());
         // PUT, PATCH, DELETE, OPTIONS 등은 HTTP/0.9나 HTTP/1.0에서 명시적으로 정의되어 있지 않는다.

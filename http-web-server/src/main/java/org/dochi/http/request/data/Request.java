@@ -29,7 +29,7 @@ public class Request implements Cloneable {
     public void clear() throws IOException {
         headers.clear();
         parameters.clear();
-        multipart.clear();
+        multipart.recycle();
     }
 
     @Override

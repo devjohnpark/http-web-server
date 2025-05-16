@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 public class ServerLifecycle extends LifecycleBase {
     private static final Logger log = LoggerFactory.getLogger(ServerLifecycle.class);

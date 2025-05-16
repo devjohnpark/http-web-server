@@ -5,6 +5,7 @@ import java.io.IOException;
 
 public class MultipartBodyUntilBoundary {
     private final ByteArrayOutputStream bodyStream = new ByteArrayOutputStream();
+    private byte[] body;
     private byte[] boundary;
 
     public void setBoundary(byte[] boundary) {
@@ -23,7 +24,7 @@ public class MultipartBodyUntilBoundary {
         return boundary;
     }
 
-    public void clear() {
+    public void recycle() {
         if (bodyStream.size() != 0 || boundary != null) {
             bodyStream.reset();
             boundary = null;

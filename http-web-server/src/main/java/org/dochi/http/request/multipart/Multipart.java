@@ -12,8 +12,12 @@ public class Multipart {
         return !parts.isEmpty();
     }
 
-    public Map<String, Part> getParts() {
-        return parts;
+//    public Map<String, Part> getParts() {
+//        return parts;
+//    }
+
+    public void addPart(String name, Part part) {
+        this.parts.put(name, part);
     }
 
     public Part getPart(String name) {
@@ -23,7 +27,7 @@ public class Multipart {
         return parts.get(name);
     }
 
-    public void clear() throws IOException {
+    public void recycle() throws IOException {
         if (parts.isEmpty()) {
             return;
         }

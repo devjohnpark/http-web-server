@@ -18,11 +18,11 @@ public class MultiPartProcessor {
 //    private final Map<String, Part> parts = new HashMap<>();
     private final MessageSizeMonitor sizeMonitor;
     private final BoundaryValidator boundaryValidator = new BoundaryValidator();
+    private final MultipartSection section;
 //    private final MultipartHeaders headers = new MultipartHeaders();
 //    private final MultipartParameters parameters = new MultipartParameters();
 //    private final MultipartBodyUntilBoundary bodyUntilBoundary = new MultipartBodyUntilBoundary();
 //    private final MultipartSection recycleSection = new MultipartSection(headers, parameters, bodyUntilBoundary);
-    private final MultipartSection section;
 
 //    public void processParts(HttpCrlfLineReader lineReader, String boundaryValue, MessageSizeMonitor sizeMonitor) throws HttpStatusException, IOException {
 //        boundaryValidator.validateBoundary(boundaryValue);
@@ -68,7 +68,7 @@ public class MultiPartProcessor {
 
     private void processHeaders(MultipartHeaders headers, HttpCrlfLineReader lineReader) throws IOException {
         String line;
-        while ((line = lineReader.readLineString(sizeMonitor)) != null) {
+        while ((line = lineReader.readHeader(sizeMonitor)) != null) {
             if (line.isEmpty()) {
                 return;
             }
@@ -130,7 +130,7 @@ public class MultiPartProcessor {
         if (name == null) {
             throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Header has no name for part from multipart/form-data format.");
         }
-        request.multipart().getParts().put(name, createPart(section.getHeaders(), section.getParameters(), section.getBody()));
+        request.multipart().addPart(name, createPart(section.getHeaders(), section.getParameters(), section.getBody()));
     }
 
     private Part createPart(MultipartHeaders headers, MultipartParameters parameters, byte[] body) throws IOException {
@@ -150,7 +150,7 @@ public class MultiPartProcessor {
         private byte[] endBoundary = null;
 
         public void validateBoundary(String boundaryValue) {
-            if (isValid(boundaryValue)) {
+            if (isInvalid(boundaryValue)) {
                 throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid multipart/form-data boundary value: " + boundaryValue);
             }
             this.boundary = (BOUNDARY_PREFIX + boundaryValue).getBytes(StandardCharsets.US_ASCII);
@@ -176,7 +176,7 @@ public class MultiPartProcessor {
         }
 
         // RFC 2046
-        private boolean isValid(String boundary) {
+        private boolean isInvalid(String boundary) {
             if (boundary == null || boundary.isEmpty()) {
                 return false;
             }
@@ -248,9 +248,9 @@ public class MultiPartProcessor {
         }
 
         public MultipartSection recycle() {
-            headers.clear();
-            parameters.clear();
-            bodyUntilBoundary.clear();
+            headers.recycle();
+            parameters.recycle();
+            bodyUntilBoundary.recycle();
             return this;
         }
     }

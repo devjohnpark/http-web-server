@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RequestParametersTest {
+class RequestRequestParametersTest {
 
     private RequestParameters parameters;
 
@@ -16,7 +16,7 @@ class RequestParametersTest {
     }
 
     @Test
-    void addRequestParameters_requestLine() {
+    void addRequestParameters_Line() {
         String queryStringWithUrlEncoded = "name=john%20park&age=20";
         parameters.addRequestParameters(queryStringWithUrlEncoded);
         assertThat(parameters.getRequestParameterValue("name")).isEqualTo("john park");
@@ -24,7 +24,7 @@ class RequestParametersTest {
     }
 
     @Test
-    void addRequestParameters_formUrlEncoded() {
+    void addParameters_formUrlEncoded() {
         String queryStringWithUrlEncoded = "name=john+park&age=20";
         parameters.addRequestParameters(queryStringWithUrlEncoded);
         assertThat(parameters.getRequestParameterValue("name")).isEqualTo("john park");
@@ -33,14 +33,14 @@ class RequestParametersTest {
 
 
     @Test
-    void addRequestParameters_null() {
+    void addParameters_null() {
         parameters.addRequestParameters(null);
         assertThat(parameters.getRequestParameterValue("name")).isNull();
         assertThat(parameters.getRequestParameterValue("age")).isNull();
     }
 
     @Test
-    void addRequestParameters_empty() {
+    void addParameters_empty() {
         parameters.addRequestParameters("");
         assertThat(parameters.getRequestParameterValue("")).isNull();
         assertThat(parameters.getRequestParameterValue("")).isNull();

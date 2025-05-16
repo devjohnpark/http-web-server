@@ -3,7 +3,7 @@ package org.dochi.http.processor;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.api.HttpApiMapper;
 import org.dochi.http.request.processor.HttpRequestProcessor;
-import org.dochi.http.response.Http11ResponseProcessor;
+import org.dochi.http.response.processor.HttpResponseProcessor;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.webserver.socket.SocketState;
 import org.dochi.webserver.socket.SocketWrapper;
@@ -16,13 +16,12 @@ import java.net.SocketTimeoutException;
 
 import static org.dochi.webserver.socket.SocketState.*;
 
-
 public abstract class AbstractHttpProcessor implements HttpProcessor {
     private static final Logger log = LoggerFactory.getLogger(AbstractHttpProcessor.class);
     protected final HttpRequestProcessor request;
-    protected final Http11ResponseProcessor response;
+    protected final HttpResponseProcessor response;
 
-    protected AbstractHttpProcessor(HttpRequestProcessor request, Http11ResponseProcessor response) {
+    protected AbstractHttpProcessor(HttpRequestProcessor request, HttpResponseProcessor response) {
         this.request = request;
         this.response = response;
     }
@@ -30,21 +29,24 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     @Override
     public SocketState process(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
         SocketState state = CLOSED;
+        int processCount = 0;
         try {
-            socketWrapper.startConnectionTimeout(socketWrapper.getKeepAliveTimeout());
+            // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
+            // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
+            recycle(); // memory visibility
             state = service(socketWrapper, httpApiMapper);
-        } catch (SocketException e) {
-            log.error("Call setSoTimeout() but socket is already closed: {}", e.getMessage());
-            sendError(HttpStatus.BAD_REQUEST, "socket is already closed");
+        } catch (Exception e) {
+            processException(e);
+            safeRecycle();
         }
+        log.debug("Processed requests count: {}", processCount);
         return state;
     }
 
-    protected abstract SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper);
+    protected abstract SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) throws IOException;
 
-    protected abstract boolean shouldKeepAlive(SocketWrapper socketWrapper);
+    protected abstract boolean shouldPersistentConnection(SocketWrapper socketWrapper);
 
-    // clear resource of request and response
     protected void recycle() throws IOException {
         request.recycle();
         response.recycle();
@@ -63,12 +65,9 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     protected void processException(Exception e) {
         switch (e) {
             case SocketTimeoutException socketTimeoutException -> {
-//                After setting the input time with soSetTimeout() on a Socket, a timeout occurs while the server is reading the request: 408 Request Timeout response (include 'Connection: close' header)
 //                SocketTimeoutException exception thrown when valid time expires while being blocked by read() method of SocketInputStream object (write() is not related to setSoTimeout)
-//                A SocketTimeoutException is thrown if the client has not read all the data in the socket receive buffer while receiving all the data from the web server after sending the request.
-//                Therefore, if you read the data in the socket buffer multiple times through system calls, you must give the client a response before the client realizes it.
                 log.error("Socket read timeout occurred: ", e);
-                sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage());
+//              sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage()); // non necessary need response when socket read timeout
             }
             case SocketException socketException -> {
                 // reference: NioSocketImpl.implRead()
@@ -97,6 +96,7 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
             } else if (status.getCode() >= 400) {
                 response.sendError(status, errorMessage);
             }
+            response.flush();
         } catch (IOException e) {
             log.error("Failed to send error response: {}", e.getMessage());
         }

@@ -72,7 +72,7 @@ class MultiPartProcessorTest {
         assertThat(request.multipart().getPart("age").getContent()).isEqualTo("30".getBytes(StandardCharsets.UTF_8));
         assertThat(request.multipart().getPart("profileInfo").getContent()).isEqualTo("{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}".getBytes(StandardCharsets.UTF_8));
         assertThat(request.multipart().getPart("profileImage").getContent()).isEqualTo("This is body of multipart/form data".getBytes(StandardCharsets.UTF_8));
-        request.multipart().clear();
+        request.multipart().recycle();
         assertNull(request.multipart().getPart("age").getContent());
         assertEquals(httpMessageSizeManager.getContentMonitor().getActualContentLength(), multipartData.getBytes(StandardCharsets.UTF_8).length);
     }
@@ -110,7 +110,7 @@ class MultiPartProcessorTest {
         assertThat(request.multipart().getPart("field1").getContent()).isEmpty();
         assertThat(request.multipart().getPart("profileInfo").getContent()).isEqualTo("{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}".getBytes(StandardCharsets.UTF_8));
         assertThat(request.multipart().getPart("profileImage").getContent()).isEqualTo("This is body of multipart/form data".getBytes(StandardCharsets.UTF_8));
-        request.multipart().clear();
+        request.multipart().recycle();
         assertNull(request.multipart().getPart("age").getContent());
         assertEquals(httpMessageSizeManager.getContentMonitor().getActualContentLength(), multipartData.getBytes(StandardCharsets.UTF_8).length);
     }
@@ -137,7 +137,7 @@ class MultiPartProcessorTest {
         assertThat(request.multipart().getPart("username").getContent()).isEqualTo("john".getBytes(StandardCharsets.UTF_8));
         assertThat(request.multipart().getPart("age").getContent()).isEqualTo("4".getBytes(StandardCharsets.UTF_8));
         assertThat(request.multipart().getPart("file").getContent()).isEqualTo("21312445321553451234213412341234234124234".getBytes(StandardCharsets.UTF_8));
-        request.multipart().clear();
+        request.multipart().recycle();
         assertNull(request.multipart().getPart("age").getContent());
         assertEquals(httpMessageSizeManager.getContentMonitor().getActualContentLength(), multipartData.getBytes(StandardCharsets.UTF_8).length);
     }

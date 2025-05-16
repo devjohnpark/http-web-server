@@ -124,7 +124,7 @@ public class WebResourceProvider implements ResourceProvider {
 
     private byte[] readResourceInJar(String resourcePath) {
         // WebResourceProvider를 로드한 클래스 로더를 가져옴
-        // ClassLoader의 getResourceAsStream 메서드는 Classpath에서 지정된 경로의 리소스를 InputStream 형태로 반환(주로 JAR 파일 내부의 파일을 읽을 때 사용)
+        // ClassLoader의 getResourceAsStream 메서드는 Classpath에서 지정된 경로의 리소스를 BufferedSocketInputStream 형태로 반환(주로 JAR 파일 내부의 파일을 읽을 때 사용)
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
             if (in != null) {
                 return in.readAllBytes();

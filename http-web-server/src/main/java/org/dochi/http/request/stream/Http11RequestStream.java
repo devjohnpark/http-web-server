@@ -9,18 +9,17 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-
-public class Http11RequestStream extends SocketBufferedInputStream implements HttpCrlfLineReader, HttpBodyReader {
+public class Http11RequestStream extends BufferedSocketInputStream implements HttpCrlfLineReader, HttpBodyReader {
     private static final Logger log = LoggerFactory.getLogger(Http11RequestStream.class);
     private static final int CR = '\r';  // Carriage Return
     private static final int LF = '\n';  // Line Feed
     private final ByteArrayOutputStream lineBuffer = new ByteArrayOutputStream();
 
-    public Http11RequestStream(InputStream in) {
+    public Http11RequestStream(java.io.InputStream in) {
         super(in);
     }
 
-    public String readLineString(MessageSizeMonitor sizeMonitor) throws IOException {
+    public String readHeader(MessageSizeMonitor sizeMonitor) throws IOException {
         try {
             byte[] lineBytes = readLine(sizeMonitor.getSizeLimit());
             if (lineBytes != null) {
@@ -94,6 +93,7 @@ public class Http11RequestStream extends SocketBufferedInputStream implements Ht
         throw new NotFoundCrlfIOException("Unexpected end of stream for missing CRLF", lineBuffer.toString(StandardCharsets.UTF_8));
     }
 
+    // 복사 비용 발생
     private byte[] trimBuffer(ByteArrayOutputStream buffer, int newSize) {
         byte[] trimmedBuffer = new byte[newSize];
         System.arraycopy(buffer.toByteArray(), 0, trimmedBuffer, 0, newSize);

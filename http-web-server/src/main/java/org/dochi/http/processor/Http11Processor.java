@@ -5,7 +5,7 @@ import org.dochi.http.request.data.RequestHeaders;
 import org.dochi.http.request.processor.Http11RequestProcessor;
 import org.dochi.http.request.data.HttpVersion;
 import org.dochi.http.request.stream.Http11RequestStream;
-import org.dochi.http.response.Http11ResponseProcessor;
+import org.dochi.http.response.processor.Http11ResponseProcessor;
 import org.dochi.webserver.config.HttpConfig;
 import org.dochi.webserver.socket.SocketState;
 import org.dochi.webserver.socket.SocketWrapper;
@@ -21,17 +21,17 @@ public class Http11Processor extends AbstractHttpProcessor {
 
     public Http11Processor(InputStream in, OutputStream out, HttpConfig config) {
         super(
-                new Http11RequestProcessor(new Http11RequestStream(in), config.getHttpReqConfig()),
+                new Http11RequestProcessor(in, config.getHttpReqConfig()),
                 new Http11ResponseProcessor(out, config.getHttpResConfig())
         );
     }
 
-    public boolean shouldKeepAlive(SocketWrapper socketWrapper) {
+    public boolean shouldPersistentConnection(SocketWrapper socketWrapper) {
         return isRequestKeepAlive() && isSeverKeepAlive(socketWrapper);
     }
 
     private boolean shouldNext(SocketWrapper socketWrapper) {
-        boolean isKeepAlive = shouldKeepAlive(socketWrapper);
+        boolean isKeepAlive = shouldPersistentConnection(socketWrapper);
         response.addConnection(isKeepAlive);
         if (isKeepAlive) {
            response.addKeepAlive(socketWrapper.getKeepAliveTimeout(), socketWrapper.getMaxKeepAliveRequests());
@@ -55,50 +55,38 @@ public class Http11Processor extends AbstractHttpProcessor {
         return request.getHttpVersion().equals(HttpVersion.HTTP_1_0) && (connectionValue != null && connectionValue.equals("keep-alive"));
     }
 
-    protected SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
+    protected SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) throws IOException {
         SocketState state = OPEN;
-        int processCount = 0;
-        try {
-            recycle();
-            while (state == OPEN) {
-                if (!request.isPrepareHeader()) {
-                    request.recycle(); // memory visibility
-                    // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
-                    // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
-                    state = CLOSED;
-                    break;
-                } else if (isUpgradeRequest(socketWrapper)) {
-                    // Current ignore HTTP/1.1 upgrade request, processing as HTTP/1.1 (Later support HTTP/2.0)
-                    state = UPGRADING;
-                    // 1. upgradeToken(); // upgradeToken = getHeader(Upgrade) & getHeader(HTTP2-Settings);
-                    // 2. sendUpgrade(); // HTTP/1.1 response 101 status
-                    // 3. break;
-                    // After client preface request -> response as HTTP/2.0 using Http2Processor
-                } else if (!shouldNext(socketWrapper)) {
-                    state = CLOSED;
-                }
-                httpApiMapper.getHttpApiHandler(request.getPath()).service(request, response);
-
-                // response.flush()
-                // Response object provides OutputStream object to developer, so it need flush() after processing HTTP API
-                // flush() has system call cost, it needs to remove inefficient action.
-                // 1. Rapping flush method by custom OutputStream.
-                // 2. The custom OutputStream declares boolean-isFlushed variable.
-                // 3. If call rapped flush method, According to isFlushed value(true/false), flush() to be called or not.
-                recycle();
-                processCount++;
+        while (state == OPEN) {
+            if (!request.isPrepareHeader()) {
+                request.recycle();
+                state = CLOSED;
+                break;
+            } else if (isUpgradeRequest(socketWrapper)) {
+                // Current ignore HTTP/1.1 upgrade request, processing as HTTP/1.1 (Later support HTTP/2.0)
+                state = UPGRADING;
+                // 1. upgradeToken(); // upgradeToken = getHeader(Upgrade) & getHeader(HTTP2-Settings);
+                // 2. sendUpgrade(); // HTTP/1.1 response 101 status
+                // 3. break;
+                // After client preface request -> response as HTTP/2.0 using Http2Processor
+            } else if (!shouldNext(socketWrapper)) {
+                state = CLOSED;
             }
-        } catch (Exception e) {
-            processException(e);
-            safeRecycle();
-            state = CLOSED;
+            httpApiMapper.getHttpApiHandler(request.getPath()).service(request, response);
+            response.flush();
+            // response.flush()
+            // Response object provides OutputStream object to developer, so it need flush() after processing HTTP API
+            // flush() has system call cost, it needs to remove inefficient action.
+            // 1. Rapping flush method by custom OutputStream.
+            // 2. The custom OutputStream declares boolean-isFlushed variable.
+            // 3. If call rapped flush method, According to isFlushed value(true/false), flush() to be called or not.
+            recycle();
         }
-        log.debug("Processed keep-alive requests count: {}", processCount);
         return state;
     }
 
     private boolean isUpgradeRequest(SocketWrapper socketWrapper) {
-        return  request.getHeader(RequestHeaders.UPGRADE) != null;
+        return request.getHeader(RequestHeaders.UPGRADE) != null;
     }
 
 //    private void sendUpgrade() {

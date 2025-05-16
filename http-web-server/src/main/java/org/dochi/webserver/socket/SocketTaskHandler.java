@@ -3,6 +3,7 @@ package org.dochi.webserver.socket;
 import org.dochi.http.api.HttpApiMapper;
 import org.dochi.http.processor.Http11Processor;
 import org.dochi.http.processor.HttpProcessor;
+import org.dochi.http.response.HttpStatus;
 import org.dochi.webserver.config.HttpConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 // BioSocketWrapper(Socket)과 HttpApiMapper 객체를 가지고 클라이언트의 요청 프로세싱
 public class SocketTaskHandler implements SocketTask {
@@ -55,8 +57,15 @@ public class SocketTaskHandler implements SocketTask {
         try (InputStream in = socket.getInputStream(); OutputStream out = socket.getOutputStream();) {
 
             // 추후 ProcessorHandler 객체로 처리
+            // HttpProcessor을 재활용하기 위해서는 네트워크 입출력 객체를 setter로 주입해야한다.
+            // BioSocketWrapper를 생성해서 Http
             HttpProcessor httpProcessor = new Http11Processor(in, out, httpConfig);
+
+            socketWrapper.startConnectionTimeout(socketWrapper.getKeepAliveTimeout());
+
             httpProcessor.process(socketWrapper, httpApiMapper);
+
+
 //            SocketState state = httpProcessor.process(socketWrapper, httpApiMapper);
 
 
@@ -68,6 +77,8 @@ public class SocketTaskHandler implements SocketTask {
 //                log.debug("Upgrading socket [Client: {}, Port: {}]", socket.getInetAddress(), socket);
 //            }
 
+        } catch (SocketException e) {
+            log.error("Set connection timeout but socket is already closed: {}", e.getMessage());
         } catch (IOException e) {
             log.error("Socket get stream error: {} [Client: {}, Port: {}]",
                     socket.getInetAddress(), socket.getPort(), e.getMessage());
