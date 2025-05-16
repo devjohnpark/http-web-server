@@ -50,7 +50,10 @@ public class SocketTaskPool {
 
     public SocketTask get() {
         SocketTask socketTask = queue.poll();
-        if (socketTask == null || socketTask.getSocketWrapper().isUsing()) {
+//        if (socketTask == null || socketTask.getSocketWrapper().isUsing()) {
+//            socketTask = supplier.get(); // SocketTask 구현체 생성
+//        }
+        if (socketTask == null) {
             socketTask = supplier.get(); // SocketTask 구현체 생성
         }
         return socketTask;
