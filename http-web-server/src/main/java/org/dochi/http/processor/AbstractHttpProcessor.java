@@ -29,7 +29,6 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     @Override
     public SocketState process(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) {
         SocketState state = CLOSED;
-        int processCount = 0;
         try {
             // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
             // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
@@ -39,7 +38,6 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
             processException(e);
             safeRecycle();
         }
-        log.debug("Processed requests count: {}", processCount);
         return state;
     }
 

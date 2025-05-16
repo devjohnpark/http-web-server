@@ -57,6 +57,7 @@ public class Http11Processor extends AbstractHttpProcessor {
 
     protected SocketState service(SocketWrapper socketWrapper, HttpApiMapper httpApiMapper) throws IOException {
         SocketState state = OPEN;
+        int processCount = 0;
         while (state == OPEN) {
             if (!request.isPrepareHeader()) {
                 request.recycle();
@@ -80,8 +81,10 @@ public class Http11Processor extends AbstractHttpProcessor {
             // 1. Rapping flush method by custom OutputStream.
             // 2. The custom OutputStream declares boolean-isFlushed variable.
             // 3. If call rapped flush method, According to isFlushed value(true/false), flush() to be called or not.
+            processCount++;
             recycle();
         }
+        log.debug("Processed requests count: {}", processCount);
         return state;
     }
 
