@@ -1,5 +1,6 @@
 package org.dochi.inputbuffer.multipart;
 
+import org.dochi.http.request.stream.Http11RequestStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,7 @@ public class MultipartStream {
     private static final Logger log = LoggerFactory.getLogger(MultipartStream.class);
     private static final int CR = '\r';  // Carriage Return
     private static final int LF = '\n';  // Line Feed
-    private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream lineBuffer = new ByteArrayOutputStream();
     private final InputStream in;
     private static final int[] EMPTY_CRLF = { CR, LF, CR, LF };
 
@@ -51,37 +52,27 @@ public class MultipartStream {
 //    }
 
     public byte[] readCRLFLine(int maxSize) throws IOException {
-        baos.reset();
+        lineBuffer.reset();
         int previousByte = -1;
         int currentByte;
 
         while ((currentByte = in.read()) != -1) {
 
-            baos.write(currentByte);
-
             // CR+LF 조합을 찾으면 줄의 끝
             if (previousByte == CR && currentByte == LF) {
                 // 마지막 CRLF 문자 제거
-                return trimBuffer(baos, baos.size() - 2);
+                return lineBuffer.toByteArray();
             }
 
-            // line과 부합할때까지 읽은 데이터 크기가 커지는것을 방지
-            // lineBuffer: 12345\r1 (7)
-            // limitLineSize: 5
-            if (baos.size() >= maxSize + 2) {
-                throw new IllegalStateException("max size exceeds the limit bytes: " + maxSize);
+            if (previousByte != -1) {
+                if (lineBuffer.size() >= maxSize) {
+                    throw new IllegalStateException("max size exceeds the limit bytes: " + maxSize);
+                }
+                lineBuffer.write(previousByte);
             }
 
             previousByte = currentByte;
         }
-        return null; // null 반환시 요청 처리 즉각 종료
+        return null;
     }
-
-    // 복사 비용 발생
-    private byte[] trimBuffer(ByteArrayOutputStream buffer, int newSize) {
-        byte[] trimmedBuffer = new byte[newSize];
-        System.arraycopy(buffer.toByteArray(), 0, trimmedBuffer, 0, newSize);
-        return trimmedBuffer;
-    }
-
 }
