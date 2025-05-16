@@ -23,12 +23,12 @@ public class Http11RequestStream implements HttpCrlfLineReader, HttpBodyReader {
     public String readHeader(MessageSizeMonitor sizeMonitor) throws IOException {
         try {
             byte[] lineBytes = readLine(sizeMonitor.getSizeLimit());
-            sizeMonitor.monitorSize(lineBytes.length);
-            return new String(lineBytes, StandardCharsets.UTF_8);
+            if (lineBytes != null) {
+                sizeMonitor.monitorSize(lineBytes.length);
+                return new String(lineBytes, StandardCharsets.UTF_8);
+            }
         } catch (LineTooLongIOException e) {
             sizeMonitor.monitorSize(e.getLimitLineSize());
-        } catch (NotFoundCrlfIOException e) {
-            throw new HttpStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
         return null;
     }
@@ -36,12 +36,12 @@ public class Http11RequestStream implements HttpCrlfLineReader, HttpBodyReader {
     public byte[] readLineBytes(MessageSizeMonitor sizeMonitor) throws IOException {
         try {
             byte[] lineBytes = readLine(sizeMonitor.getSizeLimit());
-            sizeMonitor.monitorSize(lineBytes.length);
-            return lineBytes;
+            if (lineBytes != null) {
+                sizeMonitor.monitorSize(lineBytes.length);
+                return lineBytes;
+            }
         } catch (LineTooLongIOException e) {
             sizeMonitor.monitorSize(e.getLimitLineSize());
-        } catch (NotFoundCrlfIOException e) {
-            throw new HttpStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
         return null;
     }
@@ -79,9 +79,9 @@ public class Http11RequestStream implements HttpCrlfLineReader, HttpBodyReader {
 
             previousByte = currentByte;
         }
+        return null;
 
-
-        throw new NotFoundCrlfIOException("Unexpected end of stream for missing CRLF", lineBuffer.toString(StandardCharsets.UTF_8));
+//        throw new NotFoundCrlfIOException("Unexpected end of stream for missing CRLF", lineBuffer.toString(StandardCharsets.UTF_8));
     }
 
     private static class LineTooLongIOException extends IOException {
@@ -102,21 +102,21 @@ public class Http11RequestStream implements HttpCrlfLineReader, HttpBodyReader {
         }
     }
 
-    private static class NotFoundCrlfIOException extends IOException {
-        private final String line;
-
-        public NotFoundCrlfIOException(String message, String line) {
-            super(message);
-            this.line = line;
-        }
-
-        public String getLine() {
-            return line;
-        }
-
-        @Override
-        public String getMessage() {
-            return super.getMessage() + ": " + line;
-        }
-    }
+//    private static class NotFoundCrlfIOException extends IOException {
+//        private final String line;
+//
+//        public NotFoundCrlfIOException(String message, String line) {
+//            super(message);
+//            this.line = line;
+//        }
+//
+//        public String getLine() {
+//            return line;
+//        }
+//
+//        @Override
+//        public String getMessage() {
+//            return super.getMessage() + ": " + line;
+//        }
+//    }
 }
