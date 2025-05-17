@@ -2,6 +2,7 @@ package org.dochi.webserver.socket;
 
 //import org.dochi.http.api.HttpApiMapper;
 import org.dochi.http.buffer.api.HttpApiMapper;
+import org.dochi.webserver.protocol.HttpProtocolHandler;
 import org.dochi.webserver.config.*;
 import org.dochi.webserver.executor.WorkerPoolExecutor;
 
@@ -15,10 +16,10 @@ public class SocketTaskExecutorFactory {
     }
 
     public SocketTaskExecutor createExecutor(ServerConfig serverConfig) {
-        HttpConfig httpConfig = createHttpConfig(serverConfig);
         HttpApiMapper httpApiMapper = new HttpApiMapper(serverConfig.getWebService());
         WorkerPoolExecutor workerExecutor = new WorkerPoolExecutor(serverConfig.getThreadPool());
-        SocketTaskPool taskPool = createTaskPool(serverConfig, httpConfig, httpApiMapper);
+        HttpProtocolHandler protocolHandler = new HttpProtocolHandler(createHttpConfig(serverConfig), serverConfig.getHttpProcessor());
+        SocketTaskPool taskPool = createTaskPool(serverConfig, protocolHandler, httpApiMapper);
         return new SocketTaskExecutor(workerExecutor, taskPool);
     }
 
@@ -29,29 +30,15 @@ public class SocketTaskExecutorFactory {
         );
     }
 
-//    private SocketTaskPool createTaskPool(
-//            ServerConfig serverConfig,
-//            HttpConfig httpConfig,
-//            HttpApiMapper httpApiMapper) {
-//        return new SocketTaskPool(
-//                serverConfig.getThreadPool(),
-//                () -> new SocketTaskHandler(
-//                        new SocketWrapper(serverConfig.getKeepAlive()),
-//                        httpApiMapper,
-//                        httpConfig
-//                )
-//        );
-//    }
-
     private SocketTaskPool createTaskPool(
             ServerConfig serverConfig,
-            HttpConfig httpConfig,
+            HttpProtocolHandler protocolHandler,
             HttpApiMapper httpApiMapper) {
         return new SocketTaskPool(
                 serverConfig.getThreadPool(),
                 () -> new SocketTaskHandler(
-                        httpApiMapper,
-                        httpConfig
+                        protocolHandler,
+                        httpApiMapper
                 )
         );
     }

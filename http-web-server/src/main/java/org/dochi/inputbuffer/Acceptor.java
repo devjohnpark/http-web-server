@@ -46,7 +46,7 @@
 //    // Acceptor는 AbstractEndpoint 클래스에 의존하고 BioEndpoint.getServerSocket().accept()을 호출
 //
 //    // 코드 분석을 더 해봐야함 (아직 구현할려고 정해놓지는 않았ㅇ음)
-//    // 프로토콜 핸들링 객체(ProtocolHandler)와 클라이언트 요청 처리 객체(HttpProcessor)를 adapte 하는 CoyoteAdapter 객체을 Connector(LifecycleMBeanBase)라고 설정
+//    // 프로토콜 핸들링 객체(HttpProtocolHandler)와 클라이언트 요청 처리 객체(HttpProcessorAttribute)를 adapte 하는 CoyoteAdapter 객체을 Connector(LifecycleMBeanBase)라고 설정
 //    // 기본 프로토콜을 HTTP/1.1로 설정(Connector(protocol))해서 Http11Processor 인스턴스로 초기화로 준비 -> 이후 프로토콜 업그레이드
 //
 //    public void accept(SocketTaskExecutor socketTaskExecutor, String hostName, int port) throws IOException {

@@ -27,8 +27,8 @@ public class MultiPartParser {
         this.bodyMaxSize = bodyMaxSize;
     }
 
-    // HttpProcessor -> boolean http11InputBuffer.isParseHeader() -> false -> 로깅 -> 응답 중단
-    // HttpProcessor -> boolean http11InputBuffer.isParseHeader() -> void InternalAdapter.service() -> HttpExternalRequest -> throws exception -> HttpProcessor catch
+    // HttpProcessorAttribute -> boolean http11InputBuffer.isParseHeader() -> false -> 로깅 -> 응답 중단
+    // HttpProcessorAttribute -> boolean http11InputBuffer.isParseHeader() -> void InternalAdapter.service() -> HttpExternalRequest -> throws exception -> HttpProcessorAttribute catch
     public void parseParts(String boundaryValue, Multipart multipart) throws IOException {
         boundaryValidator.validateBoundary(boundaryValue);
         byte[] currentBoundary = stream.readCRLFLine(bodyMaxSize);

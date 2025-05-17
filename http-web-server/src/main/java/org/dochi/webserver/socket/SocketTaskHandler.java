@@ -2,7 +2,7 @@
 //
 //import org.dochi.http.api.HttpApiMapper;
 //import org.dochi.http.processor.Http11Processor;
-//import org.dochi.http.processor.HttpProcessor;
+//import org.dochi.http.processor.HttpProcessorAttribute;
 //import org.dochi.http.response.HttpStatus;
 //import org.dochi.webserver.config.HttpConfig;
 //import org.slf4j.Logger;
@@ -63,7 +63,7 @@
 //            // 추후 ProcessorHandler 객체로 처리
 //            // HttpProcessor을 재활용하기 위해서는 네트워크 입출력 객체를 setter로 주입해야한다.
 //            // BioSocketWrapper를 생성해서 Http
-//            HttpProcessor httpProcessor = new Http11Processor(in, out, httpConfig);
+//            HttpProcessorAttribute httpProcessor = new Http11Processor(in, out, httpConfig);
 //            httpProcessor.process(socketWrapper, httpApiMapper);
 ////            if (httpProcessor.process(socketWrapper, httpApiMapper) == SocketState.UPGRADED) {
 ////                1. 파싱된 요청 데이터 객체의 복사본을 가지고 헤더에서 h2 관련 데이터 가져와서 HTTP/2 설정
@@ -104,10 +104,9 @@
 package org.dochi.webserver.socket;
 
 import org.dochi.http.buffer.api.HttpApiMapper;
-import org.dochi.http.buffer.processor.Http11Processor;
 import org.dochi.http.buffer.processor.HttpProcessor;
 import org.dochi.inputbuffer.socket.SocketWrapperBase;
-import org.dochi.webserver.config.HttpConfig;
+import org.dochi.webserver.protocol.HttpProtocolHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,29 +117,20 @@ import java.net.SocketException;
 public class SocketTaskHandler implements SocketTask {
     private static final Logger log = LoggerFactory.getLogger(SocketTaskHandler.class);
     private SocketWrapperBase<?> socketWrapper;
-    private final HttpApiMapper httpApiMapper; // 동적 HTTP API 추가를 위해 웹서버 인스턴스의 싱글톤 InternalAdapter 주입
-//    private final HttpConfig httpConfig;
+    private final HttpApiMapper ApiMapper; // 동적 HTTP API 추가를 위해 웹서버 인스턴스의 싱글톤 InternalAdapter 주입
+    private final HttpProtocolHandler protocolHandler;
     private HttpProcessor processor;
 
-    // 재활용 됬는데 소켓 세팅을 안했을 경우 인지하도록해라.
-    //
-
-    private boolean isRun = true; // 첫 실행 객체인지 판별
-    private boolean setSocketFlag = false;
-
-    public SocketTaskHandler(HttpApiMapper httpApiMapper, HttpConfig httpConfig) {
-        this.httpApiMapper = httpApiMapper;
-
-        // ProtocolHandler 에서 HttpProcessor 구현체 가져온다.
-        this.processor = new Http11Processor(httpConfig);
+    public SocketTaskHandler(HttpProtocolHandler protocolHandler, HttpApiMapper ApiMapper) {
+        this.ApiMapper = ApiMapper;
+        this.protocolHandler = protocolHandler;
     }
 
     @Override
     public void run() {
         try {
-            isRun = false;
             getSocketWrapper().startConnectionTimeout(socketWrapper.getKeepAliveTimeout());
-            SocketState state = processor.process(socketWrapper, httpApiMapper);
+            SocketState state = this.protocolHandler.getProcessor().process(socketWrapper, ApiMapper);
             if (state == SocketState.CLOSED) {
                 close();
 
@@ -158,36 +148,28 @@ public class SocketTaskHandler implements SocketTask {
     private void close() {
         try {
             getSocketWrapper().close();
+            protocolHandler.release(processor);
         } catch (IOException e) {
             log.error("Failed to close socket - Socket State CLOSED: {}", e.getMessage());
         } finally {
-            setSocketFlag = false;
-            socketWrapper = null;
+            socketWrapper = null; // SocketTaskHandler 구현체는 풀링되어 SocketWrapperBase 구현체가 메모리 누수되므로 null 값 할당
         }
-
     }
 
     // 재활용되는 객체일때 문제 발생: 재활용 이후 setSocketWrapper 호출을 안하는 것으로 의심됨
     @Override
     public SocketWrapperBase<?> getSocketWrapper() {
-//        log.debug("------Socket flag-------" + setSocketFlag);
-        if (!setSocketFlag) { // 소켓 설정 안되어 있음
-            log.debug("실행했던 객체인가?: " + isRun); // false 이면 문제
-        }
         if (socketWrapper == null) {
             throw new IllegalStateException("Socket wrapper is not initialized");
         }
         return socketWrapper;
     }
 
-
-
     @Override
     public void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
         if (socketWrapper == null) {
             throw new IllegalStateException(getClass().getName() + ": Socket wrapper is null");
         }
-        setSocketFlag = true;
         this.socketWrapper = socketWrapper;
     }
 }
