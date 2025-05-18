@@ -1,7 +1,5 @@
 package org.dochi.http.buffer.processor;
 
-//import org.dochi.http.api.InternalAdapter;
-//import org.dochi.http.api.HttpApiMapper;
 import org.dochi.http.buffer.api.HttpApiMapper;
 import org.dochi.inputbuffer.socket.SocketWrapperBase;
 import org.dochi.webserver.config.HttpConfig;
@@ -13,7 +11,6 @@ import java.io.IOException;
 
 import static org.dochi.webserver.socket.SocketState.*;
 
-// SocketWrapperBase로 setter 주입으로 변경
 public class Http11Processor extends AbstractHttpProcessor {
     private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
 
@@ -68,10 +65,8 @@ public class Http11Processor extends AbstractHttpProcessor {
             } else if (!shouldNext(socketWrapper)) {
                 state = CLOSED;
             }
-            // 다른 http api request로 변경
             httpApiMapper.getHttpApiHandler(request.getPath()).service(request, response);
             response.flush();
-            // response.flush()
             // Response object provides OutputStream object to developer, so it need flush() after processing HTTP API
             // flush() has system call cost, it needs to remove inefficient action.
             // 1. Rapping flush method by custom OutputStream.
