@@ -18,9 +18,6 @@ import static org.dochi.webserver.socket.SocketState.CLOSED;
 
 public abstract class AbstractHttpProcessor implements HttpProcessor {
     private static final Logger log = LoggerFactory.getLogger(AbstractHttpProcessor.class);
-//    protected final HttpRequestProcessor request;
-//    protected final InternalRequest request;
-//    protected final Request request;
     protected final HttpRequestProcessor request;
     protected final HttpResponseProcessor response;
 
@@ -28,33 +25,6 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
         this.request = request;
         this.response = response;
     }
-
-//    private final HttpApiMapper mapper;
-//
-//    protected AbstractHttpProcessor(HttpApiMapper mapper, HttpConfig config) {
-////        this.request = new Request(config.getHttpReqConfig());
-//        this.mapper = mapper;
-////        this.request = new InternalRequest();
-////        this.response = response;
-//    }
-
-
-//    @Override
-//    public SocketState process(SocketWrapper socketWrapper, InternalAdapter httpApiMapper) {
-//        SocketState state = CLOSED;
-//        try {
-//            // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
-//            // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
-//            recycle(); // memory visibility
-//            state = service(socketWrapper, httpApiMapper);
-//        } catch (Exception e) {
-//            processException(e);
-//            safeRecycle();
-//        }
-//        return state;
-//    }
-//
-//    protected abstract SocketState service(SocketWrapper socketWrapper, InternalAdapter httpApiMapper) throws IOException;
 
     @Override
     public SocketState process(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) {
@@ -82,8 +52,6 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
 
     protected abstract SocketState service(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) throws IOException;
 
-//    protected abstract boolean shouldPersistentConnection(SocketWrapper socketWrapper);
-
     protected abstract boolean shouldPersistentConnection(SocketWrapperBase<?> socketWrapper);
 
     protected void recycle() throws IOException {
@@ -106,7 +74,6 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
             case SocketTimeoutException socketTimeoutException -> {
 //                SocketTimeoutException exception thrown when valid time expires while being blocked by read() method of SocketInputStream object (write() is not related to setSoTimeout)
                 log.error("Socket read timeout occurred: ", e);
-//              sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage()); // non necessary need response when socket read timeout
             }
             case SocketException socketException -> {
                 // reference: NioSocketImpl.implRead()
