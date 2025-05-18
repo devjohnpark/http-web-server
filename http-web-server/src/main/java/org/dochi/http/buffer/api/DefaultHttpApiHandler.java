@@ -13,11 +13,6 @@ public class DefaultHttpApiHandler extends AbstractHttpApiHandler {
 
     @Override
     public void service(HttpApiRequest request, HttpApiResponse response) throws IOException {
-//        if (HttpMethod.GET.equals(request.getMethod())) {
-//            doGet(request, response);
-//        } else {
-//            super.service(request, response);
-//        }
         if (request.getMethod().equalsIgnoreCase("GET")) {
             doGet(request, response);
         } else {

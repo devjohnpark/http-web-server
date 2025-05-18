@@ -61,5 +61,15 @@ public class BioSocketWrapper extends SocketWrapperBase<Socket> {
         socket.setSoTimeout(connectionTimeout);
         log.debug("Start connection timeout: {} [Client IP: {}]", connectionTimeout, socket.getInetAddress());
     }
+
+    @Override
+    public void setReceiveBufferSize(int receiveBufferSize) throws IOException {
+        socket.setReceiveBufferSize(receiveBufferSize);
+    }
+
+    @Override
+    public void setSendBufferSize(int sendBufferSize) throws IOException {
+        socket.setSendBufferSize(sendBufferSize);
+    }
 }
 
