@@ -5,19 +5,18 @@ import org.dochi.inputbuffer.socket.SocketWrapperBase;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class TempOutputBuffer extends OutputStream {
+public class BufferedOutputStream extends OutputStream {
     private static final int DEFAULT_BUFFER_SIZE = 8192;
-//    private final OutputStream outputStream;
     private SocketWrapperBase<?> socketWrapper;
     private final byte[] buffer;
     private int bufferPosition = 0;
     private boolean isBufferEnabled = true;
 
-//    public TempOutputBuffer(OutputStream outputStream) {
+//    public BufferedOutputStream(OutputStream outputStream) {
 //        this(outputStream, DEFAULT_BUFFER_SIZE);
 //    }
 
-    public TempOutputBuffer() {
+    public BufferedOutputStream() {
         this(DEFAULT_BUFFER_SIZE);
     }
 
@@ -25,7 +24,7 @@ public class TempOutputBuffer extends OutputStream {
         this.socketWrapper = socketWrapper;
     }
 
-//    public TempOutputBuffer(OutputStream outputStream, int bufferSize) {
+//    public BufferedOutputStream(OutputStream outputStream, int bufferSize) {
 //        if (outputStream == null) {
 //            throw new IllegalArgumentException("OutputStream is null");
 //        }
@@ -36,7 +35,7 @@ public class TempOutputBuffer extends OutputStream {
 //        this.buffer = new byte[bufferSize];
 //    }
 
-    public TempOutputBuffer(int bufferSize) {
+    public BufferedOutputStream(int bufferSize) {
 //        if (outputStream == null) {
 //            throw new IllegalArgumentException("OutputStream is null");
 //        }
@@ -90,7 +89,7 @@ public class TempOutputBuffer extends OutputStream {
     }
 
     // 일반 출력 스트림 사용
-    public TempOutputBuffer getOutputStream() {
+    public BufferedOutputStream getOutputStream() {
         isBufferEnabled = false;
         return this;
     }

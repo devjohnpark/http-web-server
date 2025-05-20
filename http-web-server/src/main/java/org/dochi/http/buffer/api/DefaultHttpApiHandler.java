@@ -2,6 +2,8 @@ package org.dochi.http.buffer.api;
 
 import org.dochi.http.api.HttpApiResponse;
 import org.dochi.http.response.HttpStatus;
+import org.dochi.inputbuffer.external.HttpExternalRequest;
+import org.dochi.inputbuffer.external.HttpExternalResponse;
 import org.dochi.webresource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +14,7 @@ public class DefaultHttpApiHandler extends AbstractHttpApiHandler {
     private static final Logger log = LoggerFactory.getLogger(DefaultHttpApiHandler.class);
 
     @Override
-    public void service(HttpApiRequest request, HttpApiResponse response) throws IOException {
+    public void service(HttpExternalRequest request, HttpExternalResponse response) throws IOException {
         if (request.getMethod().equalsIgnoreCase("GET")) {
             doGet(request, response);
         } else {
@@ -21,7 +23,7 @@ public class DefaultHttpApiHandler extends AbstractHttpApiHandler {
     }
 
     @Override
-    public void doGet(HttpApiRequest request, HttpApiResponse response) throws IOException {
+    public void doGet(HttpExternalRequest request, HttpExternalResponse response) throws IOException {
         Resource resource = webResourceProvider.getResource(request.getPath());
         if (!resource.isEmpty()) {
             response.send(HttpStatus.OK, resource.getData(), resource.getContentType("UTF-8"));
@@ -31,7 +33,7 @@ public class DefaultHttpApiHandler extends AbstractHttpApiHandler {
     }
 
 //    @Override
-//    public void doGet(HttpApiRequest request, Http11ResponseProcessor response) throws IOException {
+//    public void doGet(HttpApiRequest request, Http11ResponseHandler response) throws IOException {
 //        // TCP (Transmission Control Protocol)는 스트리밍 프로토콜이다.
 //        // 그 이유는 HTTP 메세지를 TCP에서 패킷단위로 분할되어 전송되지만, 수신측 OS단에서 순서대로 조립한다.
 //

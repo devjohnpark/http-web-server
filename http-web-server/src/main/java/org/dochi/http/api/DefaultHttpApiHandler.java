@@ -31,7 +31,7 @@
 //    }
 //
 ////    @Override
-////    public void doGet(HttpApiRequest request, Http11ResponseProcessor response) throws IOException {
+////    public void doGet(HttpApiRequest request, Http11ResponseHandler response) throws IOException {
 ////        // TCP (Transmission Control Protocol)는 스트리밍 프로토콜이다.
 ////        // 그 이유는 HTTP 메세지를 TCP에서 패킷단위로 분할되어 전송되지만, 수신측 OS단에서 순서대로 조립한다.
 ////

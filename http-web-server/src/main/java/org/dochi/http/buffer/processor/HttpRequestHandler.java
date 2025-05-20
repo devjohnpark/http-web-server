@@ -1,12 +1,12 @@
 package org.dochi.http.buffer.processor;
 
+import org.dochi.http.buffer.processor.internal.InputBuffer;
+import org.dochi.http.buffer.processor.internal.InternalInputStream;
+import org.dochi.http.buffer.processor.internal.Request;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.request.multipart.Part;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.inputbuffer.MediaType;
-import org.dochi.inputbuffer.connector.InputBuffer;
-import org.dochi.inputbuffer.connector.InternalInputStream;
-import org.dochi.inputbuffer.internal.Request;
 import org.dochi.inputbuffer.multipart.MultiPartParser;
 import org.dochi.inputbuffer.multipart.Multipart;
 import org.dochi.inputbuffer.multipart.MultipartStream;
@@ -17,23 +17,22 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class AbstractHttpRequestProcessor implements HttpRequestProcessor {
-    private static final Logger log = LoggerFactory.getLogger(AbstractHttpRequestProcessor.class);
+public class HttpRequestHandler implements RequestHandler {
+    private static final Logger log = LoggerFactory.getLogger(HttpRequestHandler.class);
 
-    protected final Request request;
-    private InternalInputStream inputStream;
+    protected org.dochi.http.buffer.processor.internal.Request request;
+    private org.dochi.http.buffer.processor.internal.InternalInputStream inputStream;
     private org.dochi.inputbuffer.internal.InputBuffer internalInputBuffer;
-    private final InputBuffer inputBuffer;
+    private final org.dochi.http.buffer.processor.internal.InputBuffer inputBuffer;
     private final Multipart multipart;
     private boolean parametersParsed = false;
     private boolean multipartParsed = false;
     private final HttpReqConfig config;
 
-    public AbstractHttpRequestProcessor(HttpReqConfig httpReqConfig) {
-        this.request = new Request();
+    public HttpRequestHandler(HttpReqConfig httpReqConfig) {
+        this.request = new org.dochi.http.buffer.processor.internal.Request();
         this.inputBuffer = new InputBuffer();
-        this.inputBuffer.setRequest(request);
-        this.inputStream = new InternalInputStream(this.inputBuffer);
+        this.inputStream = new org.dochi.http.buffer.processor.internal.InternalInputStream(this.inputBuffer);
         this.multipart = new Multipart();
         this.config = httpReqConfig;
 //        this.inputBuffer = new Http11InputBuffer(request, config.getRequestHeaderMaxSize());
@@ -55,6 +54,14 @@ public abstract class AbstractHttpRequestProcessor implements HttpRequestProcess
 //    public boolean isProcessHeader() throws IOException {
 //        return inputBuffer.parseHeader();
 //    }
+
+    public void setInputBuffer(org.dochi.inputbuffer.internal.InputBuffer inputBuffer) {
+        this.inputBuffer.setInputBuffer(inputBuffer);
+    }
+
+    public Request getRequest() {
+        return request;
+    }
 
     // Adapter에서 service를 호출해서 http api handler를 처리한 후에 recycle() 호출
     @Override

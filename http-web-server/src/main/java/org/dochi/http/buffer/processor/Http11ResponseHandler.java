@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-public class Http11ResponseProcessor extends AbstractHttpResponseProcessor {
-    private static final Logger log = LoggerFactory.getLogger(Http11ResponseProcessor.class);
+public class Http11ResponseHandler extends AbstractResponseHandler {
+    private static final Logger log = LoggerFactory.getLogger(Http11ResponseHandler.class);
 
-    public Http11ResponseProcessor(HttpResConfig httpResConfig) {
+    public Http11ResponseHandler(HttpResConfig httpResConfig) {
         super(httpResConfig);
     }
 
@@ -36,26 +36,27 @@ public class Http11ResponseProcessor extends AbstractHttpResponseProcessor {
 //        }
 //    }
 
+
     @Override
-    public void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
+    public void init(SocketWrapperBase<?> socketWrapper) {
 //        this.inputBuffer.init(socketWrapper);
 //        this.socketWrapper = socketWrapper;
-        this.tmpOutputBuffer.init(socketWrapper);
+        this.bos.init(socketWrapper);
     }
 
     protected void writeHeader() throws IOException {
-        tmpOutputBuffer.write(String.format("%s %d %s\r\n", version.getVersion(), status.getCode(), status.getMessage()).getBytes(StandardCharsets.ISO_8859_1));
+        bos.write(String.format("%s %d %s\r\n", version.getVersion(), status.getCode(), status.getMessage()).getBytes(StandardCharsets.ISO_8859_1));
         Set<String> keys = headers.getHeaders().keySet();
         for (String key: keys) {
             String headerLine = key + ": " + headers.getHeaders().get(key) + "\r\n";
-            tmpOutputBuffer.write(headerLine.getBytes(StandardCharsets.ISO_8859_1));
+            bos.write(headerLine.getBytes(StandardCharsets.ISO_8859_1));
         }
-        tmpOutputBuffer.write("\r\n".getBytes(StandardCharsets.ISO_8859_1));
+        bos.write("\r\n".getBytes(StandardCharsets.ISO_8859_1));
     }
 
     protected void writePayload(byte[] body) throws IOException {
         if (body != null) {
-            tmpOutputBuffer.write(body, 0, body.length);
+            bos.write(body, 0, body.length);
         }
 //        flush(); // 스트림 버퍼의 데이터를 OS의 네트워크 스택인 TCP(socket) 버퍼에 즉시 전달 보장
     }

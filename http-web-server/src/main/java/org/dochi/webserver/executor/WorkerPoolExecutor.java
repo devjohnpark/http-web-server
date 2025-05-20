@@ -28,16 +28,16 @@ public class WorkerPoolExecutor {
         registerShutdownHook();
     }
 
-//    public void executeRequestHandler(SocketTaskHandler requestHandler, SocketTaskPool requestTaskPool) {
+//    public void executeRequestHandler(SocketTaskHandler httpRequestHandler, SocketTaskPool requestTaskPool) {
 //        // 직접 run() 호출: run()을 직접 호출하면 스레드 풀이나 새 스레드와 무관하게 현재 실행 중인 스레드에서 실행된다.
-//        // threadPool.execute()가 스레드 풀의 워커 스레드에 작업을 넘겨서 실행하므로 requestHandler.run()이 새로운 스레드에서 동작하도록 만든다.
+//        // threadPool.execute()가 스레드 풀의 워커 스레드에 작업을 넘겨서 실행하므로 httpRequestHandler.run()이 새로운 스레드에서 동작하도록 만든다.
 //        // 만약 threadPool.execute 없이 run()을 호출하면, 멀티스레드로 적용되지 않고 현재 실행중인 스레드의 스택에서 그대로 실행된다.
 //        threadPoolExecutor.execute(() -> {
 //            try {
-//                requestHandler.run();
+//                httpRequestHandler.run();
 //            } finally {
 //                // 작업 완료 후 RequestHandler를 큐에 반환
-//                requestTaskPool.recycle(requestHandler);
+//                requestTaskPool.recycle(httpRequestHandler);
 //            }
 //        });
 //    }

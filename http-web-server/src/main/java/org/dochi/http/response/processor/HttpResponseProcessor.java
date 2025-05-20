@@ -1,6 +1,6 @@
 package org.dochi.http.response.processor;
 
-//import org.dochi.buffer.Http11ResponseProcessor;
+//import org.dochi.buffer.Http11ResponseHandler;
 import org.dochi.http.api.HttpApiResponse;
 
 import java.io.IOException;

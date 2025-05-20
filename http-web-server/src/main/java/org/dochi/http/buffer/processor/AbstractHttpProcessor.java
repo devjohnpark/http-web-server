@@ -6,6 +6,7 @@ import org.dochi.http.buffer.api.HttpApiMapper;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.inputbuffer.socket.SocketWrapperBase;
+import org.dochi.webserver.config.HttpConfig;
 import org.dochi.webserver.socket.SocketState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,16 +19,25 @@ import static org.dochi.webserver.socket.SocketState.CLOSED;
 
 public abstract class AbstractHttpProcessor implements HttpProcessor {
     private static final Logger log = LoggerFactory.getLogger(AbstractHttpProcessor.class);
-    protected final HttpRequestProcessor request;
-    protected final HttpResponseProcessor response;
+//    protected final HttpRequestProcessor request;
+    protected final HttpRequestHandler requestHandler;
+    protected final ResponseHandler responseHandler;
 
-    protected AbstractHttpProcessor(HttpRequestProcessor request, HttpResponseProcessor response) {
-        this.request = request;
-        this.response = response;
+//    protected AbstractHttpProcessor(HttpRequestProcessor request, HttpResponseProcessor response) {
+//        this.request = request;
+//        this.response = response;
+//    }
+
+    protected AbstractHttpProcessor(ResponseHandler responseHandler, HttpConfig config) {
+        this.requestHandler = new HttpRequestHandler(config.getHttpReqConfig());
+        this.responseHandler = responseHandler;
     }
 
     @Override
     public SocketState process(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) {
+        if (socketWrapper == null) {
+            throw new IllegalArgumentException("SocketWrapperBase is null");
+        }
         SocketState state = CLOSED;
         setSocketWrapper(socketWrapper);
         try {
@@ -42,21 +52,23 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
         return state;
     }
 
-    private void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
-        if (socketWrapper == null) {
-            throw new IllegalArgumentException("SocketWrapperBase is null");
-        }
-        request.setSocketWrapper(socketWrapper);
-        response.setSocketWrapper(socketWrapper);
-    }
+    abstract protected void setSocketWrapper(SocketWrapperBase<?> socketWrapper);
+
+//    private void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
+//        if (socketWrapper == null) {
+//            throw new IllegalArgumentException("SocketWrapperBase is null");
+//        }
+////        httpRequestHandler.setSocketWrapper(socketWrapper);
+//        response.setSocketWrapper(socketWrapper);
+//    }
 
     protected abstract SocketState service(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) throws IOException;
 
     protected abstract boolean shouldPersistentConnection(SocketWrapperBase<?> socketWrapper);
 
     protected void recycle() throws IOException {
-        request.recycle();
-        response.recycle();
+        requestHandler.recycle();
+        responseHandler.recycle();
     }
 
     private void safeRecycle() {
@@ -98,11 +110,11 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
         log.error("HTTP status: {} {}, Reason: {}", String.valueOf(status.getCode()), status.getMessage(), errorMessage);
         try {
             if (status.getCode() >= 500) {
-                response.sendError(status, status.getMessage());
+                responseHandler.sendError(status, status.getMessage());
             } else if (status.getCode() >= 400) {
-                response.sendError(status, errorMessage);
+                responseHandler.sendError(status, errorMessage);
             }
-            response.flush();
+            responseHandler.flush();
         } catch (IOException e) {
             log.error("Failed to send error response: {}", e.getMessage());
         }

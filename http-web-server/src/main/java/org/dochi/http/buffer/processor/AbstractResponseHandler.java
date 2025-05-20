@@ -1,11 +1,11 @@
 package org.dochi.http.buffer.processor;
 
-import org.dochi.http.api.HttpApiResponse;
-import org.dochi.http.buffer.TempOutputBuffer;
+import org.dochi.http.buffer.BufferedOutputStream;
 import org.dochi.http.request.data.HttpVersion;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.http.response.ResponseHeaders;
 import org.dochi.http.util.DateFormatter;
+import org.dochi.inputbuffer.external.HttpExternalResponse;
 import org.dochi.webresource.ResourceType;
 import org.dochi.webserver.config.HttpResConfig;
 import org.slf4j.Logger;
@@ -14,47 +14,47 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public abstract class AbstractHttpResponseProcessor implements HttpResponseProcessor {
-    private static final Logger log = LoggerFactory.getLogger(AbstractHttpResponseProcessor.class);
+public abstract class AbstractResponseHandler implements ResponseHandler {
+    private static final Logger log = LoggerFactory.getLogger(AbstractResponseHandler.class);
     protected HttpVersion version = HttpVersion.HTTP_1_1;
     protected HttpStatus status = HttpStatus.OK;
     protected final ResponseHeaders headers = new ResponseHeaders();
     protected final HttpResConfig httpResConfig;
     private boolean isDateHeader = true;
     private boolean isCommitted = false;
-    protected final TempOutputBuffer tmpOutputBuffer;
+    protected final BufferedOutputStream bos;
 
-    protected AbstractHttpResponseProcessor(HttpResConfig httpResConfig) {
-        this.tmpOutputBuffer = new TempOutputBuffer();
+    protected AbstractResponseHandler(HttpResConfig httpResConfig) {
+        this.bos = new BufferedOutputStream();
         this.httpResConfig = httpResConfig;
     }
 
     @Override
     public void recycle() {
         headers.clear();
-        tmpOutputBuffer.recycle();
+        bos.recycle();
         isDateHeader = true;
         isCommitted = false;
         version = HttpVersion.HTTP_1_1;
         status = HttpStatus.OK;
     }
 
-    public HttpApiResponse addVersion(HttpVersion version) {
+    public HttpExternalResponse addVersion(HttpVersion version) {
         this.version = version;
         return this;
     }
 
-    public HttpApiResponse addStatus(HttpStatus status) {
+    public HttpExternalResponse addStatus(HttpStatus status) {
         this.status = status;
         return this;
     }
 
-    public HttpApiResponse addHeader(String key, String value) {
+    public HttpExternalResponse addHeader(String key, String value) {
         this.headers.addHeader(key, value);
         return this;
     }
 
-    public HttpApiResponse addCookie(String cookie) {
+    public HttpExternalResponse addCookie(String cookie) {
         this.headers.addHeader(ResponseHeaders.SET_COOKIE, cookie);
         return this;
     }
@@ -64,34 +64,34 @@ public abstract class AbstractHttpResponseProcessor implements HttpResponseProce
 //        return this;
 //    }
 
-    public HttpApiResponse addConnection(boolean isKeepAlive) {
+    public HttpExternalResponse addConnection(boolean isKeepAlive) {
         this.headers.addConnection(isKeepAlive);
         return this;
     }
 
-    public HttpApiResponse addKeepAlive(int timeout, int maxRequests) {
+    public HttpExternalResponse addKeepAlive(int timeout, int maxRequests) {
         this.headers.addKeepAlive(timeout, maxRequests);
         return this;
     }
 
 //    protected abstract void addStatus(HttpStatus status);
 
-    public HttpApiResponse addDateHeaders(String date) {
+    public HttpExternalResponse addDateHeaders(String date) {
         this.headers.addHeader(ResponseHeaders.DATE, date);
         return this;
     }
 
-    public HttpApiResponse addContentHeaders(String contentType, int contentLength) {
+    public HttpExternalResponse addContentHeaders(String contentType, int contentLength) {
         this.headers.addHeader(ResponseHeaders.CONTENT_TYPE, contentType);
         this.headers.addContentLength(contentLength);
         return this;
     }
 
-    public HttpApiResponse inActiveDateHeader() {
+    public HttpExternalResponse inActiveDateHeader() {
         this.isDateHeader = false; return this;
     }
 
-    public HttpApiResponse activeDateHeader() {
+    public HttpExternalResponse activeDateHeader() {
         this.isDateHeader = true; return this;
     }
 
@@ -147,7 +147,7 @@ public abstract class AbstractHttpResponseProcessor implements HttpResponseProce
 //        }
     }
     public OutputStream getOutputStream() {
-        return tmpOutputBuffer.getOutputStream();
+        return bos.getOutputStream();
     }
 
     private void writeMessage(byte[] body) throws IOException {
@@ -165,7 +165,7 @@ public abstract class AbstractHttpResponseProcessor implements HttpResponseProce
 
     public void flush() throws IOException {
         if (!isCommitted) {
-            tmpOutputBuffer.flush();
+            bos.flush();
             isCommitted = true;
         }
     }

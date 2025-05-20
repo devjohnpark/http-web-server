@@ -9,13 +9,13 @@
 //import static org.assertj.core.api.Assertions.assertThat;
 //
 //class HttpRequestTest {
-//    private Request httpRequest;
+//    private Request httpRequestHandler;
 //
 //    private void createHttpRequest(String fileName) throws IOException {
 //        String testDir = "./src/test/resources/";
 //        BufferedSocketInputStream in = new FileInputStream(new File(testDir + fileName));
-//        httpRequest = new Request(in);
-//        httpRequest.isPrepareRequest();
+//        httpRequestHandler = new Request(in);
+//        httpRequestHandler.isPrepareRequest();
 //    }
 //
 //    @Test
@@ -54,12 +54,12 @@
 //        createHttpRequest("http_req_post.txt");
 //
 //        // then
-//        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.POST);
-//        assertThat(httpRequest.getPath()).isEqualTo("/user/create");
-//        assertThat(httpRequest.getRequestParameter("userId")).isEqualTo("john park");
-//        assertThat(httpRequest.getRequestParameter("password")).isEqualTo("1234");
-//        assertThat(httpRequest.getHttpVersion()).isEqualTo(HttpVersion.HTTP_1_1);
-//        assertThat(httpRequest.getConnection()).isEqualTo("keep-alive");
+//        assertThat(httpRequestHandler.getMethod()).isEqualTo(HttpMethod.POST);
+//        assertThat(httpRequestHandler.getPath()).isEqualTo("/user/create");
+//        assertThat(httpRequestHandler.getRequestParameter("userId")).isEqualTo("john park");
+//        assertThat(httpRequestHandler.getRequestParameter("password")).isEqualTo("1234");
+//        assertThat(httpRequestHandler.getHttpVersion()).isEqualTo(HttpVersion.HTTP_1_1);
+//        assertThat(httpRequestHandler.getConnection()).isEqualTo("keep-alive");
 //    }
 //
 //    @Test
@@ -68,8 +68,8 @@
 //        createHttpRequest("http_req_post_non_content-length.txt");
 //
 //        // then
-//        assertThat(httpRequest.getRequestParameter("userId")).isNull();
-//        assertThat(httpRequest.getRequestParameter("password")).isNull();
+//        assertThat(httpRequestHandler.getRequestParameter("userId")).isNull();
+//        assertThat(httpRequestHandler.getRequestParameter("password")).isNull();
 //    }
 //
 //    @Test
@@ -78,9 +78,9 @@
 //        createHttpRequest("http_req_post_negative_content-length.txt");
 //
 //        // then
-//        assertEquals(0, httpRequest.getContentLength());
-//        assertThat(httpRequest.getRequestParameter("userId")).isNull();
-//        assertThat(httpRequest.getRequestParameter("password")).isNull();
+//        assertEquals(0, httpRequestHandler.getContentLength());
+//        assertThat(httpRequestHandler.getRequestParameter("userId")).isNull();
+//        assertThat(httpRequestHandler.getRequestParameter("password")).isNull();
 //    }
 //
 //    @Test
@@ -89,8 +89,8 @@
 //        createHttpRequest("http_req_post_non_content-type.txt");
 //
 //        // then
-//        assertThat(httpRequest.getRequestParameter("userId")).isNull();
-//        assertThat(httpRequest.getRequestParameter("password")).isNull();
+//        assertThat(httpRequestHandler.getRequestParameter("userId")).isNull();
+//        assertThat(httpRequestHandler.getRequestParameter("password")).isNull();
 //    }
 //
 //    @Test
@@ -99,13 +99,13 @@
 //        createHttpRequest("http_req_post_request-params_duplication.txt");
 //
 //        // then
-//        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.POST);
-//        assertThat(httpRequest.getPath()).isEqualTo("/user/create");
-//        assertThat(httpRequest.getRequestParameter("userId")).isEqualTo("john park");
-//        assertThat(httpRequest.getRequestParameter("password")).isEqualTo("1234");
-//        assertThat(httpRequest.getRequestParameter("num")).isEqualTo("123445");
-//        assertThat(httpRequest.getHttpVersion()).isEqualTo(HttpVersion.HTTP_1_1);
-//        assertThat(httpRequest.getConnection()).isEqualTo("keep-alive");
+//        assertThat(httpRequestHandler.getMethod()).isEqualTo(HttpMethod.POST);
+//        assertThat(httpRequestHandler.getPath()).isEqualTo("/user/create");
+//        assertThat(httpRequestHandler.getRequestParameter("userId")).isEqualTo("john park");
+//        assertThat(httpRequestHandler.getRequestParameter("password")).isEqualTo("1234");
+//        assertThat(httpRequestHandler.getRequestParameter("num")).isEqualTo("123445");
+//        assertThat(httpRequestHandler.getHttpVersion()).isEqualTo(HttpVersion.HTTP_1_1);
+//        assertThat(httpRequestHandler.getConnection()).isEqualTo("keep-alive");
 //    }
 //
 //    @Test
@@ -114,6 +114,6 @@
 //        createHttpRequest("http_req_post_content-type_text.txt");
 //
 //        // then
-//        assertThat(httpRequest.getBodyAsString()).isEqualTo("hello world");
+//        assertThat(httpRequestHandler.getBodyAsString()).isEqualTo("hello world");
 //    }
 //}
