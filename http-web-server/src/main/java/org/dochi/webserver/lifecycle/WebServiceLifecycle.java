@@ -1,6 +1,6 @@
 package org.dochi.webserver.lifecycle;
 
-import org.dochi.http.buffer.api.HttpApiHandler;
+import org.dochi.http.api.HttpApiHandler;
 import org.dochi.webserver.attribute.WebService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

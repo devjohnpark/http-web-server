@@ -1,11 +1,9 @@
 package org.dochi.webserver.socket;
 
-import org.dochi.inputbuffer.socket.SocketWrapperBase;
 import org.dochi.webserver.executor.WorkerPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.Socket;
 import java.util.concurrent.CompletableFuture;
 
 public class SocketTaskExecutor {

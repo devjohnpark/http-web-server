@@ -1,6 +1,6 @@
 package org.dochi.buffer;
 
-import org.dochi.inputbuffer.MimeHeaders;
+import org.dochi.http.data.MimeHeaders;
 
 class MimeHeadersTest {
 

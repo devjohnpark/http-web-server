@@ -53,8 +53,8 @@
 package org.dochi.webserver.attribute;
 
 //import org.dochi.http.api.DefaultHttpApiHandler;
-import org.dochi.http.buffer.api.DefaultHttpApiHandler;
-import org.dochi.http.buffer.api.HttpApiHandler;
+import org.dochi.http.api.DefaultHttpApiHandler;
+import org.dochi.http.api.HttpApiHandler;
 import org.dochi.webresource.WebResourceProvider;
 import org.dochi.webserver.config.WebServiceConfig;
 import org.slf4j.Logger;

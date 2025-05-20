@@ -1,7 +1,7 @@
 package org.dochi.webserver.socket;
 
 //import org.dochi.http.api.HttpApiMapper;
-import org.dochi.http.buffer.api.HttpApiMapper;
+import org.dochi.http.api.HttpApiMapper;
 import org.dochi.webserver.protocol.HttpProtocolHandler;
 import org.dochi.webserver.config.*;
 import org.dochi.webserver.executor.WorkerPoolExecutor;

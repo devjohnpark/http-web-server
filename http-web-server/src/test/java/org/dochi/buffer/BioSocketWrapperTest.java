@@ -1,7 +1,6 @@
 package org.dochi.buffer;
 
-import org.dochi.inputbuffer.socket.BioSocketWrapper;
-import org.dochi.inputbuffer.socket.SocketConfig;
+import org.dochi.webserver.socket.BioSocketWrapper;
 import org.dochi.webserver.attribute.KeepAlive;
 import org.junit.jupiter.api.*;
 

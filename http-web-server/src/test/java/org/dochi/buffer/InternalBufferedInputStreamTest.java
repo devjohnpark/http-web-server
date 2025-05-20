@@ -1,6 +1,6 @@
 //package org.dochi.buffer;
 //
-//import org.dochi.internal.InternalInputStream;
+//import org.dochi.external.InternalInputStream;
 //import org.junit.jupiter.api.AfterEach;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;

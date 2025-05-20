@@ -1,8 +1,8 @@
 //package org.dochi.webserver.socket;
 //
-//import org.dochi.inputbuffer.socket.BioSocketWrapper;
+//import org.dochi.webserver.socket.BioSocketWrapper;
 //import org.dochi.inputbuffer.socket.SocketConfig;
-//import org.dochi.inputbuffer.socket.SocketWrapperBase;
+//import org.dochi.webserver.socket.SocketWrapperBase;
 //import org.dochi.webserver.attribute.KeepAlive;
 //import org.junit.jupiter.api.Test;
 //

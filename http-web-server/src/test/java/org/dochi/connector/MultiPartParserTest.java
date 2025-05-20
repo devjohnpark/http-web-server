@@ -1,8 +1,8 @@
 package org.dochi.connector;
 
-import org.dochi.inputbuffer.multipart.MultiPartParser;
-import org.dochi.inputbuffer.multipart.Multipart;
-import org.dochi.inputbuffer.multipart.MultipartStream;
+import org.dochi.http.multipart.MultiPartParser;
+import org.dochi.http.multipart.Multipart;
+import org.dochi.http.multipart.MultipartStream;
 import org.dochi.http.exception.HttpStatusException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class MultiPartParserTest {
     MultiPartParser multiPartParser;
