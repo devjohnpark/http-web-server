@@ -51,67 +51,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         this.buffer.limit(0);
     }
 
-//    // 1. 버퍼의 최대 크기만큼 한번에 읽어서 초기화 (하지만 HTTP Request Message가 분할 전송될수 있기 때문에 여러번 읽어야할수 있다.)
-//    // 2. Body 전용 InputBuffer를 post의 최대 크기로 설정해서 생성하고, HttpInputBuffer의 읽지 않은 버퍼(hasRemaining)를 모두 copy 한다.
-//    @Override
-//    public int doRead(ByteBuffer buffer) throws IOException {
-//        int bytesToTransfer = this.buffer.remaining();
-//        if (this.buffer.hasRemaining() && bytesToTransfer <= buffer.remaining()) {
-////            System.arraycopy(this.buffer.array(), this.buffer.position(),
-////                    buffer.array(), buffer.position(),
-////                    bytesToTransfer);
-//
-//              // 실제로 System.arraycopy()와 ByteBuffer의 get() or put()의 속도 차이 비교 필요
-////            // 배열 복사를 피하기: System.arraycopy()는 배열 복사를 직접 수행하는 방식이라, ByteBuffer의 API를 사용하면 내부 최적화가 가능하여 더 빠를 수 있다. (비교해봐야함)
-////            // 메모리 접근 최적화: ByteBuffer의 get()과 put() 메서드는 내부 메모리 접근을 최적화하여 성능을 개선한다.
-//             // ByteBuffer의 get() or put(): 네이티브 memcpy() 기반의 블록 복사: 블록 복사(Block Copy)는 메모리에서 특정 크기의 데이터를 한 번에 복사하는 방식 (하나씩 검색하지 않음)
-//            // CPU의 최적화된 명령어(SIMD, AVX, SSE 등)를 활용 가능, 캐시 최적화 적용 가능 (CPU L1/L2 캐시 활용)
-////            Direct ByteBuffer 사용 호환: ByteBuffer의 allocateDirect() 메서드를 사용하면, JVM 힙 메모리가 아닌 운영체제의 네이티브 메모리에 할당되어 입출력 성능을 향상시킬 수 있다.
-////            this.buffer.get(buffer.array(), buffer.position(), bytesToTransfer);
-////
-////            this.buffer.position(this.buffer.position() + bytesToTransfer);
-//
-//            // this.buffer의 남은 데이터 크기가 buffer보다 큰 경우 버퍼 오버플로우 발생
-//            buffer.put(this.buffer);
-//
-//            return bytesToTransfer;
-//        }
-//        return 0;
-//    }
-//
-//    // doRead(ByteBuffer buffer)
-//    // 전달받은 버퍼에 내부 버퍼를 버퍼링
-//    @Override
-//    public int doRead(ByteBuffer buffer) throws IOException {
-//        if (buffer == null) {
-//            throw new IllegalStateException("buffer is null");
-//        }
-//        int bufferingLimitSize = buffer.capacity() - buffer.limit();
-//        if (bufferingLimitSize <= 0) {
-//            // 클라이언트가 보낸 요청 메세지의 헤더나 바디의 크기 초과
-//            throw new IllegalStateException("Request message size exceeds buffer capacity");
-//        }
-//
-//        // duplicate: 내부 버퍼에 남은 데이터 있으면 그대로 복사
-//        int bytesToTransfer = this.buffer.remaining();
-//        if (this.buffer.hasRemaining() && bytesToTransfer <= buffer.remaining()) {
-//            buffer.put(this.buffer);
-//
-//            return bytesToTransfer;
-//        }
-//
-//        // 내부 버퍼에 남은 버퍼 없으면 소켓으로 읽어온다.
-//        if (this.socketWrapper == null) {
-//            throw new IllegalStateException("No socket wrapper is initialized");
-//        }
-//        int bytesRead = this.socketWrapper.read(buffer.array(), buffer.position(), bufferingLimitSize);
-//        if (bytesRead > 0) {
-//            // 읽은 데이터 크기만큼 기존 limit 증가
-//            buffer.limit(buffer.limit() + bytesRead);
-//        }
-//        return bytesRead;
-//    }
-
     public boolean parseHeader(Request request) throws IOException {
         try {
             return parseRequestLine(request) && parseHeaders(request);
@@ -132,6 +71,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         }
         return this.buffer.get() & 0xFF;
     }
+
+    // 1. 버퍼의 최대 크기만큼 한번에 읽어서 초기화 (하지만 HTTP Request Message가 분할 전송될수 있기 때문에 여러번 읽어야할수 있다.)
+
 
     // 현재 header buffer, payload buffer 각각 할당: payload 용 버퍼 생성 비용 발생함
     // header max size + 8kb(payload)로 초기화한 후에 해당 버퍼 계속 사용한다면 payload 용 버퍼를 생성할 필요가 없다.
@@ -346,30 +288,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         }
         return HeaderParseStatus.EOF;
     }
-
-//    private HeaderParseStatus parseHeaderField() throws IOException {
-//        int previousByte = -1;
-//        int currentByte;
-//        int start = buffer.position();
-//        MimeHeaderField headerField = null;
-//        while ((currentByte = getByte()) != -1) {
-//            if (currentByte == ':' && headerField == null) {
-//                headerField = request.headers().createHeader();
-//                headerField.getName().setBytes(buffer.array(), start, buffer.position() - start - 1);
-//                start = buffer.position();
-//            } else if (previousByte == ':' && (currentByte == ' ' || currentByte == '\t')) {
-//                start++;
-//            } else if (previousByte == '\r' && currentByte == '\n') {
-//                if (headerField != null) {
-//                    headerField.getValue().setBytes(buffer.array(), start, buffer.position() - start - 2);
-//                    return HeaderParseStatus.NEED_MORE;
-//                }
-//                return HeaderParseStatus.DONE;
-//            }
-//            previousByte = currentByte;
-//        }
-//        return HeaderParseStatus.EOF;
-//    }
 
     private void validateHeader(boolean isCreateHeader) {
         if (isCreateHeader) {

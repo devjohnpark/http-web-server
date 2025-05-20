@@ -1,6 +1,5 @@
 package org.dochi.http.handler;
 
-//import org.dochi.buffer.Http11ResponseHandler;
 import org.dochi.external.HttpExternalResponse;
 import org.dochi.webserver.socket.SocketWrapperBase;
 

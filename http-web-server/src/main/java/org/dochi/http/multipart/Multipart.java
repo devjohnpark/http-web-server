@@ -12,10 +12,6 @@ public class Multipart {
     private static final Logger log = LoggerFactory.getLogger(Multipart.class);
     private final Map<String, Part> parts = new HashMap<>();
 
-    public boolean isLoad() {
-        return !parts.isEmpty();
-    }
-
     public void addPart(String name, Part part) {
         this.parts.put(name, part);
     }

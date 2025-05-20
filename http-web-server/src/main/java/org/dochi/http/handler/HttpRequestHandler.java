@@ -35,25 +35,7 @@ public class HttpRequestHandler implements RequestHandler {
         this.inputStream = new InternalInputStream(this.inputBuffer);
         this.multipart = new Multipart();
         this.config = httpReqConfig;
-//        this.inputBuffer = new Http11InputBuffer(request, config.getRequestHeaderMaxSize());
-//        this.request.setInputBuffer(inputBuffer);
     }
-
-
-    /*protected void setInternalInputBuffer(org.dochi.internal.buffer.InputBuffer inputBuffer) {
-        this.request.setInputBuffer(inputBuffer);
-        this.internalInputBuffer.init();
-    }*/
-
-//    @Override
-//    public void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
-//        this.inputBuffer.init(socketWrapper);
-//    }
-//
-//    @Override
-//    public boolean isProcessHeader() throws IOException {
-//        return inputBuffer.parseHeader();
-//    }
 
     public void setInputBuffer(org.dochi.internal.buffer.InputBuffer inputBuffer) {
         this.inputBuffer.setInputBuffer(inputBuffer);

@@ -11,7 +11,7 @@ import java.io.IOException;
 public class SocketTaskHandler implements SocketTask {
     private static final Logger log = LoggerFactory.getLogger(SocketTaskHandler.class);
     private SocketWrapperBase<?> socketWrapper;
-    private final HttpApiMapper ApiMapper; // 동적 HTTP API 추가를 위해 웹서버 인스턴스의 싱글톤 InternalAdapter 주입
+    private final HttpApiMapper ApiMapper;
     private final HttpProtocolHandler protocolHandler;
 
     public SocketTaskHandler(HttpProtocolHandler protocolHandler, HttpApiMapper ApiMapper) {

@@ -8,15 +8,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
-
-// 변경할 사항 1
-// SocketTaskExecutor의 execute(Socket socket)는 Socket 객체에 종속
-// SocketTaskExecutor의.execute(E socket)으로 변경
-
-// 변경할 사항 2
-// 서버 설정(WebServer)에서 setEndpoint -> Bio (ServerSocket, Socket으로 구성된 Endpoint)
-// SocketTaskExecutorFactory에서 설정된 Endpoint로 SocketWrapperBase<?> 자식 클래스 생성 후 SocketTaskHandler에 주입
-
 public class BioSocketWrapper extends SocketWrapperBase<Socket> {
     private static final Logger log = LoggerFactory.getLogger(BioSocketWrapper.class);
 

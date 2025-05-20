@@ -77,8 +77,6 @@ public class Http11ResponseHandler implements ResponseHandler {
         return this;
     }
 
-//    protected abstract void addStatus(HttpStatus status);
-
     public HttpExternalResponse addDateHeaders(String date) {
         this.headers.addHeader(ResponseHeaders.DATE, date);
         return this;
@@ -101,8 +99,6 @@ public class Http11ResponseHandler implements ResponseHandler {
     public void sendNoContent() throws IOException {
         send(HttpStatus.NO_CONTENT, null, null);
     }
-
-//    public ResponseHeaders getHeaders() { return headers; }
 
     // 테스트 필요
     public void send(HttpStatus status) throws IOException {

@@ -1,6 +1,5 @@
 package org.dochi.external;
 
-//import org.dochi.external.InternalInputStream;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.multipart.Part;
 

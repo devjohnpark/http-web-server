@@ -1,7 +1,7 @@
 //package org.dochi.webserver.config;
 //
 //import org.dochi.http.api.DefaultHttpApiHandler;
-//import org.dochi.LoginHttpApiHandler;
+//import org.dochi.http.api.example.LoginHttpApiHandler;
 //import org.dochi.webserver.attribute.WebService;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;

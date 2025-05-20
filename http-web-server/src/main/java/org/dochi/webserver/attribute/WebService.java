@@ -52,7 +52,6 @@
 
 package org.dochi.webserver.attribute;
 
-//import org.dochi.http.api.DefaultHttpApiHandler;
 import org.dochi.http.api.DefaultHttpApiHandler;
 import org.dochi.http.api.HttpApiHandler;
 import org.dochi.webresource.WebResourceProvider;

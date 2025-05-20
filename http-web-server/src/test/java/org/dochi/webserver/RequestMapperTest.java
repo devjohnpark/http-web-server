@@ -2,7 +2,7 @@
 //
 //import org.dochi.http.api.DefaultHttpApiHandler;
 //import org.dochi.http.api.HttpApiHandler;
-//import org.dochi.LoginHttpApiHandler;
+//import org.dochi.http.api.example.LoginHttpApiHandler;
 //import org.dochi.webresource.WebResourceProvider;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;

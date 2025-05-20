@@ -1,5 +1,6 @@
-package org.dochi.http.api;//package org.dochi;
+package org.dochi.http.api.example;//package org.dochi;
 
+import org.dochi.http.api.AbstractHttpApiHandler;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.external.HttpExternalRequest;
 import org.dochi.external.HttpExternalResponse;
@@ -21,23 +22,9 @@ public class UploadFileHttpApiHandler extends AbstractHttpApiHandler {
         }
     }
 
-//    @Override
-//    public void service(HttpApiHandler request, HttpApiResponse response) throws IOException {
-//        if (HttpMethod.POST.equals(request.getMethod())) {
-//            doPost(request, response);
-//        } else {
-//            super.service(request, response);
-//        }
-//        if (request.getMethod().equalsIgnoreCase("POST")) {
-//            doPost(request, response);
-//        } else {
-//            super.service(request, response);
-//        }
-//    }
-
     @Override
     public void doPost(HttpExternalRequest request, HttpExternalResponse response) throws IOException {
-        if (request.getPart("username") != null && request.getPart("age") != null && request.getPart("file") != null) {
+        if (request.getPart("username") != null && request.getPart("file") != null) {
             request.getPart("file").getContent();
             Resource resource = webResourceProvider.getResource("upload.html");
             if (!resource.isEmpty()) {

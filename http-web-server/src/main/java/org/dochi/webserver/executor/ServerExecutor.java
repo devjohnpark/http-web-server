@@ -27,20 +27,6 @@ public class ServerExecutor {
         // 단일 서버 실행/종료를 위한 cli 대기 스레드 생성 후 put
     }
 
-//    public static void execute() {
-//        List<ServerLifecycle> allWebServers = new ArrayList<>(servers.values());
-//        if (allWebServers.isEmpty()) {
-//            log.error("No web servers found.");
-//            throw new IllegalStateException("No web servers found.");
-//        }
-//        try(ExecutorService executor = Executors.newFixedThreadPool(allWebServers.size())) {
-//            for (ServerLifecycle serverLifecycle : allWebServers) {
-//                executor.submit(serverLifecycle::start);
-//            }
-//            registerShutdownHook(allWebServers);
-//        }
-//    }
-
     public static void execute() {
         List<ServerLifecycle> allWebServers = new ArrayList<>(servers.values());
         if (allWebServers.isEmpty()) {
@@ -54,12 +40,11 @@ public class ServerExecutor {
         // 따라서 ExecutorService의 close() 전체를 고려한다면: 타임아웃되어도 TERMINATED가 되지 않으면 상위 루프가 반복되어 close() 되지 못하는 구조이다.
         try(ExecutorService executor = Executors.newFixedThreadPool(allWebServers.size())) {
             for (ServerLifecycle serverLifecycle : allWebServers) {
-//                executor.submit(serverLifecycle::start);
                 executor.submit(() -> {
                     try {
                         serverLifecycle.start();
                     } catch (Exception e) {
-                        // 서버 인스턴스 하나라도 예외 발생하면 ExecutorService 정료됨 (모든 서버 인스턴스 종료)
+                        // 서버 인스턴스 하나라도 예외 발생하면 ExecutorService 종료됨 (모든 서버 인스턴스 종료)
                         // ThreadPoolExecutor의 내부 클래스 Worker.runWorker()에서 예외 발생시, processWorkerExit()에서 tryTerminate() 호출하여 ExecutorService 종료
                         log.error("Server exit - ServerLifecycle occur exception: ", e);
                     }

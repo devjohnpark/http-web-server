@@ -23,11 +23,5 @@ public class HttpApiMapper {
             return webService.getServices().get("/");
         }
         return httpApiHandler;
-
-//        HttpApiHandler httpApiHandler = requestMappings.get(path);
-//        if (httpApiHandler == null) {
-//            return requestMappings.get(rootPath);
-//        }
-//        return httpApiHandler;
     }
 }
