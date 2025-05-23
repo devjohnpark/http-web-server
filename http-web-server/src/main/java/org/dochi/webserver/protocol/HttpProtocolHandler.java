@@ -36,4 +36,9 @@ public class HttpProtocolHandler {
             processorPool.addFirst(processor);
         }
     }
+
+    // need for test
+    public int getSize() {
+        return processorPool.size();
+    }
 }

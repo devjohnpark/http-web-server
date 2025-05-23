@@ -1,4 +1,4 @@
-package org.dochi.internal.buffer;
+package org.dochi.webserver;
 
 import org.dochi.webserver.socket.SocketWrapperBase;
 

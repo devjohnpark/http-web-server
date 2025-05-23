@@ -287,8 +287,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 } else if (nameStart == valueEnd) {
                     return HeaderParseStatus.DONE;
                 }
-                // name:_value
-                //
                 break;
             }
             previousByte = currentByte;
