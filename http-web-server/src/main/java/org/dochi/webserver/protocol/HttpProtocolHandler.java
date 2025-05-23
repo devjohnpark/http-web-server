@@ -4,6 +4,7 @@ import org.dochi.processor.Http11Processor;
 import org.dochi.processor.HttpProcessor;
 import org.dochi.webserver.attribute.HttpProcessorAttribute;
 import org.dochi.webserver.config.HttpConfig;
+import org.dochi.webserver.config.HttpProcessorConfig;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -11,7 +12,7 @@ public class HttpProtocolHandler {
     private final HttpConfig config;
     private final ConcurrentLinkedDeque<HttpProcessor> processorPool;
 
-    public HttpProtocolHandler(HttpConfig config, HttpProcessorAttribute attribute) {
+    public HttpProtocolHandler(HttpConfig config, HttpProcessorConfig attribute) {
         this.config = config;
         // 락 프리(lock-free) 알고리즘을 사용하여 높은 동시성 성능: CAS(Compare-And-Swap) 연산으로 CAS는 CPU가 메모리 위치(V)의 현재 값을 읽어서 메모리 값을 기대 값과 비교해 일치하면 새 값으로 원자적으로 교체하는 동시성 기법
         // Deque 구현체로 LIFO 방식으로 사용할 수 있음 (addFirst로 추가, pollFirst로 제거) -> 최근에 사용된 객체를 우선 재사용하여 캐시 지역성을 활용

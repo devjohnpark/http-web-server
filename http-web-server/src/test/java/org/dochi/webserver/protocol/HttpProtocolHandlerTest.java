@@ -1,43 +1,39 @@
 package org.dochi.webserver.protocol;
 
 import org.dochi.processor.HttpProcessor;
-import org.dochi.webserver.config.HttpAttribute;
-import org.dochi.webserver.config.HttpReqConfig;
-import org.dochi.webserver.config.HttpResConfig;
-import org.dochi.webserver.config.ServerConfig;
+import org.dochi.webserver.config.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpProtocolHandlerTest {
-    HttpProtocolHandler handler;
-    ServerConfig config = new ServerConfig();
+    HttpProtocolHandler protocolHandler;
+    ServerConfig serverConfig = new ServerConfig();
+    HttpConfig httpConfig = new HttpReqResConfig(serverConfig.getHttpReqAttribute(), serverConfig.getHttpResAttribute());
+
 
     @BeforeEach
     void init() {
-        handler = new HttpProtocolHandler(new HttpAttribute(
-                new HttpReqConfig(config.getHttpReqAttribute()),
-                new HttpResConfig(config.getHttpResAttribute())
-        ), config.getHttpProcessorAttribute());
+        protocolHandler = new HttpProtocolHandler(httpConfig, serverConfig.getHttpProcessorAttribute());
     }
 
     @Test
     void getProcessor() {
-        HttpProcessor processor = handler.getProcessor();
-        assertEquals(handler.getSize() + 1, config.getHttpProcessorAttribute().getPoolSize());
+        HttpProcessor processor = protocolHandler.getProcessor();
+        assertEquals(protocolHandler.getSize() + 1, serverConfig.getHttpProcessorAttribute().getPoolSize());
     }
 
     @Test
     void release() {
-        HttpProcessor processor = handler.getProcessor();
-        assertEquals(handler.getSize() + 1, config.getHttpProcessorAttribute().getPoolSize());
-        handler.release(processor);
-        assertEquals(handler.getSize(), config.getHttpProcessorAttribute().getPoolSize());
+        HttpProcessor processor = protocolHandler.getProcessor();
+        assertEquals(protocolHandler.getSize() + 1, serverConfig.getHttpProcessorAttribute().getPoolSize());
+        protocolHandler.release(processor);
+        assertEquals(protocolHandler.getSize(), serverConfig.getHttpProcessorAttribute().getPoolSize());
     }
 
     @Test
     void getSize() {
-        assertEquals(handler.getSize(), config.getHttpProcessorAttribute().getPoolSize());
+        assertEquals(protocolHandler.getSize(), serverConfig.getHttpProcessorAttribute().getPoolSize());
     }
 }

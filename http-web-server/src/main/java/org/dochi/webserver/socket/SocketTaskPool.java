@@ -38,4 +38,8 @@ public class SocketTaskPool {
         SocketTask socketTask = queue.pollFirst(); // LIFO
         return socketTask != null ? socketTask : supplier.get();
     }
+
+    public int getPoolSize() {
+        return queue.size();
+    }
 }

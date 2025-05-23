@@ -1,33 +1,23 @@
 package org.dochi.webserver.socket;
 
-import org.dochi.webserver.attribute.HttpReqAttribute;
-import org.dochi.webserver.attribute.HttpResAttribute;
-import org.dochi.webserver.config.HttpAttribute;
-import org.dochi.webserver.config.HttpReqConfig;
-import org.dochi.webserver.config.HttpResConfig;
-import org.dochi.webserver.config.ServerConfig;
+import org.dochi.http.api.HttpApiMapper;
+import org.dochi.webserver.config.*;
 import org.dochi.webserver.protocol.HttpProtocolHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SocketTaskPoolTest {
-    SocketTaskPool pool;
+    SocketTaskPool socketTaskPool;
     ServerConfig serverConfig = new ServerConfig();
-
-
-    HttpProtocolHandler protocolHandler = new HttpProtocolHandler(new HttpAttribute(new HttpReqConfig(new HttpReqAttribute()), new HttpResConfig(new HttpResAttribute())))
+    HttpConfig httpConfig = new HttpReqResConfig(serverConfig.getHttpReqAttribute(), serverConfig.getHttpResAttribute());
+    HttpProtocolHandler protocolHandler = new HttpProtocolHandler(httpConfig, serverConfig.getHttpProcessorAttribute());
+    HttpApiMapper apiMapper = new HttpApiMapper(serverConfig.getWebService());
 
     @BeforeEach
     void setUp() {
-        serverConfig.get
-        this.pool = new SocketTaskPool(
-                serverConfig.getThreadPool(),
-                () -> new SocketTaskHandler(
-                        protocolHandler,
-                        httpApiMapper
-                )
-        );
+        socketTaskPool = new SocketTaskPool(serverConfig.getThreadPool(), () -> new SocketTaskHandler(protocolHandler, apiMapper));
     }
 
     @AfterEach
@@ -36,9 +26,17 @@ class SocketTaskPoolTest {
 
     @Test
     void recycle() {
+        int poolSize = socketTaskPool.getPoolSize();
+        SocketTask socketTaskHandler = socketTaskPool.get();
+        assertEquals(poolSize - 1, socketTaskPool.getPoolSize());
+        socketTaskPool.recycle(socketTaskHandler);
+        assertEquals(poolSize, socketTaskPool.getPoolSize());
     }
 
     @Test
     void get() {
+        int poolSize = socketTaskPool.getPoolSize();
+        socketTaskPool.get();
+        assertEquals(poolSize - 1, socketTaskPool.getPoolSize());
     }
 }
