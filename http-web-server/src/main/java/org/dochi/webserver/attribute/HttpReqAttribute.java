@@ -1,6 +1,8 @@
 package org.dochi.webserver.attribute;
 
-public class HttpReqAttribute {
+import org.dochi.webserver.config.HttpReqConfig;
+
+public class HttpReqAttribute implements HttpReqConfig {
     private static final int DEFAULT_HEADER_MAX_SIZE = 8192;
     private static final int DEFAULT_BODY_MAX_SIZE = 2097152;
 

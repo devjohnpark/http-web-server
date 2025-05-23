@@ -1,5 +1,6 @@
 package org.dochi.webserver.executor;
 
+import org.dochi.webserver.config.ThreadPoolConfig;
 import org.dochi.webserver.socket.SocketTask;
 import org.dochi.webserver.attribute.ThreadPool;
 import org.slf4j.Logger;
@@ -11,7 +12,7 @@ public class WorkerPoolExecutor {
     private static final Logger log = LoggerFactory.getLogger(WorkerPoolExecutor.class);
     private final ThreadPoolExecutor threadPoolExecutor;
 
-    public WorkerPoolExecutor(ThreadPool threadPool) {
+    public WorkerPoolExecutor(ThreadPoolConfig threadPool) {
         this.threadPoolExecutor = new ThreadPoolExecutor(
             threadPool.getMinSpareThreads(),
             threadPool.getMaxThreads(),
@@ -28,21 +29,7 @@ public class WorkerPoolExecutor {
         registerShutdownHook();
     }
 
-//    public void executeRequestHandler(SocketTaskHandler httpRequestHandler, SocketTaskPool requestTaskPool) {
-//        // 직접 run() 호출: run()을 직접 호출하면 스레드 풀이나 새 스레드와 무관하게 현재 실행 중인 스레드에서 실행된다.
-//        // threadPool.execute()가 스레드 풀의 워커 스레드에 작업을 넘겨서 실행하므로 httpRequestHandler.run()이 새로운 스레드에서 동작하도록 만든다.
-//        // 만약 threadPool.execute 없이 run()을 호출하면, 멀티스레드로 적용되지 않고 현재 실행중인 스레드의 스택에서 그대로 실행된다.
-//        threadPoolExecutor.execute(() -> {
-//            try {
-//                httpRequestHandler.run();
-//            } finally {
-//                // 작업 완료 후 RequestHandler를 큐에 반환
-//                requestTaskPool.recycle(httpRequestHandler);
-//            }
-//        });
-//    }
-
-    // Asynchronous
+//    // Asynchronous
 //    public SocketTask execute(SocketTask socketTask) {
 //        // Runnable 래핑 (FutureTask 생성)
 //        FutureTask<Void> futureTask = new FutureTask<>(() -> {
@@ -53,17 +40,10 @@ public class WorkerPoolExecutor {
 //        // FutureTask를 스레드 풀에 제출, 제출된 FutureTask 객체의 작업은 비동기로 실행
 //        threadPoolExecutor.execute(futureTask);
 //
-////        try {
-////            // FutureTask를 스레드 풀에 제출, 제출된 FutureTask 객체의 작업은 비동기로 실행
-////            threadPoolExecutor.execute(futureTask);
-////        } catch (RejectedExecutionException e) {
-////            log.error("Task rejected: {}", e.getMessage());
-////        }
-//
 //        return socketTask; // execute() 호출은 동기적으로 실행되며, 매개변수로 전달받은 Runnable 객체를 반환
 //    }
 
-    // 동기
+    // Synchronous
     public SocketTask execute(SocketTask socketTask) {
         log.debug("WorkerExecutor.execute");
         Future<?> future = threadPoolExecutor.submit(socketTask);
@@ -77,19 +57,6 @@ public class WorkerPoolExecutor {
         }
     }
 
-    // Synchronous
-//    public Runnable execute(Runnable runnable) {
-//        try {
-//            // get() 메서드가 작업이 완료될 때까지 현재 스레드를 blocking하여 동기로 실행
-//            threadPoolExecutor.submit(runnable).get(); // 작업 완료 대기
-//            return runnable; // 작업 완료 후 SocketTaskHandler 반환
-//        } catch (Exception e) {
-//            log.error("Error while executing runnable: {}", e.getMessage(), e);
-//            throw new RuntimeException("Execution failed", e);
-//        }
-//    }
-
-
     private void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownGracefully));
     }
@@ -100,8 +67,6 @@ public class WorkerPoolExecutor {
     private void shutdownGracefully() {
         log.info("Worker thread pool shutdown has started.");
         try {
-
-
             // 새로운 작업 수락 중지
             threadPoolExecutor.shutdown();
 

@@ -1,6 +1,8 @@
 package org.dochi.webserver.attribute;
 
-public class HttpResAttribute {
+import org.dochi.webserver.config.HttpResConfig;
+
+public class HttpResAttribute implements HttpResConfig {
     private static final int DEFAULT_HEADER_MAX_SIZE = 8192;
     private static final int DEFAULT_BODY_MAX_SIZE = 2097152;
 
@@ -15,12 +17,10 @@ public class HttpResAttribute {
         this.responseHeaderMaxSize = responseHeaderMaxSize;
     }
 
-
-    public int getResponseBodyMaxSize() {
-        return responseBodyMaxSize;
-    }
+    public int getResponsePayloadMaxSize() { return responseBodyMaxSize; }
 
     public int getResponseHeaderMaxSize() {
         return responseHeaderMaxSize;
     }
+
 }

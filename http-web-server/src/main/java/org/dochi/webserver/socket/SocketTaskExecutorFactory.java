@@ -17,16 +17,13 @@ public class SocketTaskExecutorFactory {
     public SocketTaskExecutor createExecutor(ServerConfig serverConfig) {
         HttpApiMapper httpApiMapper = new HttpApiMapper(serverConfig.getWebService());
         WorkerPoolExecutor workerExecutor = new WorkerPoolExecutor(serverConfig.getThreadPool());
-        HttpProtocolHandler protocolHandler = new HttpProtocolHandler(createHttpConfig(serverConfig), serverConfig.getHttpProcessor());
+        HttpProtocolHandler protocolHandler = new HttpProtocolHandler(createHttpConfig(serverConfig), serverConfig.getHttpProcessorAttribute());
         SocketTaskPool taskPool = createTaskPool(serverConfig, protocolHandler, httpApiMapper);
         return new SocketTaskExecutor(workerExecutor, taskPool);
     }
 
-    private HttpConfig createHttpConfig(ServerConfig serverConfig) {
-        return new HttpConfig(
-                new HttpReqConfig(serverConfig.getHttpReqAttribute()),
-                new HttpResConfig(serverConfig.getHttpResAttribute())
-        );
+    private HttpAttribute createHttpConfig(ServerConfig serverConfig) {
+        return new HttpAttribute(serverConfig.getHttpReqAttribute(), serverConfig.getHttpResAttribute());
     }
 
     private SocketTaskPool createTaskPool(

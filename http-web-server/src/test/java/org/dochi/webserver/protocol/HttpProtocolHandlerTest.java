@@ -1,7 +1,7 @@
 package org.dochi.webserver.protocol;
 
 import org.dochi.processor.HttpProcessor;
-import org.dochi.webserver.config.HttpConfig;
+import org.dochi.webserver.config.HttpAttribute;
 import org.dochi.webserver.config.HttpReqConfig;
 import org.dochi.webserver.config.HttpResConfig;
 import org.dochi.webserver.config.ServerConfig;
@@ -16,28 +16,28 @@ class HttpProtocolHandlerTest {
 
     @BeforeEach
     void init() {
-        handler = new HttpProtocolHandler(new HttpConfig(
+        handler = new HttpProtocolHandler(new HttpAttribute(
                 new HttpReqConfig(config.getHttpReqAttribute()),
                 new HttpResConfig(config.getHttpResAttribute())
-        ), config.getHttpProcessor());
+        ), config.getHttpProcessorAttribute());
     }
 
     @Test
     void getProcessor() {
         HttpProcessor processor = handler.getProcessor();
-        assertEquals(handler.getSize() + 1, config.getHttpProcessor().getPoolSize());
+        assertEquals(handler.getSize() + 1, config.getHttpProcessorAttribute().getPoolSize());
     }
 
     @Test
     void release() {
         HttpProcessor processor = handler.getProcessor();
-        assertEquals(handler.getSize() + 1, config.getHttpProcessor().getPoolSize());
+        assertEquals(handler.getSize() + 1, config.getHttpProcessorAttribute().getPoolSize());
         handler.release(processor);
-        assertEquals(handler.getSize(), config.getHttpProcessor().getPoolSize());
+        assertEquals(handler.getSize(), config.getHttpProcessorAttribute().getPoolSize());
     }
 
     @Test
     void getSize() {
-        assertEquals(handler.getSize(), config.getHttpProcessor().getPoolSize());
+        assertEquals(handler.getSize(), config.getHttpProcessorAttribute().getPoolSize());
     }
 }

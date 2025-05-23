@@ -2,8 +2,8 @@ package org.dochi.processor;
 
 import org.dochi.http.api.HttpApiMapper;
 import org.dochi.internal.buffer.Http11InputBuffer;
-import org.dochi.webserver.socket.SocketWrapperBase;
 import org.dochi.webserver.config.HttpConfig;
+import org.dochi.webserver.socket.SocketWrapperBase;
 import org.dochi.webserver.socket.SocketState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

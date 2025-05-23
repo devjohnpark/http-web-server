@@ -20,5 +20,5 @@ public class ServerConfig {
 
     public HttpResAttribute getHttpResAttribute() { return httpResAttribute; }
 
-    public HttpProcessorAttribute getHttpProcessor() { return httpProcessorAttribute; }
+    public HttpProcessorAttribute getHttpProcessorAttribute() { return httpProcessorAttribute; }
 }

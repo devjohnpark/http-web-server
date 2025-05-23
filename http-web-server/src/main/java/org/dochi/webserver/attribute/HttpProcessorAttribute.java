@@ -1,6 +1,8 @@
 package org.dochi.webserver.attribute;
 
-public class HttpProcessorAttribute {
+import org.dochi.webserver.config.HttpProcessorConfig;
+
+public class HttpProcessorAttribute implements HttpProcessorConfig {
     private static final int DEFAULT_PROCESSOR_POOL_SIZE = 10;
     private int poolSize = DEFAULT_PROCESSOR_POOL_SIZE;
 

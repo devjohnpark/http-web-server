@@ -1,6 +1,8 @@
 package org.dochi.webserver.attribute;
 
-public class KeepAlive {
+import org.dochi.webserver.config.KeepAliveConfig;
+
+public class KeepAlive implements KeepAliveConfig {
     private static final int DEFAULT_KEEP_ALIVE_TIMEOUT = 20000; // default: 20000 ms
     private static final int DEFAULT_MAX_REQUESTS = 100; // default: 100
 

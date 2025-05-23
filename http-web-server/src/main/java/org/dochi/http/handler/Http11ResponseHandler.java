@@ -6,9 +6,9 @@ import org.dochi.http.response.ResponseHeaders;
 import org.dochi.http.util.DateFormatter;
 import org.dochi.external.HttpExternalResponse;
 import org.dochi.http.data.HttpVersion;
+import org.dochi.webserver.config.HttpResConfig;
 import org.dochi.webserver.socket.SocketWrapperBase;
 import org.dochi.webresource.ResourceType;
-import org.dochi.webserver.config.HttpResConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
