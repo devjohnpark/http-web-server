@@ -1,6 +1,6 @@
 package org.dochi.http.handler;
 
-import org.dochi.http.response.stream.BufferedOutputStream;
+import org.dochi.http.response.BufferedOutputStream;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.http.response.ResponseHeaders;
 import org.dochi.http.util.DateFormatter;

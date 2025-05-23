@@ -269,7 +269,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         int valueStart = nameStart;
         int valueEnd = nameStart;
         while ((currentByte = getByte()) != -1) { // 1 2
-            if (currentByte == ':' && buffer.position() > nameStart + 1 && nameStart == nameEnd) {
+            if (currentByte == ':' && nameStart == nameEnd) { // && buffer.position() > nameStart + 1 &&
+                if (buffer.position() <= nameStart + 1) {
+                    break;
+                }
                 nameEnd = buffer.position() - 1;
                 valueStart = buffer.position();
             } else if (previousByte == ':' && (currentByte == ' ' || currentByte == '\t')) {
@@ -281,12 +284,19 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     headerField.getName().setBytes(buffer.array(), nameStart, nameEnd - nameStart);
                     headerField.getValue().setBytes(buffer.array(), valueStart, valueEnd - valueStart);
                     return HeaderParseStatus.NEED_MORE;
+                } else if (nameStart == valueEnd) {
+                    return HeaderParseStatus.DONE;
                 }
-                return HeaderParseStatus.DONE;
+                // name:_value
+                //
+                break;
             }
             previousByte = currentByte;
         }
-        return HeaderParseStatus.EOF;
+        if (currentByte == -1) {
+            return HeaderParseStatus.EOF;
+        }
+        throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request header");
     }
 
     private void validateHeader(boolean isCreateHeader) {

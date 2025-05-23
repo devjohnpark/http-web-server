@@ -1,6 +1,5 @@
-package org.dochi.buffer;
+package org.dochi.webserver.socket;
 
-import org.dochi.webserver.socket.BioSocketWrapper;
 import org.dochi.webserver.attribute.KeepAlive;
 import org.junit.jupiter.api.*;
 
@@ -22,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 // BioSocket
-class BioSocketWrapperTest {
+public class BioSocketWrapperTest {
     private static final Logger log = LoggerFactory.getLogger(BioSocketWrapperTest.class);
 
     protected byte[] clientBuffer = new byte[] { 10, 20, 30, 40, 50 };
@@ -96,21 +95,6 @@ class BioSocketWrapperTest {
             log.debug("server thread interrupted");
         }
     }
-
-//    protected void doHttp11Request(String header, String body) throws IOException {
-//        if (header == null) {
-//            return;
-//        }
-//        if (body == null) {
-//            body = "";
-//        }
-//        doRequest(header + "\r\n" + body);
-//    }
-
-//    private void doRequest(String message) throws IOException {
-//        clientBuffer = message.getBytes(StandardCharsets.ISO_8859_1);
-//        clientConnectedSocket.write(clientBuffer, 0, clientBuffer.length);
-//    }
 
     @Test
     void server_connected_socket_read() throws IOException {

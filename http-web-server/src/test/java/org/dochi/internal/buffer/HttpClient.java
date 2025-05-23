@@ -1,11 +1,11 @@
-package org.dochi.buffer;
+package org.dochi.internal.buffer;
 
 import org.dochi.webserver.socket.SocketWrapperBase;
 
 import java.io.IOException;
 
 public class HttpClient {
-    SocketWrapperBase<?> clientSocket;
+    private SocketWrapperBase<?> clientSocket;
 
     public HttpClient(SocketWrapperBase<?> clientSocketWrapper) {
         this.clientSocket = clientSocketWrapper;

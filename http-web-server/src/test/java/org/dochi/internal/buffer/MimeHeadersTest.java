@@ -1,4 +1,4 @@
-package org.dochi.buffer;
+package org.dochi.internal.buffer;
 
 import org.dochi.http.data.MimeHeaders;
 
