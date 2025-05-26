@@ -20,10 +20,6 @@ class SocketTaskPoolTest {
         socketTaskPool = new SocketTaskPool(serverConfig.getThreadPool(), () -> new SocketTaskHandler(protocolHandler, apiMapper));
     }
 
-    @AfterEach
-    void tearDown() {
-    }
-
     @Test
     void recycle() {
         int poolSize = socketTaskPool.getPoolSize();

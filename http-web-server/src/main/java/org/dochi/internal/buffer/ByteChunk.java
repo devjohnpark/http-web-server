@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public final class ByteChunk {
-    public static final Charset DEFAULT_CHARSET;
+    private static final Charset DEFAULT_CHARSET;
     private Charset charset;
     private byte[] buffer;
     private int start = 0;
@@ -52,24 +52,11 @@ public final class ByteChunk {
         return this.start;
     }
 
-//    public void setStart(int start) {
-//        if (this.end < start) {
-//            this.end = start;
-//        }
-//        this.start = start;
-//    }
-
     public int getEnd() {
         return this.end;
     }
 
-//    public void setEnd(int end) {
-//        this.end = end;
-//    }
-
     public String toString() {
-//        CharBuffer cb = this.getCharset().decode(ByteBuffer.wrap(this.buffer, this.start, this.end - this.start));
-//        return new String(cb.array(), cb.arrayOffset(), cb.length());
         if (end - start > 0) {
             return new String(buffer, start, end - start, charset);
         }
@@ -77,10 +64,6 @@ public final class ByteChunk {
     }
 
     public int toInt() {
-//        if (end - start > 0) {
-//            return Integer.parseInt(toString());
-//        }
-//        return 0;
         int result = 0;
         for (int i = start; i < end; i++) {
             byte b = buffer[i];
@@ -89,7 +72,6 @@ public final class ByteChunk {
             }
             result = result * 10 + (b - '0');
         }
-
         return result;
     }
 
@@ -107,7 +89,7 @@ public final class ByteChunk {
             // A: 0100 0001
             // a: 0110 0001
             if (b >= 'A' && b <= 'Z') {
-                b |= 0x20; // 대문자와 소문자의 차이는 항상 0x20 (32)
+                b |= 0x20; // 대문자와 소문자의 차이 0x20 (32)
             }
             if (c >= 'A' && c <= 'Z') {
                 c |= 0x20;

@@ -1,7 +1,7 @@
-package org.dochi.processor;
+package org.dochi.internal.processor;
 
 import org.dochi.http.api.HttpApiMapper;
-import org.dochi.internal.buffer.Http11InputBuffer;
+import org.dochi.internal.http11.Http11InputBuffer;
 import org.dochi.webserver.config.HttpConfig;
 import org.dochi.webserver.socket.SocketWrapperBase;
 import org.dochi.webserver.socket.SocketState;
@@ -23,7 +23,7 @@ public class Http11Processor extends AbstractHttpProcessor {
         this.requestHandler.setInputBuffer(this.inputBuffer);
     }
 
-    public boolean shouldPersistentConnection(SocketWrapperBase<?> socketWrapper) {
+    protected boolean shouldPersistentConnection(SocketWrapperBase<?> socketWrapper) {
         return isRequestKeepAlive() && isSeverKeepAlive(socketWrapper);
     }
 

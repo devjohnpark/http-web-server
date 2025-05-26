@@ -1,4 +1,4 @@
-package org.dochi.processor;
+package org.dochi.internal.processor;
 
 //import org.dochi.http.api.InternalAdapter;
 //import org.dochi.http.api.HttpApiMapper;

@@ -1,9 +1,11 @@
-package org.dochi.internal.buffer;
+package org.dochi.internal.http11;
 
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.response.HttpStatus;
 import org.dochi.internal.Request;
 import org.dochi.http.data.MimeHeaderField;
+import org.dochi.internal.buffer.ApplicationBufferHandler;
+import org.dochi.internal.buffer.InputBuffer;
 import org.dochi.webserver.socket.SocketWrapperBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

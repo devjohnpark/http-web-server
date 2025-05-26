@@ -1,5 +1,6 @@
 package org.dochi.internal.buffer;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 public class  MessageBytes {
@@ -66,20 +67,19 @@ public class  MessageBytes {
         return this.intValue;
     }
 
-//    public void setString(String str) {
-//        this.strValue = str;
-//        if (str != null) {
-//            this.type = 2;
-//        }
-//    }
-//
-//    public void toByte() {
-//        if (this.strValue != null) {
-//            ByteBuffer bb = this.getCharset().encode(this.strValue);
-//            this.byteChunk.setBytes(bb.array(), bb.arrayOffset(), bb.limit());
-//        }
-//    }
+    public void setString(String str) {
+        this.strValue = str;
+        if (str != null) {
+            this.type = 2;
+        }
+    }
 
+    public void toByte() {
+        if (this.strValue != null) {
+            ByteBuffer bb = this.getCharset().encode(this.strValue);
+            this.byteChunk.setBytes(bb.array(), bb.arrayOffset(), bb.limit());
+        }
+    }
 
     /*
     Request에서 path 혹은 query string에 setCharset() -> MessageBytes

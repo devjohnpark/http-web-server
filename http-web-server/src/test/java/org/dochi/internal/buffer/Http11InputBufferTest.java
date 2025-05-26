@@ -2,6 +2,7 @@ package org.dochi.internal.buffer;
 
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.internal.Request;
+import org.dochi.internal.http11.Http11InputBuffer;
 import org.dochi.webserver.HttpClient;
 import org.dochi.webserver.socket.BioSocketWrapperTest;
 import org.junit.jupiter.api.AfterEach;
