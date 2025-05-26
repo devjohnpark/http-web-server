@@ -1,4 +1,4 @@
-package org.dochi.http.multipart;
+package org.dochi.http.data.multipart;
 
 import java.io.*;
 import java.util.UUID;

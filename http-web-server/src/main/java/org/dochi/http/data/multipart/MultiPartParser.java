@@ -1,4 +1,4 @@
-package org.dochi.http.multipart;
+package org.dochi.http.data.multipart;
 
 //import org.dochi.http.request.multipart.*;
 import org.slf4j.Logger;

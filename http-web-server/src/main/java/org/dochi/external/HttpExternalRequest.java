@@ -1,7 +1,7 @@
 package org.dochi.external;
 
 import org.dochi.http.exception.HttpStatusException;
-import org.dochi.http.multipart.Part;
+import org.dochi.http.data.multipart.Part;
 
 import java.io.IOException;
 import java.io.InputStream;

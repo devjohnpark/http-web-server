@@ -3,7 +3,7 @@ package org.dochi.internal.buffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-public class  MessageBytes {
+public class MessageBytes {
     private final ByteChunk byteChunk = new ByteChunk();
     private int type = 0;
     private String strValue;

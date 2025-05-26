@@ -1,4 +1,4 @@
-package org.dochi.http.multipart;
+package org.dochi.http.data.multipart;
 
 import org.dochi.webresource.ResourceType;
 
@@ -9,7 +9,7 @@ import java.util.UUID;
 // MultipartFileManager 예외 다루기
 public class Part {
     private static final MultipartFileManager multipartFileManager = MultipartFileManager.getInstance();
-    private byte[] content = null;
+    private byte[] content;
     private final String contentType;
     private final String fileName;
     private final UUID uuid;
@@ -46,27 +46,6 @@ public class Part {
         return fileName != null && uuid != null;
     }
 
-//    public byte[] getContent() throws HttpStatusException, IOException {
-//        if (isFile()) {
-//            try {
-//                return multipartFileManager.downloadFile(fileName, uuid);
-//            } catch (FileNotFoundException e) {
-//                throw new HttpStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-//            }
-//        }
-//        return content;
-//    }
-//
-//    public void removeFile() throws HttpStatusException, IOException {
-//        if (isFile()) {
-//            try {
-//                multipartFileManager.deleteFile(fileName, uuid);
-//            } catch (FileNotFoundException e) {
-//                throw new HttpStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-//            }
-//        }
-//    }
-
     public byte[] getContent() throws IOException {
         if (isFile()) {
             return multipartFileManager.downloadFile(fileName, uuid);
@@ -78,5 +57,9 @@ public class Part {
         if (isFile()) {
             multipartFileManager.deleteFile(fileName, uuid);
         }
+    }
+
+    public boolean isEmpty() {
+        return content == null;
     }
 }

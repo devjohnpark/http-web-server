@@ -1,4 +1,4 @@
-package org.dochi.http.multipart;
+package org.dochi.http.data.multipart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +17,11 @@ public class Multipart {
     }
 
     public Part getPart(String name) {
-        if (parts.isEmpty()) {
+        Part part = parts.get(name);
+        if (part == null) {
             return new Part();
         }
-        return parts.get(name);
+        return part;
     }
 
     public void recycle() {
