@@ -1,5 +1,6 @@
 package org.dochi.http.data.multipart;
 
+import org.dochi.http.data.multipart.MultipartHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

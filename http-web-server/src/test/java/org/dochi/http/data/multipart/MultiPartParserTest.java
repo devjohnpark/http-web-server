@@ -1,5 +1,8 @@
 package org.dochi.http.data.multipart;
 
+import org.dochi.http.data.multipart.MultiPartParser;
+import org.dochi.http.data.multipart.Multipart;
+import org.dochi.http.data.multipart.MultipartStream;
 import org.dochi.http.exception.HttpStatusException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

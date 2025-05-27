@@ -53,13 +53,13 @@ public class MimeHeaders {
         return this.count;
     }
 
-    public MessageBytes getName(int n) {
-        return n >= 0 && n < this.count ? this.headers[n].getName() : null;
-    }
-
-    public MessageBytes getValue(int n) {
-        return n >= 0 && n < this.count ? this.headers[n].getValue() : null;
-    }
+//    public MessageBytes getName(int n) {
+//        return n >= 0 && n < this.count ? this.headers[n].getName() : null;
+//    }
+//
+//    public MessageBytes getValue(int n) {
+//        return n >= 0 && n < this.count ? this.headers[n].getValue() : null;
+//    }
 
 //    public void addName(int index, byte[] buffer, int start, int length) {
 //        if (count <= index) {
