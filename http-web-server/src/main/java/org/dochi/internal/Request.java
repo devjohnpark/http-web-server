@@ -51,15 +51,22 @@ public final class Request {
 
     // 헤더의 메모리 주소를 직접 참조하여, 처음 조회 O(N) 이후에 다음번 조회시 O(1)
     public String getContentType() {
-        if (this.contentTypeMB == null) {
-            this.contentTypeMB = this.headers.getValue("content-type");
+//        if (this.contentTypeMB == null) {
+//            this.contentTypeMB = this.headers.getValue("content-type");
+//        }
+//        return this.contentTypeMB.toString();
+
+        this.contentTypeMB = this.headers.getValue("content-type");
+        if (this.contentTypeMB == null || contentTypeMB.isNull()) {
+            return null;
         }
         return this.contentTypeMB.toString();
     }
 
     public int getContentLength() {
-        if (this.contentLengthMB == null) {
-            this.contentLengthMB = this.headers.getValue("content-length");
+        this.contentLengthMB = this.headers.getValue("content-length");
+        if (this.contentLengthMB == null || contentLengthMB.isNull()) {
+            return -1;
         }
         return this.contentLengthMB.toInt();
     }
@@ -79,8 +86,14 @@ public final class Request {
     }
 
     public String getCharacterEncoding() {
-        if (this.characterEncoding == null) {
-            this.characterEncoding = getCharsetEncodingFromContentType(this.getContentType());
+//        if (this.characterEncoding == null) {
+//            this.characterEncoding = getCharsetEncodingFromContentType(this.getContentType());
+//        }
+//        return this.characterEncoding;
+
+        this.characterEncoding = getCharsetEncodingFromContentType(this.getContentType());
+        if (this.characterEncoding == null || this.characterEncoding.isEmpty()) {
+            return null;
         }
         return this.characterEncoding;
     }

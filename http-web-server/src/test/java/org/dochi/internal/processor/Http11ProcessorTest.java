@@ -1,7 +1,7 @@
-package org.dochi.processor;
+package org.dochi.internal.processor;
 
+import org.dochi.http.api.HttpApiHandler;
 import org.dochi.http.api.HttpApiMapper;
-import org.dochi.internal.processor.Http11Processor;
 import org.dochi.webserver.HttpClient;
 import org.dochi.webserver.attribute.HttpReqAttribute;
 import org.dochi.webserver.attribute.HttpResAttribute;
@@ -9,7 +9,6 @@ import org.dochi.webserver.config.HttpReqResConfig;
 import org.dochi.webserver.config.ServerConfig;
 import org.dochi.webserver.socket.BioSocketWrapperTest;
 import org.dochi.webserver.socket.SocketState;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

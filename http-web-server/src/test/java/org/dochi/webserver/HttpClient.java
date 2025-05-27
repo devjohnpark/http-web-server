@@ -5,7 +5,7 @@ import org.dochi.webserver.socket.SocketWrapperBase;
 import java.io.IOException;
 
 public class HttpClient {
-    private SocketWrapperBase<?> clientSocket;
+    private final SocketWrapperBase<?> clientSocket;
 
     public HttpClient(SocketWrapperBase<?> clientSocketWrapper) {
         this.clientSocket = clientSocketWrapper;
