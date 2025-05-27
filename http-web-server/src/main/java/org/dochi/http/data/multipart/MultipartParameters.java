@@ -21,12 +21,6 @@ public class MultipartParameters {
         parameters.putAll(parseContentDisposition(contentDispositionHeaderValue));
     }
 
-//    public void addParameter(String contentDispositionHeaderValue) {
-//        // Content-Disposition 헤더 이름 일치하는지 확인
-//        if (contentDispositionHeaderValue == null || contentDispositionHeaderValue.isEmpty()) { return; }
-//        parameters.putAll(parseContentDisposition(contentDispositionHeaderValue));
-//    }
-
     public String getParameter(String name) {
         if (name.equals(NAME_PARAMETER_KEY) || name.equals(FILENAME_PARAMETER_KEY)) {
             // Content-Disposition 헤더의 파라매터만(name, filename)
@@ -42,15 +36,6 @@ public class MultipartParameters {
         }
         return null;
     }
-
-//    // Content-Disposition 헤더의 파라매터만(name, filename)
-//    public String getParameter(String key) {
-//        String value = parameters.get(key);
-//        if (value != null) {
-//            return value.replace("\"", "");
-//        }
-//        return null;
-//    }
 
     public String getNameParamValue() { return getParameter(NAME_PARAMETER_KEY); }
 

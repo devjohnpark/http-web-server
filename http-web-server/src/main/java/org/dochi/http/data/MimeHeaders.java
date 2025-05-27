@@ -53,31 +53,6 @@ public class MimeHeaders {
         return this.count;
     }
 
-//    public MessageBytes getName(int n) {
-//        return n >= 0 && n < this.count ? this.headers[n].getName() : null;
-//    }
-//
-//    public MessageBytes getValue(int n) {
-//        return n >= 0 && n < this.count ? this.headers[n].getValue() : null;
-//    }
-
-//    public void addName(int index, byte[] buffer, int start, int length) {
-//        if (count <= index) {
-//            throw new IllegalArgumentException("Index parameter greater than the number of generated header fields.");
-//        }
-//        if (length == 0) {
-//            throw new IllegalArgumentException("HTTP Header field name must not be empty.");
-//        }
-//        headers[index].getName().setBytes(buffer, start, length);
-//    }
-//
-//    public void addValue(int index, byte[] buffer, int start, int length) {
-//        if (count <= index) {
-//            throw new IllegalArgumentException("Index parameter greater than the number of generated header fields.");
-//        }
-//        headers[index].getValue().setBytes(buffer, start, length);
-//    }
-
     // 기존: 모든 헤더 필드 String으로 변환 -> HashMap<String, String> 저장 (모든 헤더의 문자 인코딩 비용과 GC 부하 발생) -> String key로 검색 -> O(1)로 데이터 접근
     // 변경: 버퍼에서 byte 단위로만 헤더 필드의 key, value의 범위만 파싱 -> String key로 검색 -> 최대 O(N) -> 찾으면 버퍼를 범위를 참조 저장 -> O(1)로 데이터 접근
 
