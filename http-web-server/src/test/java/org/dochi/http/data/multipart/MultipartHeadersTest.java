@@ -13,7 +13,6 @@ class MultipartHeadersTest {
         headers = new MultipartHeaders();
     }
     
-    // addHeader(String line) 테스트
     @Test
     void addHeaderWhenValidLineProvided() {
         headers.addHeader("Content-Type: text/plain");
@@ -33,7 +32,6 @@ class MultipartHeadersTest {
         assertEquals("application/json", headers.getHeader("content-type"));
     }
     
-    // addHeader(String name, String value) 테스트
     @Test
     void addHeaderWhenValidNameAndValueProvided() {
         headers.addHeader("Content-Type", "text/html");
