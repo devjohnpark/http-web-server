@@ -35,6 +35,7 @@ public class Part {
     public String getFileName() { return fileName; }
 
     // charset 등 parameter name, value 손 좀 봐야함
+    // content != null && contentType == null
     public String getContentType() {
         if (content != null && content.length != 0 && contentType == null) {
             return ResourceType.TEXT.getContentType("UTF-8");
