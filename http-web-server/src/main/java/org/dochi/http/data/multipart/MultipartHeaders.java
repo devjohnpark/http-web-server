@@ -20,7 +20,7 @@ public class MultipartHeaders {
     }
 
     public void addHeader(String name, String value) {
-        if (name == null || name.isEmpty() || value.isEmpty()) {
+        if (name == null || value == null || name.isEmpty() || value.isEmpty()) {
             return;
         }
         headers.put(name.toLowerCase(), value);
@@ -28,7 +28,7 @@ public class MultipartHeaders {
 
 
     public String getHeader(String key) {
-        return headers.get(key);
+        return headers.get(key.toLowerCase());
     }
 
     public String getContentDisposition() {
