@@ -53,7 +53,6 @@ public class MessageBytes {
 
     public String toString() {
         if (this.strValue == null) {
-            this.type = 2;
             this.strValue = this.byteChunk.toString();
         }
         return this.strValue;

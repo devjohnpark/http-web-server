@@ -27,6 +27,7 @@ public class HttpRequestHandler implements RequestHandler {
     private final Multipart multipart;
     private boolean parametersParsed = false;
     private boolean multipartParsed = false;
+    private boolean usingInputStream = false;
     private final HttpReqConfig config;
 
     public HttpRequestHandler(HttpReqConfig httpReqConfig) {
@@ -38,6 +39,9 @@ public class HttpRequestHandler implements RequestHandler {
     }
 
     public void setInputBuffer(org.dochi.internal.buffer.InputBuffer inputBuffer) {
+        if (inputBuffer == null) {
+            throw new IllegalArgumentException("internal.InputBuffer is null");
+        }
         this.inputBuffer.setInputBuffer(inputBuffer);
     }
 
@@ -81,9 +85,7 @@ public class HttpRequestHandler implements RequestHandler {
     public String getMethod() { return request.method().toString(); }
 
     @Override
-    public String getRequestURI() {
-        return request.requestURI().toString();
-    }
+    public String getRequestURI() { return request.requestURI().toString(); }
 
     @Override
     public String getPath() { return request.requestPath().toString(); }
@@ -94,9 +96,7 @@ public class HttpRequestHandler implements RequestHandler {
     }
 
     @Override
-    public String getProtocol() {
-        return request.protocol().toString();
-    }
+    public String getProtocol() { return request.protocol().toString(); }
 
     @Override
     public String getHeader(String key) {
@@ -133,6 +133,10 @@ public class HttpRequestHandler implements RequestHandler {
 
     @Override
     public InputStream getInputStream() throws IOException {
+        if (usingInputStream) {
+            throw new IllegalStateException("HttpRequestHandler.getInputStream already used");
+        }
+        usingInputStream = true;
         if (this.inputStream == null) {
             this.inputStream = new InternalInputStream(this.inputBuffer);
         }
@@ -145,9 +149,9 @@ public class HttpRequestHandler implements RequestHandler {
         parseHeaderRequestParameters();
         // 2. 나머지 content-type에 따라 파싱 (multipart/form-data와 application/x-www-form-urlencoded 기본 파싱)
         MediaType mediaType = MediaType.parseMediaType(this.getContentType()); // type/subtype 없으면 null 반환
-        if (mediaType == null) {
-            throw new IllegalArgumentException("Media type is invalid");
-        };
+//        if (mediaType == null) {
+//            throw new IllegalArgumentException("Media type is invalid");
+//        }
         if ("application/x-www-form-urlencoded".equalsIgnoreCase(mediaType.getTypeSubType())) {
             parseBodyRequestParameters();
         } else if ("multipart/form-data".equalsIgnoreCase(mediaType.getTypeSubType())) {
@@ -161,8 +165,9 @@ public class HttpRequestHandler implements RequestHandler {
         int contentLength = this.getContentLength();
         byte[] buf = new byte[contentLength];
         int n = 0;
+        InputStream in = getInputStream();
         while (n < contentLength) {
-            n += inputStream.read(buf, n, contentLength - n);
+            n += in.read(buf, n, contentLength - n);
         }
         request.parameters().addRequestParameters(new String(buf, request.getCharsetFromContentType()));
     }

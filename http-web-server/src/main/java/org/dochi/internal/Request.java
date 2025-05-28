@@ -35,7 +35,7 @@ public final class Request {
         this.parameters = new Parameters();
     }
 
-    public MessageBytes method() { return methodMB; }
+    public MessageBytes method() { return this.methodMB; }
 
     public MessageBytes queryString() { return this.queryStringMB; }
 
@@ -51,24 +51,17 @@ public final class Request {
 
     // 헤더의 메모리 주소를 직접 참조하여, 처음 조회 O(N) 이후에 다음번 조회시 O(1)
     public String getContentType() {
-//        if (this.contentTypeMB == null) {
-//            this.contentTypeMB = this.headers.getValue("content-type");
-//        }
-//        return this.contentTypeMB.toString();
-
-        this.contentTypeMB = this.headers.getValue("content-type");
         if (this.contentTypeMB == null || contentTypeMB.isNull()) {
-            return null;
+            this.contentTypeMB = this.headers.getValue("content-type");
         }
-        return this.contentTypeMB.toString();
+        return this.contentTypeMB != null ? this.contentTypeMB.toString() : null;
     }
 
     public int getContentLength() {
-        this.contentLengthMB = this.headers.getValue("content-length");
         if (this.contentLengthMB == null || contentLengthMB.isNull()) {
-            return -1;
+            this.contentLengthMB = this.headers.getValue("content-length");
         }
-        return this.contentLengthMB.toInt();
+        return this.contentLengthMB != null ? this.contentLengthMB.toInt() : -1;
     }
 
     public Charset getCharsetFromContentType() {
@@ -86,16 +79,10 @@ public final class Request {
     }
 
     public String getCharacterEncoding() {
-//        if (this.characterEncoding == null) {
-//            this.characterEncoding = getCharsetEncodingFromContentType(this.getContentType());
-//        }
-//        return this.characterEncoding;
-
-        this.characterEncoding = getCharsetEncodingFromContentType(this.getContentType());
         if (this.characterEncoding == null || this.characterEncoding.isEmpty()) {
-            return null;
+            this.characterEncoding = getCharsetEncodingFromContentType(this.getContentType());
         }
-        return this.characterEncoding;
+        return this.characterEncoding != null ? this.characterEncoding : null;
     }
 
     private String getCharsetEncodingFromContentType(String contentType) {

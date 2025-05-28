@@ -246,6 +246,12 @@ class RequestTest {
         assertEquals("", request.queryString().toString());
         assertEquals("", request.requestURI().toString());
         assertEquals("", request.protocol().toString());
+        
+        assertTrue(request.method().isNull());
+        assertTrue(request.requestPath().isNull());
+        assertTrue(request.queryString().isNull());
+        assertTrue(request.requestURI().isNull());
+        assertTrue(request.protocol().isNull());
 
         // 헤더가 리셋되었는지 확인
         assertEquals(0, request.headers().size());

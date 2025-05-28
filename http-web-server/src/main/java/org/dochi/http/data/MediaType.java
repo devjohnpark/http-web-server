@@ -70,7 +70,9 @@ public class MediaType {
     public static MediaType parseMediaType(String mediaType) {
         if (mediaType == null || mediaType.isBlank()) {
 //            throw new IllegalArgumentException("Media type string is null or blank");
-            return null;
+//            return new MediaType("text", "plain", null, null);
+            return new MediaType(null, null, null, null);
+//            return null;
         }
 
         String[] parts = mediaType.split(";", 2); // [type/subtype, parameter (optional)]
@@ -78,8 +80,8 @@ public class MediaType {
 
         String[] typeSubtype = typeSubtypePart.split("/");
         if (typeSubtype.length != 2) {
-            return null;
-//            throw new IllegalStateException("Invalid media type format: missing type or subtype");
+//            return null;
+            throw new IllegalStateException("Invalid media type format: missing type or subtype");
         }
 
         String type = typeSubtype[0].trim();

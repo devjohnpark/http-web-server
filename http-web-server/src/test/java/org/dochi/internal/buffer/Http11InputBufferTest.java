@@ -21,7 +21,7 @@ public class Http11InputBufferTest extends BioSocketWrapperTest {
     protected final int headerMaxSize = 1024;
     protected final Request request = new Request();
     protected Http11InputBuffer inputBuffer = new Http11InputBuffer(headerMaxSize);
-    private HttpClient httpClient;
+    protected HttpClient httpClient;
 
     @BeforeEach
     void init() {
@@ -134,6 +134,7 @@ public class Http11InputBufferTest extends BioSocketWrapperTest {
         assertEquals("keep-alive", request.headers().getHeader("Connection"));
         assertEquals("application/x-www-form-urlencoded; charset=utf-8", request.getContentType());
         assertEquals("utf-8", request.getCharacterEncoding());
+        assertEquals("application/x-www-form-urlencoded; charset=utf-8", request.getContentType());
         assertEquals(contentLength, request.getContentLength());
     }
 
