@@ -1,7 +1,5 @@
-package org.dochi.http.handler;
+package org.dochi.http.connector;
 
-import org.dochi.external.InputBuffer;
-import org.dochi.external.InternalInputStream;
 import org.dochi.internal.Request;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.data.multipart.Part;
@@ -17,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
+// HttpRequestHandler 역할: Request 객체 생성, Request 객체 감싸서 외부 API 제공
 public class HttpRequestHandler implements RequestHandler {
     private static final Logger log = LoggerFactory.getLogger(HttpRequestHandler.class);
 

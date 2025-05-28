@@ -1,4 +1,4 @@
-package org.dochi.http.handler;
+package org.dochi.http.connector;
 
 import org.dochi.http.response.BufferedOutputStream;
 import org.dochi.http.response.HttpStatus;

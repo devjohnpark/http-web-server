@@ -1,13 +1,9 @@
-package org.dochi.http.handler;
+package org.dochi.http.connector;
 
-import org.dochi.internal.Request;
-import org.dochi.internal.buffer.Http11InputBufferTest;
 import org.dochi.internal.http11.Http11InputBuffer;
 import org.dochi.webserver.HttpClient;
 import org.dochi.webserver.attribute.HttpReqAttribute;
-import org.dochi.webserver.config.HttpReqConfig;
 import org.dochi.webserver.socket.BioSocketWrapperTest;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import static org.assertj.core.api.Assertions.in;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpRequestHandlerTest extends BioSocketWrapperTest {
