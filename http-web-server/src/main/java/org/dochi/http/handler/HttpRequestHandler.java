@@ -152,9 +152,9 @@ public class HttpRequestHandler implements RequestHandler {
 //        if (mediaType == null) {
 //            throw new IllegalArgumentException("Media type is invalid");
 //        }
-        if ("application/x-www-form-urlencoded".equalsIgnoreCase(mediaType.getTypeSubType())) {
+        if ("application/x-www-form-urlencoded".equalsIgnoreCase(mediaType.getFullType())) {
             parseBodyRequestParameters();
-        } else if ("multipart/form-data".equalsIgnoreCase(mediaType.getTypeSubType())) {
+        } else if ("multipart/form-data".equalsIgnoreCase(mediaType.getFullType())) {
             // getPart() 메서드 주석에서 로직에서 확인
             request.parameters().addParameter(mediaType.getParameterName(), mediaType.getParameterValue()); // boundary
         }

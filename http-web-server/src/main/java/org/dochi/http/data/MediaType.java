@@ -40,10 +40,13 @@ public class MediaType {
         return parameterValue;
     }
 
-    public String getTypeSubType() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(type).append("/").append(subtype);
-        return sb.toString();
+    public String getFullType() {
+        if (type != null && subtype != null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(type).append("/").append(subtype);
+            return sb.toString();
+        }
+        return null;
     }
 
     @Override
@@ -63,24 +66,18 @@ public class MediaType {
         return null;
     }
 
-
     // 파싱 로직
     // text/html; charset=utf8
     // type, subtype 필수, parameter 선택
     public static MediaType parseMediaType(String mediaType) {
         if (mediaType == null || mediaType.isBlank()) {
-//            throw new IllegalArgumentException("Media type string is null or blank");
-//            return new MediaType("text", "plain", null, null);
             return new MediaType(null, null, null, null);
-//            return null;
         }
-
         String[] parts = mediaType.split(";", 2); // [type/subtype, parameter (optional)]
         String typeSubtypePart = parts[0].trim();
 
         String[] typeSubtype = typeSubtypePart.split("/");
         if (typeSubtype.length != 2) {
-//            return null;
             throw new IllegalStateException("Invalid media type format: missing type or subtype");
         }
 

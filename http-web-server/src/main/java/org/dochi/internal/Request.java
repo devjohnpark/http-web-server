@@ -89,11 +89,7 @@ public final class Request {
         if (contentType == null) {
             return null;
         }
-        MediaType mediaType = MediaType.parseMediaType(contentType);
-        if (mediaType != null) {
-            return mediaType.getCharset();
-        }
-        return "";
+        return MediaType.parseMediaType(contentType).getCharset();
     }
 
     public void recycle() {

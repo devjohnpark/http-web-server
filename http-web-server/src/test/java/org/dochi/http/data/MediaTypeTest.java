@@ -18,9 +18,9 @@ class MediaTypeTest {
     }
 
     @Test
-    void getTypeSubTypeReturnsCorrectFormat() {
+    void getFullTypeReturnsCorrectFormat() {
         MediaType mediaType = new MediaType("application", "json", null, null);
-        assertEquals("application/json", mediaType.getTypeSubType());
+        assertEquals("application/json", mediaType.getFullType());
     }
 
     @Test
@@ -61,17 +61,27 @@ class MediaTypeTest {
 
     @Test
     void parseMediaTypeReturnsNullWhenInputIsNull() {
-        assertNull(MediaType.parseMediaType(null));
+        MediaType mediaType = MediaType.parseMediaType(null);
+        assertNull(mediaType.getFullType());
+        assertNull(mediaType.getType());
+        assertNull(mediaType.getSubType());
+        assertNull(mediaType.getParameterName());
+        assertNull(mediaType.getParameterValue());
     }
 
     @Test
     void parseMediaTypeReturnsNullWhenInputIsBlank() {
-        assertNull(MediaType.parseMediaType("   "));
+        MediaType mediaType = MediaType.parseMediaType("   ");
+        assertNull(mediaType.getFullType());
+        assertNull(mediaType.getType());
+        assertNull(mediaType.getSubType());
+        assertNull(mediaType.getParameterName());
+        assertNull(mediaType.getParameterValue());
     }
 
     @Test
     void parseMediaTypeReturnsNullWhenMissingSubtype() {
-        assertNull(MediaType.parseMediaType("text"));
+        assertThrows(IllegalStateException.class, () -> MediaType.parseMediaType("text"));
     }
 
     @Test
