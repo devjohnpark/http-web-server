@@ -1,6 +1,6 @@
 //package org.dochi.http.response;
 //
-//import org.dochi.connector.Http11ResponseHandler;
+//import org.dochi.connector.handler.Http11ResponseHandler;
 //import org.dochi.http.data.HttpStatus;
 //import org.dochi.http.data.HttpVersion;
 //import org.dochi.webresource.ResourceType;

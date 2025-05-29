@@ -1,12 +1,12 @@
-package org.dochi.connector;
+package org.dochi.connector.handler;
 
+import org.dochi.connector.TmpBufferedOutputStream;
 import org.dochi.external.HttpExternalResponse;
-import org.dochi.webserver.socket.SocketWrapperBase;
 
 import java.io.IOException;
 
 public interface ResponseHandler extends HttpExternalResponse {
-    void setOutputStream(BufferedOutputStream outputStream);
+    void setOutputStream(TmpBufferedOutputStream outputStream);
     void recycle();
     void flush() throws IOException;
 }

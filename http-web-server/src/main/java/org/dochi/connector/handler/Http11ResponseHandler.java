@@ -1,5 +1,6 @@
-package org.dochi.connector;
+package org.dochi.connector.handler;
 
+import org.dochi.connector.TmpBufferedOutputStream;
 import org.dochi.http.data.HttpStatus;
 import org.dochi.http.data.ResponseHeaders;
 import org.dochi.http.util.DateFormatter;
@@ -7,7 +8,6 @@ import org.dochi.external.HttpExternalResponse;
 import org.dochi.http.data.HttpVersion;
 import org.dochi.webserver.config.HttpResConfig;
 import org.dochi.webresource.ResourceType;
-import org.dochi.webserver.socket.SocketWrapperBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +24,14 @@ public class Http11ResponseHandler implements ResponseHandler {
     private final HttpResConfig httpResConfig;
     private boolean isDateHeader = true;
     private boolean isCommitted = false;
-    private BufferedOutputStream bos;
+    private TmpBufferedOutputStream bos;
 
     public Http11ResponseHandler(HttpResConfig httpResConfig) {
         this.httpResConfig = httpResConfig;
     }
 
     @Override
-    public void setOutputStream(BufferedOutputStream outputStream) {
+    public void setOutputStream(TmpBufferedOutputStream outputStream) {
         if (outputStream == null) {
             throw new IllegalArgumentException("OutputStream cannot be null");
         }

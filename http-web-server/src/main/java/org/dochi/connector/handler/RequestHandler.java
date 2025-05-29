@@ -1,4 +1,4 @@
-package org.dochi.connector;
+package org.dochi.connector.handler;
 
 import org.dochi.internal.Request;
 import org.dochi.external.HttpExternalRequest;

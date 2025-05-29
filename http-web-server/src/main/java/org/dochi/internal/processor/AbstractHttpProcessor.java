@@ -2,12 +2,12 @@ package org.dochi.internal.processor;
 
 //import org.dochi.http.api.InternalAdapter;
 //import org.dochi.http.api.HttpApiMapper;
-import org.dochi.connector.RequestHandler;
+import org.dochi.connector.handler.RequestHandler;
 import org.dochi.http.api.HttpApiMapper;
 import org.dochi.http.exception.HttpStatusException;
-import org.dochi.connector.Http11ResponseHandler;
-import org.dochi.connector.HttpRequestHandler;
-import org.dochi.connector.ResponseHandler;
+import org.dochi.connector.handler.Http11ResponseHandler;
+import org.dochi.connector.handler.HttpRequestHandler;
+import org.dochi.connector.handler.ResponseHandler;
 import org.dochi.http.data.HttpStatus;
 import org.dochi.webserver.config.HttpConfig;
 import org.dochi.webserver.socket.SocketWrapperBase;

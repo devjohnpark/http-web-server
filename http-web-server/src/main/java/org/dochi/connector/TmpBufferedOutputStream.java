@@ -5,14 +5,14 @@ import org.dochi.webserver.socket.SocketWrapperBase;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class BufferedOutputStream extends OutputStream {
+public class TmpBufferedOutputStream extends OutputStream {
     private static final int DEFAULT_BUFFER_SIZE = 8192;
     private SocketWrapperBase<?> socketWrapper;
     private final byte[] buffer;
     private int bufferPosition = 0;
     private boolean isBufferEnabled = true;
 
-    public BufferedOutputStream() {
+    public TmpBufferedOutputStream() {
         this(DEFAULT_BUFFER_SIZE);
     }
 
@@ -20,7 +20,7 @@ public class BufferedOutputStream extends OutputStream {
         this.socketWrapper = socketWrapper;
     }
 
-    public BufferedOutputStream(int bufferSize) {
+    public TmpBufferedOutputStream(int bufferSize) {
         if (bufferSize <= 0) {
             throw new IllegalArgumentException("buffer size need to be positive");
         }
@@ -65,7 +65,7 @@ public class BufferedOutputStream extends OutputStream {
     }
 
     // 일반 출력 스트림 사용
-    public BufferedOutputStream getOutputStream() {
+    public TmpBufferedOutputStream getOutputStream() {
         isBufferEnabled = false;
         return this;
     }

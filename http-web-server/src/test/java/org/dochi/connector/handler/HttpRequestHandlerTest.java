@@ -1,4 +1,4 @@
-package org.dochi.connector;
+package org.dochi.connector.handler;
 
 import org.dochi.internal.buffer.http11.Http11InputBufferTest;
 import org.dochi.webserver.attribute.HttpReqAttribute;

@@ -1,5 +1,7 @@
-package org.dochi.connector;
+package org.dochi.connector.handler;
 
+import org.dochi.connector.InputBuffer;
+import org.dochi.connector.InternalInputStream;
 import org.dochi.internal.Request;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.data.multipart.Part;
