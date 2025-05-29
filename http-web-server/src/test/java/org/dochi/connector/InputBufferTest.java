@@ -1,7 +1,6 @@
 package org.dochi.connector;
 
-import org.dochi.internal.buffer.Http11InputBufferTest;
-import org.dochi.webserver.HttpClient;
+import org.dochi.internal.buffer.http11.Http11InputBufferTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,17 +16,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class InputBufferTest extends Http11InputBufferTest {
     private static final Logger log = LoggerFactory.getLogger(InputBufferTest.class);
     InputBuffer inputBuffer = new InputBuffer();
-    private HttpClient httpClient;
 
     @BeforeEach
     void setUp() {
-        httpClient = new HttpClient(clientConnectedSocket);
-        inputBuffer.setInputBuffer(super.inputBuffer);
+        this.inputBuffer.setInputBuffer(super.inputBuffer);
     }
 
     @AfterEach
     void tearDown() {
-        inputBuffer.recycle();
+        this.inputBuffer.recycle();
     }
 
     @Test
@@ -39,7 +36,7 @@ class InputBufferTest extends Http11InputBufferTest {
         String message = header + "\r\n" + body;
         httpClient.doRequest(message.getBytes(StandardCharsets.ISO_8859_1));
         assertTrue(super.inputBuffer.parseHeader(request));
-        assertEquals(inputBuffer.read(), 'n');
+        assertEquals(this.inputBuffer.read(), 'n');
     }
 
     @Test
@@ -58,7 +55,7 @@ class InputBufferTest extends Http11InputBufferTest {
         int j = 0;
         int total = 0;
         while (total < contentLength) {
-            int n = inputBuffer.read(buf);
+            int n = this.inputBuffer.read(buf);
             for (int i = 0; i < n; i++) {
                 bodyBuf[j++] = (byte) buf[i];
             }
@@ -76,7 +73,7 @@ class InputBufferTest extends Http11InputBufferTest {
         String message = header + body;
         httpClient.doRequest(message.getBytes(StandardCharsets.ISO_8859_1));
         assertTrue(super.inputBuffer.parseHeader(request));
-        int n = inputBuffer.read(buf, 0, 2);
+        int n = this.inputBuffer.read(buf, 0, 2);
         assertArrayEquals(Arrays.copyOf(buf, n), "na".getBytes(StandardCharsets.ISO_8859_1));
     }
 
@@ -90,7 +87,7 @@ class InputBufferTest extends Http11InputBufferTest {
         httpClient.doRequest(message.getBytes(StandardCharsets.ISO_8859_1));
         assertTrue(super.inputBuffer.parseHeader(request));
         for (byte b : buf) {
-            assertEquals(inputBuffer.read(), b);
+            assertEquals(this.inputBuffer.read(), b);
         }
     }
 
@@ -110,7 +107,7 @@ class InputBufferTest extends Http11InputBufferTest {
         byte[] bodyBuf = new byte[contentLength];
         int n = 0;
         while (n < contentLength) {
-            n += inputBuffer.read(bodyBuf, n, contentLength - n);
+            n += this.inputBuffer.read(bodyBuf, n, contentLength - n);
         }
         assertArrayEquals(bodyBuf, body.getBytes(StandardCharsets.ISO_8859_1));
     }

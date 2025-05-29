@@ -1,13 +1,12 @@
 package org.dochi.internal.processor;
 
-import org.dochi.http.api.HttpApiHandler;
 import org.dochi.http.api.HttpApiMapper;
 import org.dochi.webserver.HttpClient;
 import org.dochi.webserver.attribute.HttpReqAttribute;
 import org.dochi.webserver.attribute.HttpResAttribute;
 import org.dochi.webserver.config.HttpReqResConfig;
 import org.dochi.webserver.config.ServerConfig;
-import org.dochi.webserver.socket.BioSocketWrapperTest;
+import org.dochi.webserver.socket.BioSocketWrapperConnectionTest;
 import org.dochi.webserver.socket.SocketState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Http11ProcessorTest extends BioSocketWrapperTest {
+class Http11ProcessorTest extends BioSocketWrapperConnectionTest {
     Http11Processor processor;
     ServerConfig serverConfig = new ServerConfig();
     HttpApiMapper apiMapper = new HttpApiMapper(serverConfig.getWebService());

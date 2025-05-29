@@ -1,100 +1,20 @@
 package org.dochi.webserver.socket;
 
-import org.dochi.webserver.attribute.KeepAlive;
-import org.junit.jupiter.api.*;
-
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.io.IOException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
+import static org.junit.jupiter.api.Assertions.*;
 
-// BioSocket
-public class BioSocketWrapperTest {
+public class BioSocketWrapperTest extends BioSocketWrapperConnectionTest {
     private static final Logger log = LoggerFactory.getLogger(BioSocketWrapperTest.class);
 
     protected byte[] clientBuffer = new byte[] { 10, 20, 30, 40, 50 };
     protected byte[] serverBuffer = new byte[clientBuffer.length];
-
-    protected BioSocketWrapper serverConnectedSocket;
-    protected BioSocketWrapper clientConnectedSocket;
-
-    private Thread serverThread;
-    private Thread clientThread;
-    private ServerSocket serverSocket;
-
-    private CountDownLatch latch;
-
-    // 클라이언트가 요청 메세지를 보낸 시점에 서버의 스레드 실행이 종료되기 때문에
-    // Connector 객체를 생성
-    @BeforeEach
-    void connect() throws IOException, InterruptedException {
-
-        CountDownLatch serverReadyLatch = new CountDownLatch(1);
-
-        serverSocket = new ServerSocket(0); // 사용 가능한 포트 자동 할당
-        serverThread = new Thread(() -> {
-            log.debug("Starting server...");
-            if (!serverSocket.isClosed()) {
-                try {
-
-                    // 서버가 accept()를 호출하기 직전에 신호를 보냄
-                    serverReadyLatch.countDown();
-
-                    // blocking 되므로 해당 메서드를 실행하는 스레드 외의 서버 스레드로 실행
-                    serverConnectedSocket = new BioSocketWrapper(serverSocket.accept(), new KeepAlive());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        serverThread.start();
-
-        boolean ready = serverReadyLatch.await(50, TimeUnit.MILLISECONDS);
-
-        if (!ready) {
-            throw new RuntimeException("Server socket not ready");
-        }
-
-        clientConnectedSocket = new BioSocketWrapper(new Socket("localhost", serverSocket.getLocalPort()), new KeepAlive());
-
-        log.debug("Server started.");
-    }
-
-    @AfterEach
-    void disconnect() throws IOException {
-        if (clientConnectedSocket != null && !clientConnectedSocket.isClosed()) {
-            clientConnectedSocket.close();
-            log.debug("Client socket close");
-        }
-
-        if (serverConnectedSocket != null && !serverConnectedSocket.isClosed()) {
-            serverConnectedSocket.close();
-            log.debug("Server socket wrapper close");
-        }
-
-        if (serverSocket != null && !serverSocket.isClosed()) {
-            serverSocket.close();
-            log.debug("Server socket close");
-        }
-
-        if (serverThread != null && serverThread.isAlive()) {
-            serverThread.interrupt();
-            log.debug("server thread interrupted");
-        }
-    }
 
     @Test
     void server_connected_socket_read() throws IOException {

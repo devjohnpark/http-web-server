@@ -1,10 +1,8 @@
 package org.dochi.connector;
 
-import org.dochi.connector.HttpRequestHandler;
-import org.dochi.internal.http11.Http11InputBuffer;
-import org.dochi.webserver.HttpClient;
+import org.dochi.internal.buffer.http11.Http11InputBufferTest;
 import org.dochi.webserver.attribute.HttpReqAttribute;
-import org.dochi.webserver.socket.BioSocketWrapperTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,20 +13,19 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HttpRequestHandlerTest extends BioSocketWrapperTest {
+class HttpRequestHandlerTest extends Http11InputBufferTest {
 
     private final int headerMaxSize = 1024;
-    private final Http11InputBuffer inputBuffer = new Http11InputBuffer(headerMaxSize);;
     private final HttpRequestHandler requestHandler = new HttpRequestHandler(new HttpReqAttribute());
-    private HttpClient httpClient;
-
 
     @BeforeEach
     void setUp() {
-        this.requestHandler.recycle();
-        this.inputBuffer.init(serverConnectedSocket);
-        this.httpClient = new HttpClient(clientConnectedSocket);
         this.requestHandler.setInputBuffer(inputBuffer);
+    }
+
+    @AfterEach
+    void tearDown() {
+        this.requestHandler.recycle();
     }
 
     @Test

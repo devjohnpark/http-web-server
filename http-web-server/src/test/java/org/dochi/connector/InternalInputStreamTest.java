@@ -1,7 +1,6 @@
 package org.dochi.connector;
 
-import org.dochi.internal.buffer.Http11InputBufferTest;
-import org.dochi.webserver.HttpClient;
+import org.dochi.internal.buffer.http11.Http11InputBufferTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -19,11 +18,9 @@ class InternalInputStreamTest extends Http11InputBufferTest {
     private static final Logger log = LoggerFactory.getLogger(InternalInputStreamTest.class);
     InternalInputStream internalInputStream;
     InputBuffer inputBuffer;
-    private HttpClient httpClient = new HttpClient(clientConnectedSocket);
 
     @BeforeEach
     void setUp() {
-        this.httpClient = new HttpClient(clientConnectedSocket);
         this.inputBuffer = new InputBuffer();
         this.inputBuffer.setInputBuffer(super.inputBuffer);
         this.internalInputStream = new InternalInputStream(this.inputBuffer);

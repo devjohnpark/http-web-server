@@ -1,10 +1,10 @@
-package org.dochi.internal.buffer;
+package org.dochi.internal.buffer.http11;
 
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.internal.Request;
 import org.dochi.internal.http11.Http11InputBuffer;
 import org.dochi.webserver.HttpClient;
-import org.dochi.webserver.socket.BioSocketWrapperTest;
+import org.dochi.webserver.socket.BioSocketWrapperConnectionTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Http11InputBufferTest extends BioSocketWrapperTest {
+public class Http11InputBufferTest extends BioSocketWrapperConnectionTest {
     private static final Logger log = LoggerFactory.getLogger(Http11InputBufferTest.class);
     protected final int headerMaxSize = 1024;
     protected final Request request = new Request();
@@ -110,7 +110,7 @@ public class Http11InputBufferTest extends BioSocketWrapperTest {
         int contentLength = buf.length;
         String header = "POST /user HTTP/1.1\r\nConnection: keep-alive\r\nContent-Type: application/x-www-form-urlencoded; charset=utf-8\r\n" + String.format("Content-Length: %d\r\n\r\n", contentLength);
         this.inputBuffer = new Http11InputBuffer(header.getBytes(StandardCharsets.ISO_8859_1).length - 1);
-        this.init();
+        inputBuffer.init(serverConnectedSocket);
         String message = header + body;
 
         httpClient.doRequest(message.getBytes(StandardCharsets.ISO_8859_1));
@@ -169,7 +169,6 @@ public class Http11InputBufferTest extends BioSocketWrapperTest {
 
     @Test
     void invalid_header_format_non_value() throws IOException {
-        httpClient.doRequest("GET /user?name=john%20park&password=1234 HTTP/1.1\r\nConnection:\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1));
         httpClient.doRequest("GET /user?name=john%20park&password=1234 HTTP/1.1\r\nConnection: \r\n\r\n".getBytes(StandardCharsets.ISO_8859_1));
         assertThrows(HttpStatusException.class, () -> inputBuffer.parseHeader(request));
     }

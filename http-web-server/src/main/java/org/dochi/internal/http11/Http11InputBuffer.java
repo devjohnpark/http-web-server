@@ -32,6 +32,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     @Override
     public void init(SocketWrapperBase<?> socketWrapper) {
+        if (socketWrapper == null) {
+            log.debug("socketWrapper cannot be null");
+            throw new IllegalArgumentException("socketWrapper cannot be null");
+        }
         this.socketInputBuffer.init(socketWrapper);
     }
 
