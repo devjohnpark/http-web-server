@@ -1,6 +1,7 @@
 package org.dochi.internal.processor;
 
 import org.dochi.http.api.HttpApiMapper;
+import org.dochi.connector.BufferedOutputStream;
 import org.dochi.internal.http11.Http11InputBuffer;
 import org.dochi.webserver.config.HttpConfig;
 import org.dochi.webserver.socket.SocketWrapperBase;
@@ -16,11 +17,14 @@ public class Http11Processor extends AbstractHttpProcessor {
     private static final Logger log = LoggerFactory.getLogger(Http11Processor.class);
 
     private final Http11InputBuffer inputBuffer;
+    private final BufferedOutputStream tempBufferOutputStream;
 
     public Http11Processor(HttpConfig config) {
         super(config);
         this.inputBuffer = new Http11InputBuffer(config.getHttpReqConfig().getRequestHeaderMaxSize());
         this.requestHandler.setInputBuffer(this.inputBuffer);
+        this.tempBufferOutputStream = new BufferedOutputStream();
+        this.responseHandler.setOutputStream(this.tempBufferOutputStream);
     }
 
     protected boolean shouldPersistentConnection(SocketWrapperBase<?> socketWrapper) {
@@ -55,8 +59,7 @@ public class Http11Processor extends AbstractHttpProcessor {
     @Override
     protected void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
         inputBuffer.init(socketWrapper);
-        // temporary -> outputBuffer.init(socketWrapper);
-        responseHandler.init(socketWrapper);
+        tempBufferOutputStream.init(socketWrapper); // later -> outputBuffer.init(socketWrapper);
     }
 
     protected SocketState service(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) throws IOException {
@@ -85,7 +88,7 @@ public class Http11Processor extends AbstractHttpProcessor {
             // 1. Rapping flush method by custom OutputStream.
             // 2. The custom OutputStream declares boolean-isFlushed variable.
             // 3. If call rapped flush method, According to isFlushed value(true/false), flush() to be called or not.
-            recycle(); // 단독으로 inputBuffer.recycle 필요
+            recycle();
             count++;
         }
         log.debug("Process count: " + count);
@@ -93,10 +96,10 @@ public class Http11Processor extends AbstractHttpProcessor {
     }
 
     @Override
-    protected void recycle() {
+    protected void recycle() throws IOException {
         inputBuffer.recycle();
+        tempBufferOutputStream.recycle(); // outputBuffer.recycle();
         requestHandler.recycle();
-        // outputBuffer.recycle();
         responseHandler.recycle();
     }
 

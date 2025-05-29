@@ -1,14 +1,13 @@
 package org.dochi.connector;
 
-import org.dochi.http.response.BufferedOutputStream;
-import org.dochi.http.response.HttpStatus;
-import org.dochi.http.response.ResponseHeaders;
+import org.dochi.http.data.HttpStatus;
+import org.dochi.http.data.ResponseHeaders;
 import org.dochi.http.util.DateFormatter;
 import org.dochi.external.HttpExternalResponse;
 import org.dochi.http.data.HttpVersion;
 import org.dochi.webserver.config.HttpResConfig;
-import org.dochi.webserver.socket.SocketWrapperBase;
 import org.dochi.webresource.ResourceType;
+import org.dochi.webserver.socket.SocketWrapperBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,28 +18,29 @@ import java.util.Set;
 
 public class Http11ResponseHandler implements ResponseHandler {
     private static final Logger log = LoggerFactory.getLogger(Http11ResponseHandler.class);
-    protected HttpVersion version = HttpVersion.HTTP_1_1;
-    protected HttpStatus status = HttpStatus.OK;
-    protected final ResponseHeaders headers = new ResponseHeaders();
-    protected final HttpResConfig httpResConfig;
+    private HttpVersion version = HttpVersion.HTTP_1_1;
+    private HttpStatus status = HttpStatus.OK;
+    private final ResponseHeaders headers = new ResponseHeaders();
+    private final HttpResConfig httpResConfig;
     private boolean isDateHeader = true;
     private boolean isCommitted = false;
-    protected final BufferedOutputStream bos;
+    private BufferedOutputStream bos;
 
     public Http11ResponseHandler(HttpResConfig httpResConfig) {
-        this.bos = new BufferedOutputStream();
         this.httpResConfig = httpResConfig;
     }
 
     @Override
-    public void init(SocketWrapperBase<?> socketWrapper) {
-        this.bos.init(socketWrapper);
+    public void setOutputStream(BufferedOutputStream outputStream) {
+        if (outputStream == null) {
+            throw new IllegalArgumentException("OutputStream cannot be null");
+        }
+        this.bos = outputStream;
     }
 
     @Override
     public void recycle() {
         headers.clear();
-        bos.recycle();
         isDateHeader = true;
         isCommitted = false;
         version = HttpVersion.HTTP_1_1;
@@ -146,10 +146,16 @@ public class Http11ResponseHandler implements ResponseHandler {
 //        }
     }
     public OutputStream getOutputStream() {
+        if (bos == null) {
+            throw new IllegalArgumentException("OutputStream cannot be null");
+        }
         return bos.getOutputStream();
     }
 
     private void writeMessage(byte[] body) throws IOException {
+        if (bos == null) {
+            throw new IllegalArgumentException("OutputStream cannot be null");
+        }
         try {
             writeHeader();
             writePayload(body);
@@ -181,6 +187,9 @@ public class Http11ResponseHandler implements ResponseHandler {
 
     public void flush() throws IOException {
         if (!isCommitted) {
+            if (bos == null) {
+                throw new IllegalArgumentException("OutputStream cannot be null");
+            }
             bos.flush();
             isCommitted = true;
         }

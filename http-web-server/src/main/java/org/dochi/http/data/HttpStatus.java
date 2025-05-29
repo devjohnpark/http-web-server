@@ -1,4 +1,4 @@
-package org.dochi.http.response;
+package org.dochi.http.data;
 
 public enum HttpStatus {
     OK(200, "OK", ""),

@@ -1,6 +1,6 @@
 package org.dochi.http.api;
 
-import org.dochi.http.response.HttpStatus;
+import org.dochi.http.data.HttpStatus;
 import org.dochi.external.HttpExternalRequest;
 import org.dochi.external.HttpExternalResponse;
 import org.dochi.webresource.Resource;

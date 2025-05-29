@@ -1,4 +1,4 @@
-package org.dochi.http.response;
+package org.dochi.connector;
 
 import org.dochi.webserver.socket.SocketWrapperBase;
 

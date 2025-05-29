@@ -1,4 +1,4 @@
-package org.dochi.http.response;
+package org.dochi.http.data;
 
 import java.util.HashMap;
 import java.util.Map;

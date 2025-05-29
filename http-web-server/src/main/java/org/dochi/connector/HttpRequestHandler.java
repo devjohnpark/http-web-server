@@ -3,7 +3,7 @@ package org.dochi.connector;
 import org.dochi.internal.Request;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.data.multipart.Part;
-import org.dochi.http.response.HttpStatus;
+import org.dochi.http.data.HttpStatus;
 import org.dochi.http.data.MediaType;
 import org.dochi.http.data.multipart.MultiPartParser;
 import org.dochi.http.data.multipart.Multipart;
@@ -37,6 +37,7 @@ public class HttpRequestHandler implements RequestHandler {
         this.config = httpReqConfig;
     }
 
+    @Override
     public void setInputBuffer(org.dochi.internal.buffer.InputBuffer inputBuffer) {
         if (inputBuffer == null) {
             throw new IllegalArgumentException("internal.InputBuffer is null");
@@ -44,6 +45,7 @@ public class HttpRequestHandler implements RequestHandler {
         this.inputBuffer.setInputBuffer(inputBuffer);
     }
 
+    @Override
     public Request getRequest() {
         return request;
     }

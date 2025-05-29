@@ -1,6 +1,6 @@
 package org.dochi.external;
 
-import org.dochi.http.response.HttpStatus;
+import org.dochi.http.data.HttpStatus;
 
 import java.io.IOException;
 import java.io.OutputStream;

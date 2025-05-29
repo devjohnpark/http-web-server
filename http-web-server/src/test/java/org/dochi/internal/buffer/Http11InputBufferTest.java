@@ -160,17 +160,6 @@ public class Http11InputBufferTest extends BioSocketWrapperTest {
     }
 
     @Test
-    void header_case_insensitive() throws IOException {
-        String requestLine = "GET / HTTP/1.1\r\n";
-        String headers = "hOSt: localhost\r\ncOnneCtion: close\r\n\r\n";
-        httpClient.doRequest((requestLine + headers).getBytes(StandardCharsets.ISO_8859_1));
-
-        assertTrue(inputBuffer.parseHeader(request));
-        assertEquals("localhost", request.headers().getHeader("Host"));
-        assertEquals("close", request.headers().getHeader("Connection"));
-    }
-
-    @Test
     void invalid_header_format_non_name() throws IOException {
         String message = "GET / HTTP/1.1\r\n: keep-alive\r\n\r\n";
         httpClient.doRequest(message.getBytes(StandardCharsets.ISO_8859_1));

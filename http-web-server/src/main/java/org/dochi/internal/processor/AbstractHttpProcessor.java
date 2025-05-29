@@ -2,12 +2,13 @@ package org.dochi.internal.processor;
 
 //import org.dochi.http.api.InternalAdapter;
 //import org.dochi.http.api.HttpApiMapper;
+import org.dochi.connector.RequestHandler;
 import org.dochi.http.api.HttpApiMapper;
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.connector.Http11ResponseHandler;
 import org.dochi.connector.HttpRequestHandler;
 import org.dochi.connector.ResponseHandler;
-import org.dochi.http.response.HttpStatus;
+import org.dochi.http.data.HttpStatus;
 import org.dochi.webserver.config.HttpConfig;
 import org.dochi.webserver.socket.SocketWrapperBase;
 import org.dochi.webserver.socket.SocketState;
@@ -22,7 +23,7 @@ import static org.dochi.webserver.socket.SocketState.CLOSED;
 
 public abstract class AbstractHttpProcessor implements HttpProcessor {
     private static final Logger log = LoggerFactory.getLogger(AbstractHttpProcessor.class);
-    protected final HttpRequestHandler requestHandler;
+    protected final RequestHandler requestHandler;
     protected final ResponseHandler responseHandler;
 
     protected AbstractHttpProcessor(HttpConfig config) {

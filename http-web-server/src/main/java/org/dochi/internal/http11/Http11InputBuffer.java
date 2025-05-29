@@ -1,7 +1,7 @@
 package org.dochi.internal.http11;
 
 import org.dochi.http.exception.HttpStatusException;
-import org.dochi.http.response.HttpStatus;
+import org.dochi.http.data.HttpStatus;
 import org.dochi.internal.Request;
 import org.dochi.http.data.MimeHeaderField;
 import org.dochi.internal.buffer.ApplicationBufferHandler;

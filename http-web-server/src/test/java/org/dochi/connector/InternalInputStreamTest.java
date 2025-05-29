@@ -29,14 +29,6 @@ class InternalInputStreamTest extends Http11InputBufferTest {
         this.internalInputStream = new InternalInputStream(this.inputBuffer);
     }
 
-//    @AfterEach
-//    void tearDown() {
-//        internalInputStream.clear();
-//    }
-
-    // InputBuffer로 헤더를 파싱한 이후에 바디를 읽는 것을 테스트
-
-    // InternalInputStream 내의 InputBuffer의 ByteBuffer만 사용
     @Test
     void read() throws IOException {
         String body = "name=john%20park&password=1234";

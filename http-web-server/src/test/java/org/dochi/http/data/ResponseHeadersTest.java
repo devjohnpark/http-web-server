@@ -1,4 +1,4 @@
-package org.dochi.http.response;
+package org.dochi.http.data;
 
 import org.dochi.webresource.ResourceType;
 import org.junit.jupiter.api.BeforeEach;
