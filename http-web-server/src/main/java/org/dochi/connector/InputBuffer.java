@@ -1,4 +1,4 @@
-package org.dochi.http.connector;
+package org.dochi.connector;
 
 import org.dochi.internal.buffer.ApplicationBufferHandler;
 

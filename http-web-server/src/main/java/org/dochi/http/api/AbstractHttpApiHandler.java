@@ -13,7 +13,7 @@ import java.io.IOException;
 public abstract class AbstractHttpApiHandler implements HttpApiHandler {
     private static final Logger log = LoggerFactory.getLogger(AbstractHttpApiHandler.class);
 
-    public WebResourceProvider webResourceProvider = null;
+    protected WebResourceProvider webResourceProvider = null;
 
     @Override
     public void init(WebServiceConfig config) {

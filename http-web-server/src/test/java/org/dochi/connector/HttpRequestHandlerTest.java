@@ -1,5 +1,6 @@
-package org.dochi.http.connector;
+package org.dochi.connector;
 
+import org.dochi.connector.HttpRequestHandler;
 import org.dochi.internal.http11.Http11InputBuffer;
 import org.dochi.webserver.HttpClient;
 import org.dochi.webserver.attribute.HttpReqAttribute;

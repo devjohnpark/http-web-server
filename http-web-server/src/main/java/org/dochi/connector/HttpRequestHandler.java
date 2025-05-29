@@ -1,4 +1,4 @@
-package org.dochi.http.connector;
+package org.dochi.connector;
 
 import org.dochi.internal.Request;
 import org.dochi.http.exception.HttpStatusException;
@@ -57,10 +57,10 @@ public class HttpRequestHandler implements RequestHandler {
         this.parametersParsed = false;
         this.multipartParsed = false;
 
-        if (this.inputStream != null) {
-            this.inputStream.clear();
-            this.inputStream = null;
-        }
+//        if (this.inputStream != null) {
+//            this.inputStream.clear();
+//            this.inputStream = null;
+//        }
     }
 
     @Override
@@ -135,10 +135,10 @@ public class HttpRequestHandler implements RequestHandler {
         if (usingInputStream) {
             throw new IllegalStateException("HttpRequestHandler.getInputStream already used");
         }
+//        if (this.inputStream == null) {
+//            this.inputStream = new InternalInputStream(this.inputBuffer);
+//        }
         usingInputStream = true;
-        if (this.inputStream == null) {
-            this.inputStream = new InternalInputStream(this.inputBuffer);
-        }
         return this.inputStream;
     }
 

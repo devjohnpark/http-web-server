@@ -45,11 +45,9 @@ public class WorkerPoolExecutor {
 
     // Synchronous
     public SocketTask execute(SocketTask socketTask) {
-        log.debug("WorkerExecutor.execute");
         Future<?> future = threadPoolExecutor.submit(socketTask);
         try {
             future.get(); // 작업 완료까지 대기
-            log.debug("WorkerExecutor get future");
             return socketTask;
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error while executing socket task: {}", e.getMessage(), e);
