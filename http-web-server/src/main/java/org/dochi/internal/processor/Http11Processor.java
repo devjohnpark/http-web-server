@@ -99,7 +99,7 @@ public class Http11Processor extends AbstractHttpProcessor {
     protected void recycle() throws IOException {
         inputBuffer.recycle();
         tempBufferOutputStream.recycle(); // outputBuffer.recycle();
-        requestHandler.recycle();
+        requestHandler.recycle(); // InputBufer (internal.Inputbuffer) = null -> setInputBuffer
         responseHandler.recycle();
     }
 

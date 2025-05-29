@@ -63,7 +63,7 @@ public class InputBuffer implements ApplicationBufferHandler, Closeable {
     public void recycle() {
         this.isClosed = false;
         this.buffer = EMPTY_BUFFER;
-        this.internalInputBuffer = null;
+//        this.internalInputBuffer = null;
     }
 
     // 자동으로 파싱하는 Multipart/form-data나 application/x-www-form-urlencoded 본문을 파싱한다면 입력스트림을 이미 한번 사용한것이므로 소모 되어야한다.
