@@ -3,7 +3,6 @@ package org.dochi.webserver.socket;
 import org.dochi.http.api.HttpApiMapper;
 import org.dochi.webserver.config.*;
 import org.dochi.webserver.protocol.HttpProtocolHandler;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class SocketTaskPoolTest {
     SocketTaskPool socketTaskPool;
     ServerConfig serverConfig = new ServerConfig();
-    HttpConfig httpConfig = new HttpReqResConfig(serverConfig.getHttpReqAttribute(), serverConfig.getHttpResAttribute());
-    HttpProtocolHandler protocolHandler = new HttpProtocolHandler(httpConfig, serverConfig.getHttpProcessorAttribute());
+    HttpConfig httpConfig = new HttpConfigImpl(serverConfig.getHttpReqAttribute(), serverConfig.getHttpResAttribute());
+    HttpProtocolHandler protocolHandler = new HttpProtocolHandler(httpConfig);
     HttpApiMapper apiMapper = new HttpApiMapper(serverConfig.getWebService());
 
     @BeforeEach

@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public interface RequestHandler extends HttpExternalRequest {
     void setInputBuffer(InputBuffer inputBuffer);
-    void recycle() throws IOException;
+    void recycle();
     Request getRequest();
 }
 

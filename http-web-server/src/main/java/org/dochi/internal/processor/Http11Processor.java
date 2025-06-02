@@ -27,6 +27,13 @@ public class Http11Processor extends AbstractHttpProcessor {
         this.responseHandler.setOutputStream(this.tempBufferOutputStream);
     }
 
+    @Override
+    protected void recycle() {
+        inputBuffer.recycle();
+        tempBufferOutputStream.recycle();
+        super.recycleHandler();
+    }
+
     protected boolean shouldPersistentConnection(SocketWrapperBase<?> socketWrapper) {
         return isRequestKeepAlive() && isSeverKeepAlive(socketWrapper);
     }
@@ -64,11 +71,8 @@ public class Http11Processor extends AbstractHttpProcessor {
 
     protected SocketState service(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) throws IOException {
         SocketState state = OPEN;
-        int count = 0;
         while (state == OPEN) {
             if (!inputBuffer.parseHeader(requestHandler.getRequest())) {
-                inputBuffer.recycle();
-                requestHandler.recycle();
                 state = CLOSED;
                 break;
             } else if (isUpgradeRequest(socketWrapper)) {
@@ -89,19 +93,10 @@ public class Http11Processor extends AbstractHttpProcessor {
             // 2. The custom OutputStream declares boolean-isFlushed variable.
             // 3. If call rapped flush method, According to isFlushed value(true/false), flush() to be called or not.
             recycle();
-            count++;
         }
-        log.debug("Process count: " + count);
         return state;
     }
 
-    @Override
-    protected void recycle() throws IOException {
-        inputBuffer.recycle();
-        tempBufferOutputStream.recycle(); // outputBuffer.recycle();
-        requestHandler.recycle(); // InputBufer (internal.Inputbuffer) = null -> setInputBuffer
-        responseHandler.recycle();
-    }
 
     private boolean isUpgradeRequest(SocketWrapperBase<?> socketWrapper) {
         return requestHandler.getHeader("upgrade") != null;

@@ -6,7 +6,6 @@ public class ServerConfig {
     private final KeepAlive keepAlive = new KeepAlive();
     private final WebService webService = new WebService();
     private final ThreadPool threadPool = new ThreadPool();
-    private final HttpProcessorAttribute httpProcessorAttribute = new HttpProcessorAttribute();
     private final HttpReqAttribute httpReqAttribute = new HttpReqAttribute();
     private final HttpResAttribute httpResAttribute = new HttpResAttribute();
 
@@ -19,6 +18,4 @@ public class ServerConfig {
     public HttpReqAttribute getHttpReqAttribute() { return httpReqAttribute; }
 
     public HttpResAttribute getHttpResAttribute() { return httpResAttribute; }
-
-    public HttpProcessorAttribute getHttpProcessorAttribute() { return httpProcessorAttribute; }
 }

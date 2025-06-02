@@ -17,8 +17,8 @@ public class SocketTaskExecutorFactory {
     public SocketTaskExecutor createExecutor(ServerConfig serverConfig) {
         HttpApiMapper httpApiMapper = new HttpApiMapper(serverConfig.getWebService());
         WorkerPoolExecutor workerExecutor = new WorkerPoolExecutor(serverConfig.getThreadPool());
-        HttpConfig httpConfig = new HttpReqResConfig(serverConfig.getHttpReqAttribute(), serverConfig.getHttpResAttribute());
-        HttpProtocolHandler protocolHandler = new HttpProtocolHandler(httpConfig, serverConfig.getHttpProcessorAttribute());
+        HttpConfig httpConfig = new HttpConfigImpl(serverConfig.getHttpReqAttribute(), serverConfig.getHttpResAttribute());
+        HttpProtocolHandler protocolHandler = new HttpProtocolHandler(httpConfig);
         SocketTaskPool taskPool = createTaskPool(serverConfig, protocolHandler, httpApiMapper);
         return new SocketTaskExecutor(workerExecutor, taskPool);
     }

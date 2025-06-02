@@ -4,7 +4,7 @@ import org.dochi.http.api.HttpApiMapper;
 import org.dochi.webserver.HttpClient;
 import org.dochi.webserver.attribute.HttpReqAttribute;
 import org.dochi.webserver.attribute.HttpResAttribute;
-import org.dochi.webserver.config.HttpReqResConfig;
+import org.dochi.webserver.config.HttpConfigImpl;
 import org.dochi.webserver.config.ServerConfig;
 import org.dochi.webserver.socket.BioSocketWrapperConnectionTest;
 import org.dochi.webserver.socket.SocketState;
@@ -24,7 +24,7 @@ class Http11ProcessorTest extends BioSocketWrapperConnectionTest {
 
     @BeforeEach
     void setUp() {
-        processor = new Http11Processor(new HttpReqResConfig(new HttpReqAttribute(), new HttpResAttribute()));
+        processor = new Http11Processor(new HttpConfigImpl(new HttpReqAttribute(), new HttpResAttribute()));
         httpClient = new HttpClient(clientConnectedSocket);
     }
 

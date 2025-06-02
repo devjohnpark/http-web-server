@@ -1,7 +1,5 @@
 package org.dochi.internal.processor;
 
-//import org.dochi.http.api.InternalAdapter;
-//import org.dochi.http.api.HttpApiMapper;
 import org.dochi.connector.handler.RequestHandler;
 import org.dochi.http.api.HttpApiMapper;
 import org.dochi.http.exception.HttpStatusException;
@@ -41,13 +39,22 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
         try {
             // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
             // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
-            recycle(); // memory visibility
+            recycle();  // memory visibility
             state = service(socketWrapper, httpApiMapper);
         } catch (Exception e) {
             processException(e);
-            safeRecycle();
+            recycle(); // shouldn't call when upgrading protocol
+        } finally {
+            log.debug("Process count: {}", socketWrapper.incrementKeepAliveCount() - 1);
         }
         return state;
+    }
+
+    abstract protected void recycle();
+
+    protected void recycleHandler() {
+        requestHandler.recycle();
+        responseHandler.recycle();
     }
 
     abstract protected void setSocketWrapper(SocketWrapperBase<?> socketWrapper);
@@ -55,19 +62,6 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     protected abstract SocketState service(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) throws IOException;
 
     protected abstract boolean shouldPersistentConnection(SocketWrapperBase<?> socketWrapper);
-
-    protected void recycle() throws IOException {
-        requestHandler.recycle();
-        responseHandler.recycle();
-    }
-
-    private void safeRecycle() {
-        try {
-            recycle();
-        } catch (IOException e) {
-            log.error("Recycle failed: ", e);
-        }
-    }
 
     // Because the developer has the option to handle RuntimeException, RuntimeException propagated by not catching it is considered to be an invalid request from the client and a 400 response is sent.
     // Unexpected IOException on input/output, 500 response because Exception is a server problem.
