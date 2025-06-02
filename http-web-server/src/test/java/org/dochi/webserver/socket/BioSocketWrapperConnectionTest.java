@@ -29,6 +29,7 @@ public class BioSocketWrapperConnectionTest {
             if (!serverSocket.isClosed()) {
                 try {
                     serverConnectedSocket = new BioSocketWrapper(serverSocket.accept(), new KeepAlive());
+                    serverConnectedSocket.startConnectionTimeout(1000);
                     log.debug("created server's connection socket");
                 } catch (IOException e) {
                     throw new RuntimeException(e);

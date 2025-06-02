@@ -2,8 +2,8 @@ package org.dochi.internal.http11;
 
 import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.data.HttpStatus;
+import org.dochi.internal.parser.Http11Parser;
 import org.dochi.internal.Request;
-import org.dochi.http.data.MimeHeaderField;
 import org.dochi.internal.buffer.ApplicationBufferHandler;
 import org.dochi.internal.buffer.InputBuffer;
 import org.dochi.webserver.socket.SocketWrapperBase;
@@ -13,14 +13,14 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
-public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler {
+public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler, Http11Parser.HeaderDataSource {
     private static final Logger log = LoggerFactory.getLogger(Http11InputBuffer.class);
     private static final int SEPARATOR_SIZE = 1;
     private static final int CRLF_SIZE = 2;
     private ByteBuffer buffer;
     private final SocketInputBuffer socketInputBuffer;
+    private final Http11Parser parser;
 
     // Request는 AbstractProcessor 클래스에서 생성된다.
     // HttpXXInputBuffer는 AbstractProcessor 자식 클래스 Http11Processor에서 생성된다.
@@ -28,6 +28,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     public Http11InputBuffer(int headerMaxSize) {
         this.buffer = initBuffer(headerMaxSize);
         this.socketInputBuffer = new SocketInputBuffer();
+        this.parser = new Http11Parser(this);
     }
 
     @Override
@@ -57,9 +58,17 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         this.buffer.limit(0);
     }
 
+//    public boolean parseHeader(Request request) throws IOException {
+//        try {
+//            return parseRequestLine(request) && parseHeaders(request);
+//        } catch (BufferOverflowException e) {
+//            throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Header max size exceed");
+//        }
+//    }
+
     public boolean parseHeader(Request request) throws IOException {
         try {
-            return parseRequestLine(request) && parseHeaders(request);
+            return parser.parseRequestLine(request) && parser.parseHeaders(request);
         } catch (BufferOverflowException e) {
             throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Header max size exceed");
         }
@@ -71,12 +80,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         return buffer;
     }
 
-    private int getByte() throws IOException {
-        if (!this.buffer.hasRemaining() && this.socketInputBuffer.doRead(this) <= 0) {
-            return -1;
-        }
-        return this.buffer.get() & 0xFF;
-    }
+//    private int getByte() throws IOException {
+//        if (!this.buffer.hasRemaining() && this.socketInputBuffer.doRead(this) <= 0) {
+//            return -1;
+//        }
+//        return this.buffer.get() & 0xFF;
+//    }
 
     // 1. 버퍼의 최대 크기만큼 한번에 읽어서 초기화 (하지만 HTTP Request Message가 분할 전송될수 있기 때문에 여러번 읽어야할수 있다.)
 
@@ -110,6 +119,16 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         this.buffer.position(this.buffer.limit()); // position = limit
 
         return length;
+    }
+
+    @Override
+    public boolean fillHeaderBuffer() throws IOException {
+        return this.socketInputBuffer.doRead(this) > 0;
+    }
+
+    @Override
+    public ByteBuffer getHeaderByteBuffer() {
+        return this.getByteBuffer();
     }
 
     public static class SocketInputBuffer implements InputBuffer {
@@ -157,49 +176,49 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     // 헤더의 key가 정해져있으나 파라매터의 key는 요청마다 다르다.
     // 그리고 헤더와 다르게 파라메터는 API에서 대부분 사용되는 데이터이기 때문에 대부분 값을 파싱해서 사용된다.
     // 따라서 파라메터는 HashMap으로 저장해서 사용하도록한다.
-    private boolean parseRequestLine(Request request) throws IOException {
-        int elementCnt = 0;
-        int querySeparator = -1;
-        int previousByte = -1;
-        int currentByte;
-        int start = this.buffer.position();
-        while ((currentByte = getByte()) != -1) {
-            if (currentByte == ' ') {
-                elementCnt++;
-                if (elementCnt == 1) {
-                    request.method().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
-                } else if (elementCnt == 2) { // GET /user?name=john%20park&password=1234 HTTP/1.1
-                    request.requestURI().setCharset(StandardCharsets.UTF_8);
-                    request.requestURI().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
-                    request.requestPath().setCharset(StandardCharsets.UTF_8);
-                    if (querySeparator != -1) {
-                        request.requestPath().setBytes(buffer.array(), start, querySeparator - start - SEPARATOR_SIZE);
-                        request.queryString().setCharset(StandardCharsets.UTF_8);
-                        request.queryString().setBytes(buffer.array(), querySeparator, buffer.position() - querySeparator - SEPARATOR_SIZE);
-                    } else {
-                        request.requestPath().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
-                    }
-                }
-                start = buffer.position();
-            } else if (currentByte == '?') {
-                querySeparator = this.buffer.position();
-            } else if (previousByte == '\r' && currentByte == '\n') {
-                if (elementCnt != 2) {
-                    // 아쉬운점: 가급적 예외 객체보단 객체를 사용해서 처리한다.
-                    // 1. 스택 트레이스 캡처: 예외가 발생하면 JVM은 스택 트레이스를 캡처하는 비용 발생
-                    // 2. 예외 객체 생성 비용: 스택 트레이스까지 캡처하기 때문에 예외 객체의 생성은 일반 객체보다 비용이 큼
-                    // 3. JIT 최적화 방해: 자바 JIT(Just-In-Time) 컴파일러는 예외가 자주 발생하는 경로는 비정상 경로로 간주해서 최적화하지 않거나 인라이닝하지 않는다. 따라서 반복문 안에서 예외가 자주 발생하면 JIT 최적화가 비활성화되어 전체 성능 저하로 이어진다.
-                    // 4. 코드 실행 흐름 예측 실패: 예외는 정상적인 흐름과 분리된 별도 경로로 흐름을 변경시키기 때문에, CPU 입장에서는 분기 예측 실패와 캐시 미스 등이 더 자주 발생할 수 있다. 따라서 이 과정은 일반적인 if-else 분기보다 훨씬 무겁다.
-                    // internal.Response 객체에 HTTP Status 저장
-                    throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request line");
-                }
-                request.protocol().setBytes(buffer.array(), start, buffer.position() - start - CRLF_SIZE);
-                return true;
-            }
-            previousByte = currentByte;
-        }
-        return false;
-    }
+//    private boolean parseRequestLine(Request request) throws IOException {
+//        int elementCnt = 0;
+//        int querySeparator = -1;
+//        int previousByte = -1;
+//        int currentByte;
+//        int start = this.buffer.position();
+//        while ((currentByte = getByte()) != -1) {
+//            if (currentByte == ' ') {
+//                elementCnt++;
+//                if (elementCnt == 1) {
+//                    request.method().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
+//                } else if (elementCnt == 2) { // GET /user?name=john%20park&password=1234 HTTP/1.1
+//                    request.requestURI().setCharset(StandardCharsets.UTF_8);
+//                    request.requestURI().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
+//                    request.requestPath().setCharset(StandardCharsets.UTF_8);
+//                    if (querySeparator != -1) {
+//                        request.requestPath().setBytes(buffer.array(), start, querySeparator - start - SEPARATOR_SIZE);
+//                        request.queryString().setCharset(StandardCharsets.UTF_8);
+//                        request.queryString().setBytes(buffer.array(), querySeparator, buffer.position() - querySeparator - SEPARATOR_SIZE);
+//                    } else {
+//                        request.requestPath().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
+//                    }
+//                }
+//                start = buffer.position();
+//            } else if (currentByte == '?') {
+//                querySeparator = this.buffer.position();
+//            } else if (previousByte == '\r' && currentByte == '\n') {
+//                if (elementCnt != 2) {
+//                    // 아쉬운점: 가급적 예외 객체보단 객체를 사용해서 처리한다.
+//                    // 1. 스택 트레이스 캡처: 예외가 발생하면 JVM은 스택 트레이스를 캡처하는 비용 발생
+//                    // 2. 예외 객체 생성 비용: 스택 트레이스까지 캡처하기 때문에 예외 객체의 생성은 일반 객체보다 비용이 큼
+//                    // 3. JIT 최적화 방해: 자바 JIT(Just-In-Time) 컴파일러는 예외가 자주 발생하는 경로는 비정상 경로로 간주해서 최적화하지 않거나 인라이닝하지 않는다. 따라서 반복문 안에서 예외가 자주 발생하면 JIT 최적화가 비활성화되어 전체 성능 저하로 이어진다.
+//                    // 4. 코드 실행 흐름 예측 실패: 예외는 정상적인 흐름과 분리된 별도 경로로 흐름을 변경시키기 때문에, CPU 입장에서는 분기 예측 실패와 캐시 미스 등이 더 자주 발생할 수 있다. 따라서 이 과정은 일반적인 if-else 분기보다 훨씬 무겁다.
+//                    // internal.Response 객체에 HTTP Status 저장
+//                    throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request line");
+//                }
+//                request.protocol().setBytes(buffer.array(), start, buffer.position() - start - CRLF_SIZE);
+//                return true;
+//            }
+//            previousByte = currentByte;
+//        }
+//        return false;
+//    }
 
     // InputBuffer: Input(입력) + Buffer(버퍼) - 입력과 버퍼링을 수행하는 객체
     // HttpInputBuffer는 소켓에서 데이터를 읽고 이를 내부 버퍼에 저장하는 역할(버퍼링)을 하며, 프로토콜별 호환을 위해 기본적인 파싱 작업도 수행한다.
@@ -259,61 +278,55 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     // 그리고 HttpXXInputBuffer 재활용하기 위해서 해당 클래스에 init(BioSocketWrapper) 메서드를 정의하였다.
     // 소켓 데이터의 읽기는 SocketWrapper가 책임지므로 SocketInputBuffer의 로직을 Http11inputBuffer에 위임하는 것이 합리적이고 레이어 줄이고 객체 생성비용을 아낀다.
 
-    public boolean parseHeaders(Request request) throws IOException {
-        HeaderParseStatus status;
-        do {
-            status = parseHeaderField(request);
-        } while (status == HeaderParseStatus.NEED_MORE); // DONE, EOF
-        return status == HeaderParseStatus.DONE && request.headers().size() > 0;
-    }
+//    public boolean parseHeaders(Request request) throws IOException {
+//        HeaderParseStatus status;
+//        do {
+//            status = parseHeaderField(request);
+//        } while (status == HeaderParseStatus.NEED_MORE); // DONE, EOF
+//        return status == HeaderParseStatus.DONE && request.headers().size() > 0;
+//    }
+//
+//    private HeaderParseStatus parseHeaderField(Request request) throws IOException {
+//        int previousByte = -1;
+//        int currentByte;
+//        int nameStart = buffer.position();
+//        int nameEnd = nameStart;
+//        int valueStart = nameStart;
+//        int valueEnd = nameStart;
+//        while ((currentByte = getByte()) != -1) { // 1 2
+//            if (currentByte == ':' && nameStart == nameEnd) { // && buffer.position() > nameStart + 1 &&
+//                if (buffer.position() <= nameStart + 1) {
+//                    break;
+//                }
+//                nameEnd = buffer.position() - 1;
+//                valueStart = buffer.position();
+//            } else if (previousByte == ':' && (currentByte == ' ' || currentByte == '\t')) {
+//                valueStart++;
+//            } else if (previousByte == '\r' && currentByte == '\n') {
+//                valueEnd = buffer.position() - 2;
+//                if (nameStart < nameEnd && nameEnd < valueStart && valueStart < valueEnd) {
+//                    MimeHeaderField headerField = request.headers().createHeader();
+//                    headerField.getName().setBytes(buffer.array(), nameStart, nameEnd - nameStart);
+//                    headerField.getValue().setBytes(buffer.array(), valueStart, valueEnd - valueStart);
+//                    return HeaderParseStatus.NEED_MORE;
+//                } else if (nameStart == valueEnd) {
+//                    return HeaderParseStatus.DONE;
+//                }
+//                break;
+//            }
+//            previousByte = currentByte;
+//        }
+//        if (currentByte == -1) {
+//            return HeaderParseStatus.EOF;
+//        }
+//        throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request header");
+//    }
 
-    private HeaderParseStatus parseHeaderField(Request request) throws IOException {
-        int previousByte = -1;
-        int currentByte;
-        int nameStart = buffer.position();
-        int nameEnd = nameStart;
-        int valueStart = nameStart;
-        int valueEnd = nameStart;
-        while ((currentByte = getByte()) != -1) { // 1 2
-            if (currentByte == ':' && nameStart == nameEnd) { // && buffer.position() > nameStart + 1 &&
-                if (buffer.position() <= nameStart + 1) {
-                    break;
-                }
-                nameEnd = buffer.position() - 1;
-                valueStart = buffer.position();
-            } else if (previousByte == ':' && (currentByte == ' ' || currentByte == '\t')) {
-                valueStart++;
-            } else if (previousByte == '\r' && currentByte == '\n') {
-                valueEnd = buffer.position() - 2;
-                if (nameStart < nameEnd && nameEnd < valueStart && valueStart < valueEnd) {
-                    MimeHeaderField headerField = request.headers().createHeader();
-                    headerField.getName().setBytes(buffer.array(), nameStart, nameEnd - nameStart);
-                    headerField.getValue().setBytes(buffer.array(), valueStart, valueEnd - valueStart);
-                    return HeaderParseStatus.NEED_MORE;
-                } else if (nameStart == valueEnd) {
-                    return HeaderParseStatus.DONE;
-                }
-                break;
-            }
-            previousByte = currentByte;
-        }
-        if (currentByte == -1) {
-            return HeaderParseStatus.EOF;
-        }
-        throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid request header");
-    }
-
-    private void validateHeader(boolean isCreateHeader) {
-        if (isCreateHeader) {
-            throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Invalid header field");
-        }
-    }
-
-    private static enum HeaderParseStatus {
-        DONE,
-        NEED_MORE,
-        EOF;
-        private HeaderParseStatus() {
-        }
-    }
+//    private static enum HeaderParseStatus {
+//        DONE,
+//        NEED_MORE,
+//        EOF;
+//        private HeaderParseStatus() {
+//        }
+//    }
 }
