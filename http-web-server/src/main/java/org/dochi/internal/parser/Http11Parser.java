@@ -4,12 +4,16 @@ import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.data.HttpStatus;
 import org.dochi.http.data.MimeHeaderField;
 import org.dochi.internal.Request;
+import org.dochi.internal.http11.Http11InputBuffer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class Http11Parser {
+    private static final Logger log = LoggerFactory.getLogger(Http11Parser.class);
     private static final int SEPARATOR_SIZE = 1;
     private static final int CRLF_SIZE = 2;
     private static final int CR = '\r';
@@ -40,11 +44,10 @@ public class Http11Parser {
                 elementCnt++;
                 if (elementCnt == 1) {
                     request.method().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
-                } else if (elementCnt == 2) { // GET /user?name=john%20park&password=1234 HTTP/1.1
+                } else if (elementCnt == 2) { 
                     request.requestURI().setCharset(StandardCharsets.UTF_8);
                     request.requestURI().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
                     request.requestPath().setCharset(StandardCharsets.UTF_8);
-
                     if (querySeparator != -1) {
                         request.requestPath().setBytes(buffer.array(), start, querySeparator - start - SEPARATOR_SIZE);
                         request.queryString().setCharset(StandardCharsets.UTF_8);
@@ -52,7 +55,6 @@ public class Http11Parser {
                     } else {
                         request.requestPath().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
                     }
-
                 }
                 start = buffer.position();
             } else if (currentByte == '?' && querySeparator == -1) {

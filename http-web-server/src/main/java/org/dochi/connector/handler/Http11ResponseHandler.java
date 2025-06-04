@@ -6,12 +6,14 @@ import org.dochi.http.data.ResponseHeaders;
 import org.dochi.http.util.DateFormatter;
 import org.dochi.external.HttpExternalResponse;
 import org.dochi.http.data.HttpVersion;
+import org.dochi.webresource.SplitFileResource;
 import org.dochi.webserver.config.HttpResConfig;
 import org.dochi.webresource.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
@@ -49,11 +51,6 @@ public class Http11ResponseHandler implements ResponseHandler {
 
     public HttpExternalResponse addVersion(HttpVersion version) {
         this.version = version;
-        return this;
-    }
-
-    public HttpExternalResponse addStatus(HttpStatus status) {
-        this.status = status;
         return this;
     }
 
@@ -96,19 +93,35 @@ public class Http11ResponseHandler implements ResponseHandler {
         this.isDateHeader = true; return this;
     }
 
-    public void sendNoContent() throws IOException {
-        send(HttpStatus.NO_CONTENT, null, null);
-    }
-
-    // 테스트 필요
     public void send(HttpStatus status) throws IOException {
-//        send(status, new byte[0], null);
         send(status, null, null);
     }
 
     public void send(HttpStatus status, byte[] body, String contentType) throws IOException {
-        addDefaultHeader(status, getContentLength(body), contentType);
+        addDefaultHeader(status, body, contentType);
         writeMessage(body);
+    }
+
+    private void addDefaultHeader(HttpStatus status, byte[] body, String contentType) {
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
+
+        this.status = status;
+
+        if (this.isDateHeader && headers.getHeaders().get(ResponseHeaders.DATE) == null) {
+            addDateHeaders(DateFormatter.getCurrentDate());
+        }
+
+        if (status != HttpStatus.NO_CONTENT) {
+            // content 헤더 설정 안된 경우만 추가
+            if (headers.getContentLength() <= 0 && body != null) {
+                this.headers.addContentLength(body.length);
+            }
+            if (headers.getHeaders().get(ResponseHeaders.CONTENT_TYPE) == null && contentType != null) {
+                this.headers.addHeader(ResponseHeaders.CONTENT_TYPE, contentType);
+            }
+        }
     }
 
     public void sendError(HttpStatus status) throws IOException {
@@ -123,28 +136,6 @@ public class Http11ResponseHandler implements ResponseHandler {
         send(status, errorMessage.getBytes(), ResourceType.TEXT.getContentType(null));
     }
 
-    private static int getContentLength(byte[] body) {
-        int contentLength = 0;
-        if (body != null) {
-            contentLength = body.length;
-        }
-        return contentLength;
-    }
-
-    private void addDefaultHeader(HttpStatus status, int contentLength, String contentType) {
-        addStatus(status);
-        if (isDateHeader) {
-            addDateHeaders(DateFormatter.getCurrentDate());
-        }
-        // NO_CONTENT면, Content_Length도 없어야함
-        if (status != HttpStatus.NO_CONTENT) {
-            addContentHeaders(contentType, contentLength);
-        }
-//        // 204 No Content일 경우에만, contentType과 content length 생략
-//        if (status != HttpStatus.NO_CONTENT || body != null) {
-//            addContentHeaders(contentType, contentLength);
-//        }
-    }
     public OutputStream getOutputStream() {
         if (bos == null) {
             throw new IllegalArgumentException("OutputStream cannot be null");
@@ -165,9 +156,6 @@ public class Http11ResponseHandler implements ResponseHandler {
         }
     }
 
-//    protected abstract void writeHeader() throws IOException;
-//    protected abstract void writePayload(byte[] body) throws IOException;
-
     private void writeHeader() throws IOException {
         bos.write(String.format("%s %d %s\r\n", version.getVersion(), status.getCode(), status.getMessage()).getBytes(StandardCharsets.ISO_8859_1));
         Set<String> keys = headers.getHeaders().keySet();
@@ -182,7 +170,6 @@ public class Http11ResponseHandler implements ResponseHandler {
         if (body != null) {
             bos.write(body, 0, body.length);
         }
-//        flush(); // 스트림 버퍼의 데이터를 OS의 네트워크 스택인 TCP(socket) 버퍼에 즉시 전달 보장
     }
 
     public void flush() throws IOException {

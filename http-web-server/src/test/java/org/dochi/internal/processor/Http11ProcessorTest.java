@@ -1,7 +1,7 @@
 package org.dochi.internal.processor;
 
 import org.dochi.http.api.HttpApiMapper;
-import org.dochi.webserver.HttpClient;
+import org.dochi.webserver.socket.HttpClient;
 import org.dochi.webserver.attribute.HttpReqAttribute;
 import org.dochi.webserver.attribute.HttpResAttribute;
 import org.dochi.webserver.config.HttpConfigImpl;

@@ -14,8 +14,6 @@ public interface HttpExternalResponse {
 
     HttpExternalResponse addKeepAlive(int timeout, int maxRequests);
 
-    HttpExternalResponse addStatus(HttpStatus status);
-
     HttpExternalResponse addDateHeaders(String date);
 
     HttpExternalResponse addContentHeaders(String contentType, int contentLength);
@@ -23,8 +21,6 @@ public interface HttpExternalResponse {
     HttpExternalResponse inActiveDateHeader();
 
     HttpExternalResponse activeDateHeader();
-
-    void sendNoContent() throws IOException;
 
     void send(HttpStatus status) throws IOException;
 

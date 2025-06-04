@@ -4,10 +4,14 @@ import org.dochi.http.data.HttpStatus;
 import org.dochi.external.HttpExternalRequest;
 import org.dochi.external.HttpExternalResponse;
 import org.dochi.webresource.Resource;
+import org.dochi.webresource.SplitFileResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class DefaultHttpApiHandler extends AbstractHttpApiHandler {
     private static final Logger log = LoggerFactory.getLogger(DefaultHttpApiHandler.class);
@@ -32,7 +36,7 @@ public class DefaultHttpApiHandler extends AbstractHttpApiHandler {
     }
 
 //    @Override
-//    public void doGet(HttpApiRequest request, Http11ResponseHandler response) throws IOException {
+//    public void doGet(HttpExternalRequest request, HttpExternalResponse response) throws IOException {
 //        // TCP (Transmission Control Protocol)는 스트리밍 프로토콜이다.
 //        // 그 이유는 HTTP 메세지를 TCP에서 패킷단위로 분할되어 전송되지만, 수신측 OS단에서 순서대로 조립한다.
 //
@@ -44,13 +48,26 @@ public class DefaultHttpApiHandler extends AbstractHttpApiHandler {
 //        // 1) Payload를 분할해서 전송하기전에 헤더를 먼저 보낸다.
 //        // 2) 파일을 읽기전에 파일 용량만 알아내서 Content-Length 헤더 필드 값을 설정한다.
 //        // 3) request.path()로 ResourceType로 Content-Type 헤더 필드 값을 설정한다.
-//        // 4) sendFile() 메서드에서 내부적으로 OutputStream을 사용하여 파일을 버퍼 8KB로 나눠서 전송(write & flush)한다.
+//        // 4) serveSplitFile() 메서드에서 내부적으로 OutputStream을 사용하여 파일을 버퍼 8KB로 나눠서 전송(write & flush)한다.
 //
 //        SplitFileResource splitFileResource = webResourceProvider.getSplitResource(request.getPath());
 //        if (!splitFileResource.isEmpty()) {
-//            response.sendSplitFile(HttpStatus.OK, splitFileResource);
+//            response.addContentHeaders(splitFileResource.getContentType(null), (int) splitFileResource.getFileSize());
+//            response.send(HttpStatus.OK);
+//            serveSplitFile(splitFileResource, response.getOutputStream());
 //        } else {
 //            response.sendError(HttpStatus.NOT_FOUND);
+//        }
+//    }
+//
+//    private void serveSplitFile(SplitFileResource splitFileResource, OutputStream outputStream) throws IOException {
+//        int bytesRead;
+//        int bufferSize = Math.max((int) (splitFileResource.getFileSize()/5), 1024 * 8);
+//        final byte[] buffer = new byte[bufferSize];
+//        try(InputStream in = splitFileResource.getInputStream()) {
+//            while ((bytesRead = in.read(buffer)) > 0) {
+//                outputStream.write(buffer, 0, bytesRead);
+//            }
 //        }
 //    }
 }

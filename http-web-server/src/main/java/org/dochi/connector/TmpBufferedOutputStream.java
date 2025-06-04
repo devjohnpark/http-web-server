@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class TmpBufferedOutputStream extends OutputStream {
-    private static final int DEFAULT_BUFFER_SIZE = 8192;
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 8;
     private SocketWrapperBase<?> socketWrapper;
     private final byte[] buffer;
     private int bufferPosition = 0;
-    private boolean isBufferEnabled = true;
 
     public TmpBufferedOutputStream() {
         this(DEFAULT_BUFFER_SIZE);
@@ -27,24 +26,14 @@ public class TmpBufferedOutputStream extends OutputStream {
         this.buffer = new byte[bufferSize];
     }
 
-    private final byte[] tmp = new byte[1];
-
     @Override
     public void write(int b) throws IOException {
-        if (isBufferEnabled) {
-            writeToBuffer(b);
-        } else {
-            tmp[0] = (byte) b;
-            socketWrapper.write(tmp, 0 , 1);
-        }
-    }
-
-    private void writeToBuffer(int b) throws IOException {
         if (bufferPosition >= buffer.length) {
             flushBuffer();
         }
         buffer[bufferPosition++] = (byte) b;
     }
+
 
     @Override
     public void flush() throws IOException {
@@ -61,12 +50,10 @@ public class TmpBufferedOutputStream extends OutputStream {
 
     public void recycle() {
         bufferPosition = 0;
-        isBufferEnabled = true;
     }
 
     // 일반 출력 스트림 사용
     public TmpBufferedOutputStream getOutputStream() {
-        isBufferEnabled = false;
         return this;
     }
 }

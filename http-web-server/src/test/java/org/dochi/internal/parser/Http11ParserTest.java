@@ -45,7 +45,7 @@ public class Http11ParserTest extends Http11InputBufferTest {
     }
 
     @Test
-    void testParseRequestLine_post() throws IOException {
+    void parseRequestLine_post() throws IOException {
         String requestLine = "POST /api/users HTTP/1.1\r\n";
         httpClient.doRequest(requestLine.getBytes(StandardCharsets.ISO_8859_1));
         assertTrue(parser.parseRequestLine(request));

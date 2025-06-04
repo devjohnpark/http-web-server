@@ -38,6 +38,11 @@ public class ResponseHeaders {
         addHeader(CONTENT_LENGTH, String.valueOf(contentLength));
     }
 
+    public int getContentLength() {
+        String contentLength = headers.get(CONTENT_LENGTH);
+        return contentLength != null ? Integer.parseInt(headers.get(CONTENT_LENGTH)) : 0;
+    }
+
     public Map<String, String> getHeaders() {
         return headers;
     }

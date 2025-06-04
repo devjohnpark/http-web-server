@@ -29,20 +29,6 @@ public class WorkerPoolExecutor {
         registerShutdownHook();
     }
 
-//    // Asynchronous
-//    public SocketTask execute(SocketTask socketTask) {
-//        // Runnable 래핑 (FutureTask 생성)
-//        FutureTask<Void> futureTask = new FutureTask<>(() -> {
-//            socketTask.run();
-//            return null;
-//        });
-//
-//        // FutureTask를 스레드 풀에 제출, 제출된 FutureTask 객체의 작업은 비동기로 실행
-//        threadPoolExecutor.execute(futureTask);
-//
-//        return socketTask; // execute() 호출은 동기적으로 실행되며, 매개변수로 전달받은 Runnable 객체를 반환
-//    }
-
     // Synchronous
     public SocketTask execute(SocketTask socketTask) {
         Future<?> future = threadPoolExecutor.submit(socketTask);

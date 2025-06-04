@@ -1,6 +1,4 @@
-package org.dochi.webserver;
-
-import org.dochi.webserver.socket.SocketWrapperBase;
+package org.dochi.webserver.socket;
 
 import java.io.IOException;
 
