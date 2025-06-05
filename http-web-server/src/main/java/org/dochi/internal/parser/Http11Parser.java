@@ -4,7 +4,6 @@ import org.dochi.http.exception.HttpStatusException;
 import org.dochi.http.data.HttpStatus;
 import org.dochi.http.data.MimeHeaderField;
 import org.dochi.internal.Request;
-import org.dochi.internal.http11.Http11InputBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +15,13 @@ public class Http11Parser {
     private static final Logger log = LoggerFactory.getLogger(Http11Parser.class);
     private static final int SEPARATOR_SIZE = 1;
     private static final int CRLF_SIZE = 2;
-    private static final int CR = '\r';
-    private static final int LF = '\n';
+    private static final byte CR = '\r';
+    private static final byte LF = '\n';
+    private static final byte WHITE_SPACE = ' ';
+    private static final byte TAB = '\t';
+    private static final byte QUERY_SP = '?';
+    private static final byte HEADER_KEY_VALUE_SP = ':';
+
 
     private final HeaderDataSource source;
 
@@ -25,22 +29,22 @@ public class Http11Parser {
         this.source = source;
     }
 
-    private int getByte() throws IOException {
+    private byte getByte() throws IOException {
         if (!this.source.getHeaderByteBuffer().hasRemaining() && !this.source.fillHeaderBuffer()) {
             return -1;
         }
-        return this.source.getHeaderByteBuffer().get() & 0xFF;
+        return this.source.getHeaderByteBuffer().get();
     }
 
     public boolean parseRequestLine(Request request) throws IOException {
         int elementCnt = 0;
         int querySeparator = -1;
-        int previousByte = -1;
-        int currentByte;
+        byte previousByte = -1;
+        byte currentByte;
         ByteBuffer buffer = source.getHeaderByteBuffer();
         int start = buffer.position();
         while ((currentByte = getByte()) != -1) {
-            if (currentByte == ' ') {
+            if (currentByte == WHITE_SPACE) {
                 elementCnt++;
                 if (elementCnt == 1) {
                     request.method().setBytes(buffer.array(), start, buffer.position() - start - SEPARATOR_SIZE);
@@ -57,7 +61,7 @@ public class Http11Parser {
                     }
                 }
                 start = buffer.position();
-            } else if (currentByte == '?' && querySeparator == -1) {
+            } else if (currentByte == QUERY_SP && querySeparator == -1) {
                 querySeparator = buffer.position();
             } else if (previousByte == CR && currentByte == LF) {
                 if (elementCnt != 2) {
@@ -80,8 +84,8 @@ public class Http11Parser {
     }
 
     private HeaderParseStatus parseHeaderField(Request request) throws IOException {
-        int previousByte = -1;
-        int currentByte;
+        byte previousByte = -1;
+        byte currentByte;
         ByteBuffer buffer = source.getHeaderByteBuffer();
         int nameStart = buffer.position();
         int nameEnd = nameStart;
@@ -89,13 +93,13 @@ public class Http11Parser {
         int valueEnd = nameStart;
         
         while ((currentByte = getByte()) != -1) { // 1 2
-            if (currentByte == ':' && nameStart == nameEnd) { // && buffer.position() > nameStart + 1 &&
+            if (currentByte == HEADER_KEY_VALUE_SP && nameStart == nameEnd) { // && buffer.position() > nameStart + 1 &&
                 if (buffer.position() <= nameStart + 1) {
                     break;
                 }
                 nameEnd = buffer.position() - 1;
                 valueStart = buffer.position();
-            } else if (previousByte == ':' && (currentByte == ' ' || currentByte == '\t')) {
+            } else if (previousByte == HEADER_KEY_VALUE_SP && (currentByte == WHITE_SPACE || currentByte == TAB)) {
                 valueStart++;
             } else if (previousByte == CR && currentByte == LF) {
                 valueEnd = buffer.position() - 2;
