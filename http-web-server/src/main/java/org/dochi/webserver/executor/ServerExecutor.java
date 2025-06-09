@@ -1,7 +1,6 @@
 package org.dochi.webserver.executor;
 
 import org.dochi.webserver.attribute.WebServer;
-import org.dochi.webserver.lifecycle.LifecycleException;
 import org.dochi.webserver.lifecycle.ServerLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

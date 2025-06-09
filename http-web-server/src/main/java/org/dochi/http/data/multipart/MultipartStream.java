@@ -14,7 +14,6 @@ public class MultipartStream {
     private static final int LF = '\n';  // Line Feed
     private final ByteArrayOutputStream lineBuffer = new ByteArrayOutputStream();
     private final InputStream in;
-    private static final int[] EMPTY_CRLF = { CR, LF, CR, LF };
 
     public MultipartStream(InputStream in) {
         this.in = in;

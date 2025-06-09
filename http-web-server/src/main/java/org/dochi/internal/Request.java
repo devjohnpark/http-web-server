@@ -1,7 +1,5 @@
 package org.dochi.internal;
 
-//import org.dochi.buffer.*;
-
 import org.dochi.internal.buffer.ApplicationBufferHandler;
 import org.dochi.internal.buffer.MessageBytes;
 import org.dochi.http.data.MediaType;
@@ -10,7 +8,7 @@ import org.dochi.http.data.Parameters;
 
 import java.nio.charset.Charset;
 
-// parsed raw data, low level layer
+// low level layer, parsed raw data,
 public final class Request {
     private final MessageBytes methodMB;
     private final MessageBytes requestPathMB;

@@ -16,7 +16,8 @@ public class HttpApiMapper {
 
     public HttpApiHandler getHttpApiHandler(String path) {
 
-        // 여기서 객체의 타입을 가져와서 실행하는 것이 아니라, 그냥 실행해야 타입 의존성이 제거된다. -> 어댑터 패턴
+        // HttpApiHandler 객체를 참조하는 객체에서 HttpApiHandler 타입의 객체를 가져와서 메서드를 호출하면 의존성을 띈다.
+        // getHttpApiHandler 메서드 내에서 HttpApiHandler 타입의 객체를 가져와서 메서드 호출하면 의존성이 제거된다. -> 어댑터 패턴
 
         HttpApiHandler httpApiHandler = webService.getServices().get(path);
         if (httpApiHandler == null) {

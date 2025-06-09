@@ -6,14 +6,12 @@ import org.dochi.http.data.ResponseHeaders;
 import org.dochi.http.util.DateFormatter;
 import org.dochi.external.HttpExternalResponse;
 import org.dochi.http.data.HttpVersion;
-import org.dochi.webresource.SplitFileResource;
 import org.dochi.webserver.config.HttpResConfig;
 import org.dochi.webresource.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;

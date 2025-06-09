@@ -21,15 +21,14 @@ import java.io.InputStream;
 public class HttpRequestHandler implements RequestHandler {
     private static final Logger log = LoggerFactory.getLogger(HttpRequestHandler.class);
 
-    protected Request request;
-    private InternalInputStream inputStream;
-    private org.dochi.internal.buffer.InputBuffer internalInputBuffer;
+    private final Request request;
+    private final InternalInputStream inputStream;
     private final InputBuffer inputBuffer;
     private final Multipart multipart;
+    private final HttpReqConfig config;
     private boolean parametersParsed = false;
     private boolean multipartParsed = false;
     private boolean usingInputStream = false;
-    private final HttpReqConfig config;
 
     public HttpRequestHandler(HttpReqConfig httpReqConfig) {
         this.request = new Request();
@@ -52,7 +51,6 @@ public class HttpRequestHandler implements RequestHandler {
         return request;
     }
 
-    // Adapter에서 service를 호출해서 http api handler를 처리한 후에 recycle() 호출
     @Override
     public void recycle() {
         this.request.recycle();
@@ -60,11 +58,7 @@ public class HttpRequestHandler implements RequestHandler {
         this.multipart.recycle();
         this.parametersParsed = false;
         this.multipartParsed = false;
-
-//        if (this.inputStream != null) {
-//            this.inputStream.clear();
-//            this.inputStream = null;
-//        }
+        this.usingInputStream = false;
     }
 
     @Override
@@ -139,9 +133,6 @@ public class HttpRequestHandler implements RequestHandler {
         if (usingInputStream) {
             throw new IllegalStateException("HttpRequestHandler.getInputStream already used");
         }
-//        if (this.inputStream == null) {
-//            this.inputStream = new InternalInputStream(this.inputBuffer);
-//        }
         usingInputStream = true;
         return this.inputStream;
     }
@@ -152,9 +143,6 @@ public class HttpRequestHandler implements RequestHandler {
         parseHeaderRequestParameters();
         // 2. 나머지 content-type에 따라 파싱 (multipart/form-data와 application/x-www-form-urlencoded 기본 파싱)
         MediaType mediaType = MediaType.parseMediaType(this.getContentType()); // type/subtype 없으면 null 반환
-//        if (mediaType == null) {
-//            throw new IllegalArgumentException("Media type is invalid");
-//        }
         if ("application/x-www-form-urlencoded".equalsIgnoreCase(mediaType.getFullType())) {
             parseBodyRequestParameters();
         } else if ("multipart/form-data".equalsIgnoreCase(mediaType.getFullType())) {

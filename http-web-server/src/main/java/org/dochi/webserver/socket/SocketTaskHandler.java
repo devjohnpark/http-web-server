@@ -40,17 +40,12 @@ public class SocketTaskHandler implements SocketTask {
                 // 2. 필요한 스트림의 개수 만큼 Http2Processor 생성
                 // 3. 소켓 연결 시간 다시 설정
 
-                // 다음 코드만 추가하면됨
-                // processor = this.protocolHandler.getProcessor("HTTP/2.0")
-
-                // 아래의 코드는 반복문으로 코드 실행
-                // getSocketWrapper().startConnectionTimeout(socketWrapper.getKeepAliveTimeout());
-                // state = processor.process(socketWrapper, apiMapper);
+                // 다음 코드만 추가하고, 필요한 스트림 개수만큼 while 문 반복
+                // processor = this.protocolHandler.getProcessor("HTTP/2.0");
             }
         }
     }
 
-    // SocketTaskHandler 재사용 -> 닫기 수행 -> getSocketWrapper 호출
     private void terminate() {
         try {
             getSocketWrapper().close();
@@ -61,7 +56,6 @@ public class SocketTaskHandler implements SocketTask {
         }
     }
 
-    // 재활용되는 객체일때 문제 발생: 재활용 이후 setSocketWrapper 호출을 안하는 것으로 의심됨
     @Override
     public SocketWrapperBase<?> getSocketWrapper() {
         if (socketWrapper == null) {

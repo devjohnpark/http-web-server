@@ -229,7 +229,7 @@ class HttpRequestHandlerTest extends Http11InputBufferTest {
 
         requestHandler.recycle();
 
-        assertThrows(IllegalStateException.class, requestHandler::getInputStream);
+        assertDoesNotThrow(requestHandler::getInputStream);
         assertTrue(requestHandler.getRequest().method().isNull());
         assertNull(requestHandler.getRequest().parameters().getValue("boundary"));
     }

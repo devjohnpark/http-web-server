@@ -37,9 +37,7 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
         SocketState state = CLOSED;
         setSocketWrapper(socketWrapper);
         try {
-            // Recycling object's sharing resource cannot match the main memory with cpu cache in multithreading environment.
-            // I choose recycling object initialization cuz volatile variable for memory visibility has overhead.
-            recycle();  // memory visibility
+            recycle();
             state = service(socketWrapper, httpApiMapper);
         } catch (Exception e) {
             processException(e);

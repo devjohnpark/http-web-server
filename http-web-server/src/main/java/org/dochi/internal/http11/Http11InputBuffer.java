@@ -16,8 +16,8 @@ import java.nio.ByteBuffer;
 
 public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler, Http11Parser.HeaderDataSource {
     private static final Logger log = LoggerFactory.getLogger(Http11InputBuffer.class);
-    private static final int SEPARATOR_SIZE = 1;
-    private static final int CRLF_SIZE = 2;
+//    private static final int SEPARATOR_SIZE = 1;
+//    private static final int CRLF_SIZE = 2;
     private ByteBuffer buffer;
     private final SocketInputBuffer socketInputBuffer;
     private final Http11Parser parser;
