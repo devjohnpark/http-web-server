@@ -13,16 +13,18 @@ import java.util.concurrent.*;
 
 public class ServerExecutor {
     private static final Logger log = LoggerFactory.getLogger(ServerExecutor.class);
-    private static final Map<Integer, ServerLifecycle> servers = new HashMap<>();
+    private static final Map<WebServer, ServerLifecycle> servers = new HashMap<>();
 
     private ServerExecutor() {}
 
     public static void addWebServer(WebServer webServer) {
-        if (servers.containsKey(webServer.getPort())) {
-            log.error("Web server already exists: {}", webServer.getPort());
-            throw new IllegalArgumentException("Web server has already exists.");
+
+        if (servers.containsKey(webServer)) {
+            log.error("Web server already exists: {}", webServer);
+            throw new IllegalArgumentException("Web server already exists: " + webServer);
         }
-        servers.put(webServer.getPort(), new ServerLifecycle(webServer));
+
+        servers.put(webServer, new ServerLifecycle(webServer));
         // 단일 서버 실행/종료를 위한 cli 대기 스레드 생성 후 put
     }
 

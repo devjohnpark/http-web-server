@@ -4,6 +4,8 @@ import org.dochi.webserver.config.ServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 public class WebServer {
     private static final Logger log = LoggerFactory.getLogger(WebServer.class);
     private final int port;
@@ -32,4 +34,17 @@ public class WebServer {
     }
 
     public ServerConfig getConfig() { return serverConfig; }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        WebServer webServer = (WebServer) obj;
+        return port == webServer.port && Objects.equals(hostName, webServer.hostName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hostName, port);
+    }
 }
