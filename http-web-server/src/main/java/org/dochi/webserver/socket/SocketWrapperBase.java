@@ -39,6 +39,8 @@ public abstract class SocketWrapperBase<E> {
 
     public int incrementKeepAliveCount() { return ++keepAliveCount; }
 
+    public int getKeepAliveCount() { return keepAliveCount; }
+
     public int getKeepAliveTimeout() { return keepAliveTimeout; }
 
     public int getMaxKeepAliveRequests() { return maxKeepAliveRequests; }

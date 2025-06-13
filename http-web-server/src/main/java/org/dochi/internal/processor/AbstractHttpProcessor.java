@@ -43,7 +43,7 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
             processException(e);
             recycle(); // shouldn't call when upgrading protocol
         } finally {
-            log.debug("Process count: {}", socketWrapper.incrementKeepAliveCount() - 1);
+            log.info("Process count: {}", socketWrapper.getKeepAliveCount());
         }
         return state;
     }

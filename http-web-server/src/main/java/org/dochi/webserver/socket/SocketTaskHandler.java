@@ -23,7 +23,7 @@ public class SocketTaskHandler implements SocketTask {
         try {
             dispatch(SocketState.OPEN, this.protocolHandler.getProcessor());
         } catch (IOException e) {
-            log.error("Set connection timeout but socket is already closed: {}", e.getMessage());
+            log.error("Set connection timeout but socket is already closed: ", e);
         } finally {
             terminate();
         }
