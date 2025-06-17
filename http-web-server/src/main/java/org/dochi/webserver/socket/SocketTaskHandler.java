@@ -21,28 +21,28 @@ public class SocketTaskHandler implements SocketTask {
     @Override
     public void run() {
         try {
-            dispatch(SocketState.OPEN, this.protocolHandler.getProcessor());
+            SocketState state = SocketState.OPEN;
+            HttpProcessor processor;
+            while (state == SocketState.OPEN) { // state == SocketState.OPEN
+                getSocketWrapper().startConnectionTimeout(socketWrapper.getKeepAliveTimeout());
+                processor = this.protocolHandler.getProcessor();
+                state = processor.process(socketWrapper, apiMapper);
+                if (state == SocketState.CLOSED) {
+                    protocolHandler.release(processor);
+                } else if (state ==  SocketState.UPGRADING) {
+                    // 1. 파싱된 요청 데이터 객체(internal.Request)의 복사본을 가지고 헤더에서 h2 관련 데이터 가져와서(AbstractProcessor.getUpgradeToken()) HTTP/2 설정
+                    // 2. 필요한 스트림의 개수 만큼 Http2Processor 생성
+                    // 3. 소켓 연결 시간 다시 설정
+
+                    // 다음 코드만 추가하고, 필요한 스트림 개수만큼 while 문 반복
+                    // ulti stream 처리를 위해 process 비동기 메서드로 변환필요, process 실행 이후 동기적으로 release 메서드 호출 필요
+                    // processor = this.protocolHandler.getProcessor("HTTP/2.0");
+                }
+            }
         } catch (IOException e) {
             log.error("Set connection timeout but socket is already closed: ", e);
         } finally {
             terminate();
-        }
-    }
-
-    private void dispatch(SocketState state, HttpProcessor processor) throws IOException {
-        while (state == SocketState.OPEN) { // state == SocketState.OPEN
-            getSocketWrapper().startConnectionTimeout(socketWrapper.getKeepAliveTimeout());
-            state = processor.process(socketWrapper, apiMapper);
-            if (state == SocketState.CLOSED) {
-                protocolHandler.release(processor);
-            } else if (state ==  SocketState.UPGRADING) {
-                // 1. 파싱된 요청 데이터 객체(internal.Request)의 복사본을 가지고 헤더에서 h2 관련 데이터 가져와서(AbstractProcessor.getUpgradeToken()) HTTP/2 설정
-                // 2. 필요한 스트림의 개수 만큼 Http2Processor 생성
-                // 3. 소켓 연결 시간 다시 설정
-
-                // 다음 코드만 추가하고, 필요한 스트림 개수만큼 while 문 반복
-                // processor = this.protocolHandler.getProcessor("HTTP/2.0");
-            }
         }
     }
 
