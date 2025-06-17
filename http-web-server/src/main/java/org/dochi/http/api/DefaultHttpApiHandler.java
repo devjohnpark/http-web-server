@@ -1,17 +1,13 @@
 package org.dochi.http.api;
 
 import org.dochi.http.data.HttpStatus;
-import org.dochi.external.HttpExternalRequest;
-import org.dochi.external.HttpExternalResponse;
+import org.dochi.http.external.HttpExternalRequest;
+import org.dochi.http.external.HttpExternalResponse;
 import org.dochi.webresource.Resource;
-import org.dochi.webresource.SplitFileResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public class DefaultHttpApiHandler extends AbstractHttpApiHandler {
     private static final Logger log = LoggerFactory.getLogger(DefaultHttpApiHandler.class);

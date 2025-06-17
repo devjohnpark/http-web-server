@@ -2,8 +2,8 @@ package org.dochi.http.api.example;//package org.dochi;
 
 import org.dochi.http.api.AbstractHttpApiHandler;
 import org.dochi.http.data.HttpStatus;
-import org.dochi.external.HttpExternalRequest;
-import org.dochi.external.HttpExternalResponse;
+import org.dochi.http.external.HttpExternalRequest;
+import org.dochi.http.external.HttpExternalResponse;
 import org.dochi.webresource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

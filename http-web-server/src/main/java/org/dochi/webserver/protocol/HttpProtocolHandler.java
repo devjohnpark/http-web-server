@@ -1,9 +1,8 @@
 package org.dochi.webserver.protocol;
 
-import org.dochi.internal.processor.Http11Processor;
-import org.dochi.internal.processor.HttpProcessor;
+import org.dochi.http.internal.processor.Http11Processor;
+import org.dochi.http.internal.processor.HttpProcessor;
 import org.dochi.webserver.config.HttpConfig;
-import org.dochi.webserver.config.HttpProcessorConfig;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
