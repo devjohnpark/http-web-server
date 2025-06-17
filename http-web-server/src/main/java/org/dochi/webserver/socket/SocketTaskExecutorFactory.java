@@ -1,6 +1,7 @@
 package org.dochi.webserver.socket;
 
 import org.dochi.http.api.HttpApiMapper;
+import org.dochi.webserver.protocol.HttpProtocolHandler;
 import org.dochi.webserver.config.*;
 import org.dochi.webserver.executor.WorkerPoolExecutor;
 
@@ -14,30 +15,23 @@ public class SocketTaskExecutorFactory {
     }
 
     public SocketTaskExecutor createExecutor(ServerConfig serverConfig) {
-        HttpConfig httpConfig = createHttpConfig(serverConfig);
         HttpApiMapper httpApiMapper = new HttpApiMapper(serverConfig.getWebService());
         WorkerPoolExecutor workerExecutor = new WorkerPoolExecutor(serverConfig.getThreadPool());
-        SocketTaskPool taskPool = createTaskPool(serverConfig, httpConfig, httpApiMapper);
+        HttpConfig httpConfig = new HttpConfigImpl(serverConfig.getHttpReqAttribute(), serverConfig.getHttpResAttribute());
+        HttpProtocolHandler protocolHandler = new HttpProtocolHandler(httpConfig);
+        SocketTaskPool taskPool = createTaskPool(serverConfig, protocolHandler, httpApiMapper);
         return new SocketTaskExecutor(workerExecutor, taskPool);
-    }
-
-    private HttpConfig createHttpConfig(ServerConfig serverConfig) {
-        return new HttpConfig(
-                new HttpReqConfig(serverConfig.getHttpReqAttribute()),
-                new HttpResConfig(serverConfig.getHttpResAttribute())
-        );
     }
 
     private SocketTaskPool createTaskPool(
             ServerConfig serverConfig,
-            HttpConfig httpConfig,
+            HttpProtocolHandler protocolHandler,
             HttpApiMapper httpApiMapper) {
         return new SocketTaskPool(
                 serverConfig.getThreadPool(),
                 () -> new SocketTaskHandler(
-                        new SocketWrapper(serverConfig.getKeepAlive()),
-                        httpApiMapper,
-                        httpConfig
+                        protocolHandler,
+                        httpApiMapper
                 )
         );
     }

@@ -1,5 +1,6 @@
 package org.dochi.webserver.executor;
 
+import org.dochi.webserver.config.ThreadPoolConfig;
 import org.dochi.webserver.socket.SocketTask;
 import org.dochi.webserver.attribute.ThreadPool;
 import org.slf4j.Logger;
@@ -11,7 +12,7 @@ public class WorkerPoolExecutor {
     private static final Logger log = LoggerFactory.getLogger(WorkerPoolExecutor.class);
     private final ThreadPoolExecutor threadPoolExecutor;
 
-    public WorkerPoolExecutor(ThreadPool threadPool) {
+    public WorkerPoolExecutor(ThreadPoolConfig threadPool) {
         this.threadPoolExecutor = new ThreadPoolExecutor(
             threadPool.getMinSpareThreads(),
             threadPool.getMaxThreads(),
@@ -70,23 +71,10 @@ public class WorkerPoolExecutor {
             future.get(); // 작업 완료까지 대기
             return socketTask;
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Error while executing socket task: {}", e.getMessage(), e);
+            log.error("Error while executing socket task: ", e);
             throw new RuntimeException("Execution failed", e);
         }
     }
-
-    // Synchronous
-//    public Runnable execute(Runnable runnable) {
-//        try {
-//            // get() 메서드가 작업이 완료될 때까지 현재 스레드를 blocking하여 동기로 실행
-//            threadPoolExecutor.submit(runnable).get(); // 작업 완료 대기
-//            return runnable; // 작업 완료 후 SocketTaskHandler 반환
-//        } catch (Exception e) {
-//            log.error("Error while executing runnable: {}", e.getMessage(), e);
-//            throw new RuntimeException("Execution failed", e);
-//        }
-//    }
-
 
     private void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownGracefully));
@@ -98,8 +86,6 @@ public class WorkerPoolExecutor {
     private void shutdownGracefully() {
         log.info("Worker thread pool shutdown has started.");
         try {
-
-
             // 새로운 작업 수락 중지
             threadPoolExecutor.shutdown();
 

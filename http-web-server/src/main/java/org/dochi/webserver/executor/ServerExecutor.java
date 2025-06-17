@@ -1,7 +1,6 @@
 package org.dochi.webserver.executor;
 
 import org.dochi.webserver.attribute.WebServer;
-import org.dochi.webserver.lifecycle.LifecycleException;
 import org.dochi.webserver.lifecycle.ServerLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,32 +13,20 @@ import java.util.concurrent.*;
 
 public class ServerExecutor {
     private static final Logger log = LoggerFactory.getLogger(ServerExecutor.class);
-    private static final Map<Integer, ServerLifecycle> servers = new HashMap<>();
+    private static final Map<WebServer, ServerLifecycle> servers = new HashMap<>();
 
     private ServerExecutor() {}
 
     public static void addWebServer(WebServer webServer) {
-        if (servers.containsKey(webServer.getPort())) {
-            log.error("Web server already exists: {}", webServer.getPort());
-            throw new IllegalArgumentException("Web server has already exists.");
+
+        if (servers.containsKey(webServer)) {
+            log.error("Web server already exists: {}", webServer);
+            throw new IllegalArgumentException("Web server already exists: " + webServer);
         }
-        servers.put(webServer.getPort(), new ServerLifecycle(webServer));
+
+        servers.put(webServer, new ServerLifecycle(webServer));
         // 단일 서버 실행/종료를 위한 cli 대기 스레드 생성 후 put
     }
-
-//    public static void execute() {
-//        List<ServerLifecycle> allWebServers = new ArrayList<>(servers.values());
-//        if (allWebServers.isEmpty()) {
-//            log.error("No web servers found.");
-//            throw new IllegalStateException("No web servers found.");
-//        }
-//        try(ExecutorService executor = Executors.newFixedThreadPool(allWebServers.size())) {
-//            for (ServerLifecycle serverLifecycle : allWebServers) {
-//                executor.submit(serverLifecycle::start);
-//            }
-//            registerShutdownHook(allWebServers);
-//        }
-//    }
 
     public static void execute() {
         List<ServerLifecycle> allWebServers = new ArrayList<>(servers.values());
@@ -54,12 +41,11 @@ public class ServerExecutor {
         // 따라서 ExecutorService의 close() 전체를 고려한다면: 타임아웃되어도 TERMINATED가 되지 않으면 상위 루프가 반복되어 close() 되지 못하는 구조이다.
         try(ExecutorService executor = Executors.newFixedThreadPool(allWebServers.size())) {
             for (ServerLifecycle serverLifecycle : allWebServers) {
-//                executor.submit(serverLifecycle::start);
                 executor.submit(() -> {
                     try {
                         serverLifecycle.start();
                     } catch (Exception e) {
-                        // 서버 인스턴스 하나라도 예외 발생하면 ExecutorService 정료됨 (모든 서버 인스턴스 종료)
+                        // 서버 인스턴스 하나라도 예외 발생하면 ExecutorService 종료됨 (모든 서버 인스턴스 종료)
                         // ThreadPoolExecutor의 내부 클래스 Worker.runWorker()에서 예외 발생시, processWorkerExit()에서 tryTerminate() 호출하여 ExecutorService 종료
                         log.error("Server exit - ServerLifecycle occur exception: ", e);
                     }

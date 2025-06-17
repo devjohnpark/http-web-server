@@ -1,7 +1,6 @@
 package org.dochi.webserver.config;
 
 import org.dochi.webresource.WebResourceProvider;
-import org.dochi.webserver.attribute.WebService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

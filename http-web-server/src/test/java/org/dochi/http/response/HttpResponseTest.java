@@ -1,9 +1,10 @@
 //package org.dochi.http.response;
 //
-//import org.dochi.http.api.Request;
-//import org.dochi.http.request.data.HttpVersion;
-//import org.dochi.http.request.data.MimeHeaders;
+//import org.dochi.connector.handler.Http11ResponseHandler;
+//import org.dochi.http.data.HttpStatus;
+//import org.dochi.http.data.HttpVersion;
 //import org.dochi.webresource.ResourceType;
+//import org.dochi.webserver.attribute.HttpResAttribute;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //
@@ -20,14 +21,15 @@
 //    // add headers -> send -> get data of OutputStream -> check
 //    // OutputStream.toString(): ByteArrayOutputStream 클래스의 메서드로, 스트림에 쓰여진 바이트 데이터를 문자열로 변환하여 반환
 //    private ByteArrayOutputStream outputStream;
-//    private Response response;
+//    private Http11ResponseHandler response;
 //    private Path tempDir;
 //
 //    @BeforeEach
 //    void setUp() {
-//        outputStream = new ByteArrayOutputStream();
-//        response = new Response(outputStream);
-//        response.inActiveDateHeader();
+//        this.outputStream = new ByteArrayOutputStream();
+//        this.response = new Http11ResponseHandler(new HttpResAttribute());
+//        this.response.setOutputBuffer(this.outputStream);
+//        this.response.inActiveDateHeader();
 //    }
 //
 //    @Test

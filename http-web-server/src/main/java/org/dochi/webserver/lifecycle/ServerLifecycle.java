@@ -30,7 +30,8 @@ public class ServerLifecycle extends LifecycleBase {
             connector.connect(
                     SocketTaskExecutorFactory.getInstance().createExecutor(webServer.getConfig()),
                     webServer.getHostName(),
-                    webServer.getPort()
+                    webServer.getPort(),
+                    webServer.getConfig()
             );
         } catch (IOException e) {
             logAcceptError(webServer, e);
