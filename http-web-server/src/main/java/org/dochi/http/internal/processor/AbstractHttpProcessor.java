@@ -59,7 +59,7 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
 
     protected abstract SocketState service(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) throws IOException;
 
-    protected abstract boolean shouldPersistentConnection(SocketWrapperBase<?> socketWrapper);
+    protected abstract boolean shouldKeepAlive(SocketWrapperBase<?> socketWrapper);
 
     // Because the developer has the option to handle RuntimeException, RuntimeException propagated by not catching it is considered to be an invalid request from the client and a 400 response is sent.
     // Unexpected IOException on input/output, 500 response because Exception is a server problem.

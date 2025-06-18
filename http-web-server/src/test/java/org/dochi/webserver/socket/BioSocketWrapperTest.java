@@ -51,7 +51,7 @@ public class BioSocketWrapperTest extends BioSocketWrapperConnectionTest {
     @Test
     void startConnectionTimeout_after_close() throws IOException, InterruptedException {
         serverConnectedSocket.close();
-        assertThrows(SocketException.class, () -> serverConnectedSocket.setConnectionTimeout(serverConnectedSocket.getKeepAliveTimeout()));
+        assertThrows(SocketException.class, () -> serverConnectedSocket.setConnectionTimeout(serverConnectedSocket.getConfigKeepAliveTimeout()));
     }
 
     @Test

@@ -23,8 +23,8 @@ public class SocketTaskHandler implements SocketTask {
         try {
             SocketState state = SocketState.OPEN;
             HttpProcessor processor;
-            getSocketWrapper().setConnectionTimeout(socketWrapper.getConnectionTimeout());
-            while (state == SocketState.OPEN) { // state == SocketState.OPEN
+            getSocketWrapper().setConnectionTimeout(socketWrapper.getConfigConnectionTimeout());
+            while (state == SocketState.OPEN) {
                 processor = this.protocolHandler.getProcessor();
                 state = processor.process(socketWrapper, apiMapper);
                 if (state == SocketState.CLOSED) {

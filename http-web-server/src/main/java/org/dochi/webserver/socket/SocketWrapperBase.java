@@ -39,9 +39,9 @@ public abstract class SocketWrapperBase<E> {
 
     public int getKeepAliveCount() { return keepAliveCount; }
 
-    public int getKeepAliveTimeout() { return config.getKeepAliveTimeout(); }
+    public int getConfigKeepAliveTimeout() { return config.getKeepAliveTimeout(); }
 
-    public int getMaxKeepAliveRequests() { return config.getMaxKeepAliveRequests(); }
+    public int getConfigMaxKeepAliveRequests() { return config.getMaxKeepAliveRequests(); }
 
-    public int getConnectionTimeout() { return config.getConnectionTimeout(); }
+    public int getConfigConnectionTimeout() { return config.getConnectionTimeout(); }
 }

@@ -34,22 +34,21 @@ public class Http11Processor extends AbstractHttpProcessor {
         super.recycleHandler();
     }
 
-    protected boolean shouldPersistentConnection(SocketWrapperBase<?> socketWrapper) {
+    protected boolean shouldKeepAlive(SocketWrapperBase<?> socketWrapper) {
         return isRequestKeepAlive() && isSeverKeepAlive(socketWrapper);
     }
 
     private boolean shouldNext(SocketWrapperBase<?> socketWrapper) throws IOException {
-        boolean isKeepAlive = shouldPersistentConnection(socketWrapper);
+        boolean isKeepAlive = shouldKeepAlive(socketWrapper);
         responseHandler.addConnection(isKeepAlive);
         if (isKeepAlive) {
-            responseHandler.addKeepAlive(socketWrapper.getKeepAliveTimeout(), socketWrapper.getMaxKeepAliveRequests());
-            socketWrapper.setConnectionTimeout(socketWrapper.getKeepAliveTimeout()); // reset timeout
+            responseHandler.addKeepAlive(socketWrapper.getConfigKeepAliveTimeout(), socketWrapper.getConfigMaxKeepAliveRequests());
         }
         return isKeepAlive;
     }
 
     private boolean isSeverKeepAlive(SocketWrapperBase<?> socketWrapper) {
-        return !isReachedMax(socketWrapper.incrementKeepAliveCount(), socketWrapper.getMaxKeepAliveRequests());
+        return !isReachedMax(socketWrapper.incrementKeepAliveCount(), socketWrapper.getConfigMaxKeepAliveRequests());
     }
 
     private static boolean isReachedMax(int currentCount, int maxCount) {
@@ -72,11 +71,9 @@ public class Http11Processor extends AbstractHttpProcessor {
 
     protected SocketState service(SocketWrapperBase<?> socketWrapper, HttpApiMapper httpApiMapper) throws IOException {
         SocketState state = OPEN;
-        int processCount = 0;
         while (state == OPEN) {
             if (!inputBuffer.parseHeader(requestHandler.getRequest())) {
-                state = CLOSED;
-                break;
+                return CLOSED;
             } else if (isUpgradeRequest(socketWrapper)) {
                 // Current ignore HTTP/1.1 upgrade request, processing as HTTP/1.1 (Later support HTTP/2.0)
                 state = UPGRADING;
@@ -94,13 +91,17 @@ public class Http11Processor extends AbstractHttpProcessor {
             // 1. Rapping flush method by custom OutputStream.
             // 2. The custom OutputStream declares boolean-isFlushed variable.
             // 3. If call rapped flush method, According to isFlushed value(true/false), flush() to be called or not.
-            processCount++;
             recycle();
+            resetKeepAliveTimeout(socketWrapper, state);
         }
-        log.debug("Processed requests count: {}", processCount);
         return state;
     }
 
+    private static void resetKeepAliveTimeout(SocketWrapperBase<?> socketWrapper, SocketState state) throws IOException {
+        if (state == OPEN) {
+            socketWrapper.setConnectionTimeout(socketWrapper.getConfigKeepAliveTimeout());
+        }
+    }
 
     private boolean isUpgradeRequest(SocketWrapperBase<?> socketWrapper) {
         return requestHandler.getHeader("upgrade") != null;
