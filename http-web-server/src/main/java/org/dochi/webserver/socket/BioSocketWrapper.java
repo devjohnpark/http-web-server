@@ -1,6 +1,6 @@
 package org.dochi.webserver.socket;
 
-import org.dochi.webserver.attribute.KeepAlive;
+import org.dochi.webserver.attribute.SocketAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +11,7 @@ import java.net.SocketException;
 public class BioSocketWrapper extends SocketWrapperBase<Socket> {
     private static final Logger log = LoggerFactory.getLogger(BioSocketWrapper.class);
 
-    public BioSocketWrapper(Socket socket, KeepAlive config) throws SocketException {
+    public BioSocketWrapper(Socket socket, SocketAttribute config) throws SocketException {
         super(socket, config);
     }
 
@@ -48,7 +48,7 @@ public class BioSocketWrapper extends SocketWrapperBase<Socket> {
     public boolean isClosed() { return socket.isClosed(); }
 
     @Override
-    public void startConnectionTimeout(int connectionTimeout) throws SocketException {
+    public void setConnectionTimeout(int connectionTimeout) throws SocketException {
         socket.setSoTimeout(connectionTimeout);
         log.debug("Start connection timeout: {} [Client IP: {}]", connectionTimeout, socket.getInetAddress());
     }

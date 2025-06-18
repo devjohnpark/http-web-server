@@ -51,13 +51,13 @@ public class BioSocketWrapperTest extends BioSocketWrapperConnectionTest {
     @Test
     void startConnectionTimeout_after_close() throws IOException, InterruptedException {
         serverConnectedSocket.close();
-        assertThrows(SocketException.class, () -> serverConnectedSocket.startConnectionTimeout(serverConnectedSocket.getKeepAliveTimeout()));
+        assertThrows(SocketException.class, () -> serverConnectedSocket.setConnectionTimeout(serverConnectedSocket.getKeepAliveTimeout()));
     }
 
     @Test
     void startConnectionTimeout_socketTimeout() throws IOException, InterruptedException {
         int connectionTimeout = 1000;
-        serverConnectedSocket.startConnectionTimeout(connectionTimeout);
+        serverConnectedSocket.setConnectionTimeout(connectionTimeout);
         Thread readThread = new Thread(() -> {
             // SocketTimeoutException은 read가 blocking 상태일때 발생, 따라서 서버의 연결 소켓 read() 후에 connection timeout 시간이 지난뒤 클랑이언트 연결 소켓 write()
             assertThrows(SocketTimeoutException.class, () -> serverConnectedSocket.read(serverBuffer, 0, serverBuffer.length));
