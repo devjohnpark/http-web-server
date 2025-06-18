@@ -3,7 +3,7 @@ package org.dochi.webserver.config;
 import org.dochi.webserver.attribute.*;
 
 public class ServerConfig {
-    private final KeepAlive keepAlive = new KeepAlive();
+    private final SocketAttribute keepAlive = new SocketAttribute();
     private final WebService webService = new WebService();
     private final ThreadPool threadPool = new ThreadPool();
     private final HttpReqAttribute httpReqAttribute = new HttpReqAttribute();
@@ -11,7 +11,7 @@ public class ServerConfig {
 
     public WebService getWebService() { return webService; }
 
-    public KeepAlive getKeepAlive() { return keepAlive; }
+    public SocketAttribute getKeepAlive() { return keepAlive; }
 
     public ThreadPool getThreadPool() { return threadPool; }
 

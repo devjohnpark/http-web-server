@@ -1,6 +1,6 @@
 package org.dochi.webserver.config;
 
-import org.dochi.webserver.attribute.KeepAlive;
+import org.dochi.webserver.attribute.SocketAttribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class KeepAliveTest {
 
-    private KeepAlive keepAlive;
+    private SocketAttribute keepAlive;
 
     @BeforeEach
     void setUp() {
-        keepAlive = new KeepAlive();
+        keepAlive = new SocketAttribute();
     }
 
     @Test

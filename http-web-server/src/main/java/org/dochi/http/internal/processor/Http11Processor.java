@@ -38,11 +38,12 @@ public class Http11Processor extends AbstractHttpProcessor {
         return isRequestKeepAlive() && isSeverKeepAlive(socketWrapper);
     }
 
-    private boolean shouldNext(SocketWrapperBase<?> socketWrapper) {
+    private boolean shouldNext(SocketWrapperBase<?> socketWrapper) throws IOException {
         boolean isKeepAlive = shouldPersistentConnection(socketWrapper);
         responseHandler.addConnection(isKeepAlive);
         if (isKeepAlive) {
             responseHandler.addKeepAlive(socketWrapper.getKeepAliveTimeout(), socketWrapper.getMaxKeepAliveRequests());
+            socketWrapper.setConnectionTimeout(socketWrapper.getKeepAliveTimeout()); // reset timeout
         }
         return isKeepAlive;
     }

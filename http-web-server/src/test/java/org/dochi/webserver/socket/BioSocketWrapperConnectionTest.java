@@ -1,6 +1,6 @@
 package org.dochi.webserver.socket;
 
-import org.dochi.webserver.attribute.KeepAlive;
+import org.dochi.webserver.attribute.SocketAttribute;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -28,8 +28,8 @@ public class BioSocketWrapperConnectionTest {
             log.debug("Start accept thread...");
             if (!serverSocket.isClosed()) {
                 try {
-                    serverConnectedSocket = new BioSocketWrapper(serverSocket.accept(), new KeepAlive());
-                    serverConnectedSocket.startConnectionTimeout(1000);
+                    serverConnectedSocket = new BioSocketWrapper(serverSocket.accept(), new SocketAttribute());
+                    serverConnectedSocket.setConnectionTimeout(1000);
                     log.debug("created server's connection socket");
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -41,7 +41,7 @@ public class BioSocketWrapperConnectionTest {
 
         serverThread.start();
 
-        clientConnectedSocket = new BioSocketWrapper(new Socket("localhost", serverSocket.getLocalPort()), new KeepAlive());
+        clientConnectedSocket = new BioSocketWrapper(new Socket("localhost", serverSocket.getLocalPort()), new SocketAttribute());
 
         log.debug("Created client's connection socket");
 
