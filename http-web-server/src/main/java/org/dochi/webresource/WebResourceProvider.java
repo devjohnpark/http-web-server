@@ -22,14 +22,14 @@ public class WebResourceProvider implements ResourceProvider {
     private static final Logger log = LoggerFactory.getLogger(WebResourceProvider.class);
     private static final String DEFAULT_PAGE = "index.html";
     private final Path rootDirPath;
-    private final FileSystem jarFileSystem;
+//    private final FileSystem jarFileSystem;
     private final boolean isJar;
 
     // 1. AbstractApiHandler is singleton class
     // 2. Worker threads can access AbstractApiHandler's child object
     // 3. Worker threads can access WebResourceProvider's isClosed instance variable
     // 4. So, it needs prevention synchronization issue
-    private final AtomicBoolean isJarFileSystemClosed = new AtomicBoolean(false);
+//    private final AtomicBoolean isJarFileSystemClosed = new AtomicBoolean(false);
 
     public WebResourceProvider(Path rootDirPath) {
         /*
@@ -41,9 +41,9 @@ public class WebResourceProvider implements ResourceProvider {
 
         URL url = getClassLocation();
         this.isJar = isJar(url);
-        this.jarFileSystem = createJarFileSystem(url);
+//        this.jarFileSystem = createJarFileSystem(url);
         this.rootDirPath = validWebRootDirectory(rootDirPath, url);
-        log.debug("WebResourceProvider is created");
+        log.debug("WebResourceProvider is created");g
     }
 
     @Override
@@ -53,21 +53,21 @@ public class WebResourceProvider implements ResourceProvider {
         return getResourceInternal(rootDirPath.resolve(normalizeFilePath(validateResourcePath(resourcePath))));
     }
 
-    @Override
-    public SplitFileResource getSplitResource(String resourcePath) {
-        return doGetSplitResource(getResourceFileSystemPath(resourcePath));
-    }
+//    @Override
+//    public SplitFileResource getSplitResource(String resourcePath) {
+//        return doGetSplitResource(getResourceFileSystemPath(resourcePath));
+//    }
 
     @Override
     public void close() {
-        if (this.jarFileSystem != null && this.isJarFileSystemClosed.compareAndSet(false, true)) {
-            try {
-                this.jarFileSystem.close();
-                log.debug("WebResourceProvider is Closed");
-            } catch (IOException e) {
-                log.error("Failed to close jar file system", e);
-            }
-        }
+//        if (this.jarFileSystem != null && this.isJarFileSystemClosed.compareAndSet(false, true)) {
+//            try {
+//                this.jarFileSystem.close();
+//                log.debug("WebResourceProvider is Closed");
+//            } catch (IOException e) {
+//                log.error("Failed to close jar file system", e);
+//            }
+//        }
     }
 
     private boolean isValidatedWebappDirectory(Path rootDirPath) {
@@ -162,38 +162,38 @@ public class WebResourceProvider implements ResourceProvider {
         return null;
     }
 
-    private SplitFileResource doGetSplitResource(Path resourcePath) {
-        try {
-            InputStream in = getInputStream(resourcePath);
-            if (in != null) {
-                // File system API를 사용해서 파일 사이즈 가져오기
-                return new SplitFileResource(in, Files.size(resourcePath), ResourceType.fromFilePath(resourcePath).getMimeType());
-            }
-        } catch (IOException e) {
-            log.error("Failed to find resource, path: {}, exception: {}", resourcePath, e.getMessage());
-        }
-        return new SplitFileResource();
-    }
+//    private SplitFileResource doGetSplitResource(Path resourcePath) {
+//        try {
+//            InputStream in = getInputStream(resourcePath);
+//            if (in != null) {
+//                // File system API를 사용해서 파일 사이즈 가져오기
+//                return new SplitFileResource(in, Files.size(resourcePath), ResourceType.fromFilePath(resourcePath).getMimeType());
+//            }
+//        } catch (IOException e) {
+//            log.error("Failed to find resource, path: {}, exception: {}", resourcePath, e.getMessage());
+//        }
+//        return new SplitFileResource();
+//    }
 
-    private Path getResourceFileSystemPath(String resourcePath) {
-        Path path = rootDirPath.resolve(normalizeFilePath(validateResourcePath(resourcePath)));
-        if (jarFileSystem != null) {
-            // jarFileSystem.getPath("webapp/index.html") → jar:file:/.../app.jar!/webapp/index.html
-            return jarFileSystem.getPath(path.toString());
-        }
-        return path;
-    }
-
-    // 각 파일마다 하나의 입력 스트림을 생성하는 것이 효율적이지 안나?
-    // 장점: 메모리 자원 적게 씀, 입력 스트림 생성시간 단축
-    // 단점: 동시에 여러 클라이언트가 InputStream으로 읽으면 blocking 발생해서 읽기 지연 -> 응답 지연
-    // 결론: 성능이 중요한 웹서버는 메모리를 더 쓰러라도 처리 속도가 중요하므로 클라이언트간에 동일한 입력스트림을 공유하지 않는다.
-    private InputStream getInputStream(Path resourcePath) throws IOException {
-        if (jarFileSystem != null) {
-            return WebResourceProvider.class.getClassLoader().getResourceAsStream(resourcePath.toString());
-        }
-        return Files.exists(resourcePath) ? Files.newInputStream(resourcePath) : null;
-    }
+//    private Path getResourceFileSystemPath(String resourcePath) {
+//        Path path = rootDirPath.resolve(normalizeFilePath(validateResourcePath(resourcePath)));
+//        if (jarFileSystem != null) {
+//            // jarFileSystem.getPath("webapp/index.html") → jar:file:/.../app.jar!/webapp/index.html
+//            return jarFileSystem.getPath(path.toString());
+//        }
+//        return path;
+//    }
+//
+//    // 각 파일마다 하나의 입력 스트림을 생성하는 것이 효율적이지 안나?
+//    // 장점: 메모리 자원 적게 씀, 입력 스트림 생성시간 단축
+//    // 단점: 동시에 여러 클라이언트가 InputStream으로 읽으면 blocking 발생해서 읽기 지연 -> 응답 지연
+//    // 결론: 성능이 중요한 웹서버는 메모리를 더 쓰러라도 처리 속도가 중요하므로 클라이언트간에 동일한 입력스트림을 공유하지 않는다.
+//    private InputStream getInputStream(Path resourcePath) throws IOException {
+//        if (jarFileSystem != null) {
+//            return WebResourceProvider.class.getClassLoader().getResourceAsStream(resourcePath.toString());
+//        }
+//        return Files.exists(resourcePath) ? Files.newInputStream(resourcePath) : null;
+//    }
 
     private String validateResourcePath(String resourcePath) {
         if (resourcePath == null) {

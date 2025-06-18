@@ -5,6 +5,6 @@ import java.nio.file.Path;
 
 public interface ResourceProvider {
     Resource getResource(String resourcePath);
-    SplitFileResource getSplitResource(String resourcePath);
+//    SplitFileResource getSplitResource(String resourcePath);
     void close();
 }
