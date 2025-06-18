@@ -97,7 +97,7 @@ public class Http11Processor extends AbstractHttpProcessor {
         return state;
     }
 
-    private static void resetKeepAliveTimeout(SocketWrapperBase<?> socketWrapper, SocketState state) throws IOException {
+    private void resetKeepAliveTimeout(SocketWrapperBase<?> socketWrapper, SocketState state) throws IOException {
         if (state == OPEN) {
             socketWrapper.setConnectionTimeout(socketWrapper.getConfigKeepAliveTimeout());
         }
