@@ -38,7 +38,7 @@ public class Http11Processor extends AbstractHttpProcessor {
         return isRequestKeepAlive() && isSeverKeepAlive(socketWrapper);
     }
 
-    private boolean shouldNext(SocketWrapperBase<?> socketWrapper) throws IOException {
+    private boolean shouldNext(SocketWrapperBase<?> socketWrapper) {
         boolean isKeepAlive = shouldKeepAlive(socketWrapper);
         responseHandler.addConnection(isKeepAlive);
         if (isKeepAlive) {
@@ -51,7 +51,7 @@ public class Http11Processor extends AbstractHttpProcessor {
         return !isReachedMax(socketWrapper.incrementKeepAliveCount(), socketWrapper.getConfigMaxKeepAliveRequests());
     }
 
-    private static boolean isReachedMax(int currentCount, int maxCount) {
+    private boolean isReachedMax(int currentCount, int maxCount) {
         return currentCount >= maxCount;
     }
 

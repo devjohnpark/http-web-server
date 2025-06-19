@@ -31,7 +31,7 @@ public class BioSocketWrapper extends SocketWrapperBase<Socket> {
     public void close() throws IOException {
         if (!socket.isClosed()) {
             socket.close();
-            log.debug("Socket closed [Client: {}, Port: {}]",
+            log.info("Socket closed [Client: {}, Port: {}]",
                     socket.getInetAddress(), socket.getPort());
         }
     }
