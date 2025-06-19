@@ -2,17 +2,39 @@
 ---
 ## VERSION
 
-- 0.0.0 
-	- HTTP request data processing.
-	- HTTP response data processing.
-	- HTTP API processing.
+- **0.0.0: Initial WAS Implementation**
+    - Process HTTP/1.1 Request Messages
+    - Process HTTP/1.1 Response Messages
+    - Handle HTTP API Requests
+    - Serve Web Resource Files (HTML, CSS, JS, Images)
+
 - 0.0.1
-	- Support virtual servers by port and domain by.
+    - Support Virtual Servers by Port
+
 - 0.0.2
-	- Support keep alive feature in HTTP/1.0 and HTTP/1.1
-	- Improving exception handling
-	- Non-synchronized Buffer I/O Stream for improved I/O speed (allocating a thread to process each request)
+    - Introduce Worker Thread Pool and Socket Operation Object Pool for Efficient HTTP Request Handling
+    - Manage Lifecycle of Web Server Instances and Web Service Endpoints
+    - Parse HTML Form Data
+        - `application/x-www-form-urlencoded`
+        - `multipart/form-data`
+    - Handle HTTP Status Errors (400, 404, 500, etc.)
+
+- 0.0.3
+    - Enable Internal Resource Loading via ClassLoader for Single JAR Deployment
+
+- **0.1.0: HTTP/1.1 Keep-Alive (Persistent Connection)**
+    - Refactor Internals to Support Persistent Connections and Reuse Objects
+    - Support HTTP/1.1 Keep-Alive with Configurable Timeout and Max Request Count
+
+- **0.2.0: Protocol Decoupling & Performance Optimization**
+    - Resolve protocol dependency by separating low-level and high-level processing into a two-layer architecture
+    - Improve GC Performance by Buffering Headers and Parsing Necessary Fields
+    - Leverage Cache Locality with LIFO-based Object Pool
+    - Enhance Socket Extensibility with `SocketWrapperBase<E>` for Future NIO
+    - Support Virtual Servers by Port and Domain
+
 ---
+
 ## How to use
 
 #### Single web server
@@ -28,20 +50,15 @@ public class WebServerLauncher {
 
 #### Virtual web servers 
 ```java
-package org.dochi.webserver;  
-  
-import org.dochi.http.api.LoginHttpApiHandler;  
-  
 public class WebServerLauncher {  
-    public static void main(String[] args) {  
-        WebServer server1 = new WebServer(8080, "localhost");  
-        server1.getWebService().addService("/user/create", new LoginHttpApiHandler());  
-  
-        WebServer server2 = new WebServer(7070, "example.com");  
-  
-        Executor.addWebServer(server1);  
-        Executor.addWebServer(server2);  
-        Executor.execute();  
-    }  
-}
+    public static void main(String[] args) throws IOException {  
+        WebServer localServer = new WebServer(8080, "localhost");  
+        WebServer remoteServer = new WebServer(8080, "0.0.0.0");  
+        remoteServer.getConfig().getWebService().addService("/user/create", new LoginHttpApiHandler())  
+                                           .addService("/upload", new UploadFileHttpApiHandler());  
+        ServerExecutor.addWebServer(localServer);  
+        ServerExecutor.addWebServer(remoteServer);  
+        ServerExecutor.execute();  
+    }
+}       
 ```
