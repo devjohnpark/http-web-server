@@ -43,7 +43,7 @@ public class WebResourceProvider implements ResourceProvider {
         this.isJar = isJar(url);
 //        this.jarFileSystem = createJarFileSystem(url);
         this.rootDirPath = validWebRootDirectory(rootDirPath, url);
-        log.debug("WebResourceProvider is created");g
+        log.debug("WebResourceProvider is created");
     }
 
     @Override
