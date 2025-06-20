@@ -49,6 +49,6 @@ public class ServerLifecycle extends LifecycleBase {
     }
 
     private void logAcceptError(WebServer webServer, IOException e) {
-        log.error("Server socket accept error: {} [Host: {}, Port: {}]", webServer.getHostName(), webServer.getPort(), e.getMessage());
+        log.error("Server socket accept error: {} [Host: {}, Port: {}]", e, webServer.getHostName(), webServer.getPort());
     }
 }
