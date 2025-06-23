@@ -33,8 +33,8 @@
 <!--        </layout>-->
 <!--    </appender>-->
 
-<!--    <root level="INFO">-->
-    <root level="OFF">
+    <root level="DEBUG">
+<!--    <root level="OFF">-->
 <!--        <appender-ref ref="STDOUT"/>-->
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE" />

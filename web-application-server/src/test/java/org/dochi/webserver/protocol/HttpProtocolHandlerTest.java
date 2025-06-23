@@ -21,7 +21,7 @@ class HttpProtocolHandlerTest {
     @Test
     void getProcessor() {
         HttpProcessor processor = protocolHandler.getProcessor();
-        assertEquals(0, protocolHandler.getSize());
+        assertEquals(0, protocolHandler.getSize("HTTP/1.1"));
     }
 
     @Test
@@ -30,11 +30,11 @@ class HttpProtocolHandlerTest {
         protocolHandler.release(processor); // 1
         processor = protocolHandler.getProcessor(); // 0
         protocolHandler.release(processor); // 1
-        assertEquals(1, protocolHandler.getSize());
+        assertEquals(1, protocolHandler.getSize("HTTP/1.1"));
     }
 
     @Test
     void getSize() {
-        assertEquals(protocolHandler.getSize(), 0);
+        assertEquals(protocolHandler.getSize("HTTP/1.1"), 0);
     }
 }
