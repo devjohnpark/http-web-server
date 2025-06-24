@@ -47,31 +47,6 @@ public class ResponseHeaders {
         return headers;
     }
 
-    public void addConnection(boolean isKeepAlive) {
-        addHeader(CONNECTION, isKeepAlive ? "keep-alive" : "close");
-    }
-
-    public void addKeepAlive(int timeout, int maxRequests) {
-        if (timeout <= 0 && maxRequests <= 0) {
-            return;
-        }
-
-        StringBuilder keepAlive = new StringBuilder();
-
-        if (timeout > 0) {
-            keepAlive.append("timeout=").append(timeout / 1000);
-        }
-
-        if (maxRequests > 0) {
-            if (!keepAlive.isEmpty()) {
-                keepAlive.append(", ");
-            }
-            keepAlive.append("max=").append(maxRequests);
-        }
-
-        addHeader(KEEP_ALIVE, keepAlive.toString());
-    }
-
     public void clear() {
         if (headers.isEmpty()) {
             return;

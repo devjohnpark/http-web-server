@@ -10,9 +10,7 @@ public interface HttpExternalResponse {
 
     HttpExternalResponse addCookie(String cookie);
 
-    HttpExternalResponse addConnection(boolean isKeepAlive);
-
-    HttpExternalResponse addKeepAlive(int timeout, int maxRequests);
+    HttpExternalResponse addConnection(boolean isKeep);
 
     HttpExternalResponse addDateHeaders(String date);
 

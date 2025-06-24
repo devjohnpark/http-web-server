@@ -61,13 +61,8 @@ public class Http11ResponseHandler implements ResponseHandler {
         return this;
     }
 
-    public HttpExternalResponse addConnection(boolean isKeepAlive) {
-        this.headers.addConnection(isKeepAlive);
-        return this;
-    }
-
-    public HttpExternalResponse addKeepAlive(int timeout, int maxRequests) {
-        this.headers.addKeepAlive(timeout, maxRequests);
+    public HttpExternalResponse addConnection(boolean isKeep) {
+        this.headers.addHeader(ResponseHeaders.CONNECTION, isKeep ? "keep-alive" : "close");
         return this;
     }
 
@@ -129,7 +124,6 @@ public class Http11ResponseHandler implements ResponseHandler {
         if (errorMessage == null) {
             errorMessage = status.getDescription();
         }
-        headers.addConnection(false);
         send(status, errorMessage.getBytes(), ResourceType.TEXT.getContentType(null));
     }
 

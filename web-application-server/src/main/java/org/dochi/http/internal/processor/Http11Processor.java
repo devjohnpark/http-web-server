@@ -1,5 +1,6 @@
 package org.dochi.http.internal.processor;
 
+import org.dochi.http.data.ResponseHeaders;
 import org.dochi.http.internal.http11.Http11InputBuffer;
 import org.dochi.http.api.HttpApiMapper;
 import org.dochi.http.connector.TmpBufferedOutputStream;
@@ -42,7 +43,22 @@ public class Http11Processor extends AbstractHttpProcessor {
         boolean isKeepAlive = shouldKeepAlive(socketWrapper);
         responseHandler.addConnection(isKeepAlive);
         if (isKeepAlive) {
-            responseHandler.addKeepAlive(socketWrapper.getConfigKeepAliveTimeout(), socketWrapper.getConfigMaxKeepAliveRequests());
+            int timeout = socketWrapper.getConfigKeepAliveTimeout();
+            int maxRequests = socketWrapper.getConfigMaxKeepAliveRequests();
+
+            StringBuilder keepAlive = new StringBuilder();
+
+            if (timeout > 0) {
+                keepAlive.append("timeout=").append(timeout / 1000);
+            }
+
+            if (maxRequests > 0) {
+                if (!keepAlive.isEmpty()) {
+                    keepAlive.append(", ");
+                }
+                keepAlive.append("max=").append(maxRequests);
+            }
+            responseHandler.addHeader(ResponseHeaders.KEEP_ALIVE, keepAlive.toString());
         }
         return isKeepAlive;
     }
@@ -73,6 +89,7 @@ public class Http11Processor extends AbstractHttpProcessor {
         SocketState state = OPEN;
         while (state == OPEN) {
             if (!inputBuffer.parseHeader(requestHandler.getRequest())) {
+                // request line null -> false -> disconnection
                 return CLOSED;
             } else if (isUpgradeRequest(socketWrapper)) {
                 // Current ignore HTTP/1.1 upgrade request, processing as HTTP/1.1 (Later support HTTP/2.0)
@@ -107,8 +124,7 @@ public class Http11Processor extends AbstractHttpProcessor {
         return requestHandler.getHeader("upgrade") != null;
     }
 
-
-//    private void sendUpgrade() {
+    //    private void sendUpgrade() {
 //
 //    }
 }

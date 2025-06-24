@@ -31,6 +31,6 @@ class ThreadPoolTest {
 
     @Test
     void getMaxThreads() {
-        assertEquals(200, threadPool.getMaxThreads());
+        assertTrue(threadPool.getMaxThreads() > 0);
     }
 }

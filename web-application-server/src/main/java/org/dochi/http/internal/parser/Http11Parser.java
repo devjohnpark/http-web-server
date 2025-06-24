@@ -79,7 +79,7 @@ public class Http11Parser {
         HeaderParseStatus status;
         do {
             status = parseHeaderField(request);
-        } while (status == HeaderParseStatus.NEED_MORE); // DONE, EOF
+        } while (status == HeaderParseStatus.NEED_MORE);
         return status == HeaderParseStatus.DONE && request.headers().size() > 0;
     }
 

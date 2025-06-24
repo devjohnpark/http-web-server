@@ -67,7 +67,7 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
         switch (e) {
             case SocketTimeoutException socketTimeoutException -> {
 //                SocketTimeoutException exception thrown when valid time expires while being blocked by read() method of SocketInputStream object (write() is not related to setSoTimeout)
-                log.error("Socket read timeout occurred: ", e);
+                sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage());
             }
             case SocketException socketException -> {
                 // reference: NioSocketImpl.implRead()
@@ -91,6 +91,7 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     private void sendError(HttpStatus status, String errorMessage) {
         log.error("HTTP status: {} {}, Reason: {}", String.valueOf(status.getCode()), status.getMessage(), errorMessage);
         try {
+            responseHandler.addConnection(false);
             if (status.getCode() >= 500) {
                 responseHandler.sendError(status, status.getMessage());
             } else if (status.getCode() >= 400) {
