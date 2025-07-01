@@ -66,7 +66,7 @@ public abstract class AbstractHttpProcessor implements HttpProcessor {
     private void processException(Exception e) {
         switch (e) {
             case SocketTimeoutException socketTimeoutException -> {
-//                SocketTimeoutException exception thrown when valid time expires while being blocked by read() method of SocketInputStream object (write() is not related to setSoTimeout)
+//                SocketTimeoutException exception thrown when valid time expires while being blocked by`ㅎ read() method of SocketInputStream object (write() is not related to setSoTimeout)
                 sendError(HttpStatus.REQUEST_TIMEOUT, e.getMessage());
             }
             case SocketException socketException -> {

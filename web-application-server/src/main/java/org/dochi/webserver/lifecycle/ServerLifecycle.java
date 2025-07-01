@@ -48,7 +48,8 @@ public class ServerLifecycle extends LifecycleBase {
         log.info("Web server started [Host: {}, Port: {}]", webServer.getHostName(), webServer.getPort());
     }
 
+    // String "Too many open files" from c library with SocketException
     private void logAcceptError(WebServer webServer, IOException e) {
-        log.error("Server socket accept error: {} [Host: {}, Port: {}]", e, webServer.getHostName(), webServer.getPort());
+        log.error("Server socket accept error: {} [Host: {}, Port: {}]: ", e, webServer.getHostName(), webServer.getPort(), e);
     }
 }
