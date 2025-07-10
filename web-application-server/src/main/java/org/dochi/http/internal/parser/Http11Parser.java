@@ -127,6 +127,7 @@ public class Http11Parser {
         EOF;
     }
 
+    // HeaderDataSource 인터페이스를 HttpHeaderParser 내에 정의하여, HeaderDataSource 구현체가 HttpHeaderParser에서만 사용하는것을 의미
     public interface HeaderDataSource {
 
         boolean fillHeaderBuffer() throws IOException;

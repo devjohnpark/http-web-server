@@ -50,15 +50,15 @@ public class WebServerLauncher {
 
 #### Virtual web servers 
 ```java
-public class WebServerLauncher {  
-    public static void main(String[] args) throws IOException {  
-        WebServer localServer = new WebServer(8080, "localhost");  
-        WebServer remoteServer = new WebServer(8080, "0.0.0.0");  
-        remoteServer.getConfig().getWebService().addService("/user/create", new LoginHttpApiHandler())  
-                                           .addService("/upload", new UploadFileHttpApiHandler());  
-        ServerExecutor.addWebServer(localServer);  
-        ServerExecutor.addWebServer(remoteServer);  
-        ServerExecutor.execute();  
+public class WebServerLauncher {
+    public static void main(String[] args) throws IOException {
+        WebServer localServer = new WebServer(8080, "localhost");
+        WebServer remoteServer = new WebServer(80, "0.0.0.0");
+        remoteServer.getConfig().getWebService().addService("/user/create", new LoginHttpApiHandler())
+                                           .addService("/upload", new UploadFileHttpApiHandler());
+        ServerExecutor.addWebServer(localServer);
+        ServerExecutor.addWebServer(remoteServer);
+        ServerExecutor.execute();
     }
-}       
+}  
 ```
